@@ -48,8 +48,8 @@ int main(){
 
     AtmosphereCalc(CI, &engine, &Pmax_h, &press0, &temp0, &rho0, &vsuono0, &press_h, &temp_h, &rho_h, &vsuono_h, &flagatm);
 
-    equation(5.0, 1.1116, &CI, &body_axes, &aer_der_x, &aer_der_y, &aer_der_z, &steady_state_coeff, &control_force_der, 
-        &control_moment_der, &rotary_der);
+    equation(5.0, 1.1116, CI, body_axes, aer_der_x, aer_der_y, aer_der_z, steady_state_coeff, control_force_der, 
+        control_moment_der, rotary_der);
     /*do {
         // inizializzazione - Equazioni della dinamica
 
