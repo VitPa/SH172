@@ -1,6 +1,6 @@
 # Legenda per le variabili utilizzate nel simulatore
 
-## ENGINE
+## ENGINE - [engine]
 
 | Indice | Descrizione                                          | Unità     |
 |--------|------------------------------------------------------|-----------|
@@ -13,7 +13,7 @@
 
 
 ## PROPELLER
-### geometry_propeller
+### [geometry_propeller]
 
 | Indice | Descrizione          | Unità     |
 |--------|----------------------|-----------|
@@ -24,7 +24,7 @@
 | 4      | Numero di stazioni   | [-]       |
 
 
-### propeller_profile
+### [propeller_profile]
 
 | Indice | Descrizione   | Unità       |
 |--------|----------------|-------------|
@@ -35,7 +35,7 @@
 | 4      | Cdalfa         | [rad⁻¹]     |
 | 5      | Cd0            | [-]         |
 
-### data_propeller
+### [data_propeller]
 
 | Indice | Descrizione  | Unità    |
 |--------|--------------|----------|
@@ -45,7 +45,7 @@
 | x,3    | BA           | [deg]    |
 
 ## DBA
-### body_axes
+### [body_axes]
 
 | Indice | Descrizione                                                                  | Unità     |
 |--------|------------------------------------------------------------------------------|-----------|
@@ -72,7 +72,7 @@
 | 20     | Posizione pilota lungo Y (rispetto al C.G.)                                  | [m]       |
 | 21     | Posizione pilota lungo Z (rispetto al C.G.)                                  | [m]       |
 
-### deflection_limits
+### [deflection_limits]
 
 | Indice | Descrizione                   | Unità  |
 |--------|-------------------------------|--------|
@@ -83,14 +83,14 @@
 | 4      | Flap (min deflection)         | [deg]  |
 | 5      | Flap (max deflection)         | [deg]  |
 
-### mass_data
+### [fuel_mass]
 
 | Indice | Descrizione                               | Unità |
 |--------|-------------------------------------------|-------|
 | 0      | Opzione massa (0: costante, 1: variabile) | [-]   |
 | 1      | Frazione di massa (% MTOW)                | [-]   |
 
-### steady_state_coefficients
+### [steady_state_coefficients]
 
 | Indice | Descrizione | Unità |
 |--------|-------------|--------|
@@ -103,7 +103,7 @@
 | x,6    | Cn          | [-]    |
 
 ### aerodynamic_derivatives
-#### x force derivatives
+#### x force derivatives - [aer_der_x]
 
 | Indice | Descrizione | Unità |
 |--------|-------------|--------|
@@ -116,8 +116,7 @@
 | x,6    | CXP         | [-]    |
 | x,7    | CXR         | [-]    |
 
-#### y force derivatives
-
+#### y force derivatives - [aer_der_y]
 
 | Indice | Descrizione | Unità |
 |--------|-------------|--------|
@@ -129,7 +128,7 @@
 | x,5    | CYA         | [-]    |
 | x,6    | CYQ         | [-]    |
 
-#### z force derivatives
+#### z force derivatives - [aer_der_z]
 
 | Indice | Descrizione | Unità |
 |--------|-------------|--------|
@@ -142,7 +141,7 @@
 | x,6    | CZP         | [-]    |
 | x,7    | CZR         | [-]    |
 
-#### rolling_moment_derivatives
+#### [rolling_moment_der]
 
 | Indice | Descrizione | Unità |
 |--------|-------------|--------|
@@ -154,7 +153,7 @@
 | x,5    | ClA         | [-]    |
 | x,6    | ClQ         | [-]    |
 
-#### pitching_moment_derivatives
+#### [pitch_moment_der]
 
 | Indice | Descrizione | Unità |
 |--------|-------------|--------|
@@ -167,7 +166,7 @@
 | x,6    | CmP         | [-]    |
 | x,7    | CmR         | [-]    |
 
-#### yawing_moment_derivatives
+#### [yawing_moment_der]
 
 | Indice | Descrizione | Unità |
 |--------|-------------|--------|
@@ -179,7 +178,7 @@
 | x,5    | CnA         | [-]    |
 | x,6    | CnQ         | [-]    |
 
-#### control_force_derivates
+#### [control_force_der]
 
 | Indice | Descrizione | Unità |
 |--------|-------------|--------|
@@ -191,7 +190,7 @@
 | x,5    | CYda        | [-]    |
 | x,6    | CYdr        | [-]    |
 
-#### control_moment_derivates
+#### [control_moment_der]
 
 | Indice | Descrizione | Unità |
 |--------|-------------|--------|
@@ -203,7 +202,7 @@
 | x,5    | Cnda        | [-]    |
 | x,6    | Cndr        | [-]    |
 
-#### rotary_derivates
+#### [rotary_der]
 
 | Indice | Descrizione | Unità |
 |--------|-------------|--------|

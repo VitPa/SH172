@@ -6,7 +6,6 @@
 #include "Atmosphere.h"
 #include "EstrazioneDati.h"
 #include "Interpolazione.h"
-#include "MotionEq.h"
 
 int main(){
 
@@ -32,46 +31,26 @@ int main(){
     double Pmax_h = 0, press0 = 0, temp0 = 0, rho0 = 0, vsuono0 = 0, press_h = 0, temp_h = 0, rho_h = 0, vsuono_h = 0;
     int flagatm;
 
-    printf("\n\nSimulatore di volo per il Cessna 172\n Inserire i dati iniziali\n --------------------------------------------\n\nInserire la velocità inziale: ");
-    scanf("%lf", &CI[0]);
-    printf("Inserire l'altitudine inziale: ");
-    scanf("%lf", &CI[1]);
-    printf("Inserire l'angolo di attacco inziale: ");
-    scanf("%lf", &CI[2]);
-    printf("\n");
+    double alpha = 1;  // inseriamo un valore di alpha per validare i dati sui file
+    double CL, CD, CL0 = 0.3832, CLa = 3.9849, aplha_0 = -0.09616302, CD0 = 0.0235, CDa = 0.154, CDa2 = 1.0476;
+    double CX, CZ;
+    int trovato = 1, i = 0;
 
     datiFiles(0, &engine, &geometry_propeller, &propeller_profile, &data_propeller, &body_axes, &deflection_limits,
         &fuel_mass, &steady_state_coeff, &aer_der_x, &aer_der_y, &aer_der_z, &rolling_moment_der, 
         &pitch_moment_der, &yawing_moment_der, &control_force_der, &control_moment_der, &rotary_der);
-
-    AtmosphereChoice(&press0, &temp0, &rho0, &vsuono0, &press_h, &temp_h, &rho_h, &vsuono_h, CI, &flagatm);
-
-    AtmosphereCalc(CI, &engine, &Pmax_h, &press0, &temp0, &rho0, &vsuono0, &press_h, &temp_h, &rho_h, &vsuono_h, &flagatm);
-
-    equation(5.0, 1.1116, &CI, &body_axes, &aer_der_x, &aer_der_y, &aer_der_z, &steady_state_coeff, &control_force_der, 
-        &control_moment_der, &rotary_der);
-    /*do {
-        // inizializzazione - Equazioni della dinamica
-
-        // inizializzazione - CONDIZIONI DI TRIM (){ autovalori e autovettori, angoli di Trim, numero di giri, coefficienti aer tot}
-
-
-        // Interpoliamo per calcolare i dati aerodinamici corretti
-        InterpolazioneCoeff(0, &body_axes, CI, &temp_h, 2.0, Int_ssc, Int_adx, Int_ady, Int_adz, Int_rmd, 
+    
+    InterpolazioneCoeff(0, &body_axes, CI, &temp_h, alpha, Int_ssc, Int_adx, Int_ady, Int_adz, Int_rmd, 
         Int_pmd, Int_ymd, Int_cfd, Int_cmd, Int_rd, &steady_state_coeff, &aer_der_x, &aer_der_y, 
         &aer_der_z, &rolling_moment_der, &pitch_moment_der, &yawing_moment_der, &control_force_der, 
         &control_moment_der, &rotary_der);
 
+    CL = CL0 + CLa * alpha;
+    CD = CD0 + CDa * alpha + CDa2 * alpha * alpha;
+    CX = - (CD * cos(alpha) + CL * sin(alpha));
+    CZ = - (CD * sin(alpha) + CL * cos(alpha));
 
+    printf("Il valore di CX sperimentale: %lf, il valore validato: %lf\n", steady_state_coeff[i][1], CX);
+    printf("Il valore di CZ sperimentale: %lf, il valore validato: %lf\n", steady_state_coeff[i][3], CZ);
 
-    } while (1);*/
-
-    return 0;
-
-    
-
-    // inizializzazione - COMANDI DI VOLO (comando desiderato semplice) {calcolo e creazione del vetore comando}
-
-    // loop - EQUAZIONI DEL MOTO (Tutti i dati aerodinamici e di potenza, comandi input)  { studiare la stabilità statica e dinamica, 
-    //                                                                                      calcolare i dati aggiornati cambiati in base alle manovre}
 }
