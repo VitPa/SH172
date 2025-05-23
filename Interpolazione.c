@@ -59,7 +59,7 @@ void InterpolazioneCoeff(int stampa, double **body_axes, double *CI, double *tem
     if (mio_alpha > 20.0){
         mio_alpha = 20;
         printf("Il valore di aplha è superiore del valore massimo consentito. \nIl valore impostato è: 20°\n");
-    } else if(mio_alpha < -5){
+    } else if(mio_alpha < -5.0){
         mio_alpha = -5;
         printf("Il valore di aplha è inferiore del valore minimo consentito. \nIl valore impostato è: -5°\n");
     }

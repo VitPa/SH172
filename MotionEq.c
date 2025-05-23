@@ -2,10 +2,16 @@
 #include <stdlib.h>
 #include <math.h>
 #include "MotionEq.h"
+#include "Interpolazione_new.h"
+#include "propeller.h"
 
-void equation(double alpha, double rho_h, double *CI, double *body_axes, double **aer_der_x, double **aer_der_y, double **aer_der_z, double **steady_state_coeff, double **control_force_der, double **control_moment_der, double **rotary_der){
+#define g 9.80665
+#define pi 3.14159265
 
-    int i = 0, i_e = 0, i_a = 0, flag = 0, de, beta, err[126];
+void equation(double alpha, double rho_h, double *CI, double *body_axes, double **aer_der_x, double **aer_der_y, double **aer_der_z, double **steady_state_coeff, double **control_force_der, double **control_moment_der, double **rotary_der, double **pitch_moment_der, double *geometry_propeller, double *propeller_profile, double **data_propeller, double *fuel_mass) {
+
+    int i = 0, i_e = 0, i_a = 0, flag = 0, de = 0;
+    double alphaTrim = 0.0, deTrim = 0.0, RPMTrim = 0.0;
 
     // Trovare l'indice di alpha 
     while (flag == 0 && i_a < 126){
@@ -17,35 +23,75 @@ void equation(double alpha, double rho_h, double *CI, double *body_axes, double 
     }
 
     double cst = 0.5 * rho_h * CI[0] * CI[0] * body_axes[2];
-    printf("-----\n%lf\n", cst);
-    while (i < 126){
+    int flag_1 = 0;
+    double alpha_1 = 0;
+    
+    for (int i = 0; i <= 2470; ++i) {
 
-        double CZ_tot = aer_der_z[i][1] * aer_der_x[i][0] * (3.1415/180);
-        double control = fabs(body_axes[0]*9.81*cos(aer_der_x[i][0]*(3.1415/180)) + cst * CZ_tot);
+        alpha_1 = i * 0.01 - 5.0;
 
-        printf("---------- ALPHA: %lf\n", aer_der_x[i][0]);
-        printf("CZ_tot: %lf\n", CZ_tot);
-        printf("cst * CZ_tot: %lf\n", cst * CZ_tot);
-        printf("m*g*cos(a): %lf\n", body_axes[0]*9.81*cos(aer_der_x[i][0]*(3.1415/180)));
+        double CZss = interpolazioneTotale(steady_state_coeff, 3, alpha_1);
+        double CMss = interpolazioneTotale(steady_state_coeff, 5, alpha_1);
+        double CMa = interpolazioneTotale(pitch_moment_der, 1, alpha_1);
+        double CMde = interpolazioneTotale(control_moment_der, 3, alpha_1);
+        double CZalpha = interpolazioneTotale(aer_der_z, 1, alpha_1);
+        double CZde = control_force_der[0][3];
+        
+        for (double de_1 = -20.0; de_1 <= 20.0; de_1 += 0.01){
+            double CZ_tot = CZss + CZalpha * alpha_1 * (pi/180) + CZde * de_1 * (pi/180);
+            double control = fabs(body_axes[0]*g*cos(alpha_1*(pi/180) + CI[2]*(pi/180)) + cst * CZ_tot);
+            double control2 = fabs(CMss + CMa * alpha_1 * (pi/180) + CMde * de_1 * (pi/180));
 
-        if (control < 10.0){
-            printf("Alpha di Trim trovato");
-        } else {
-            printf("ABS: %lf\n\n", control);
+            if (control < 10.0 && control2 < 0.0004){
+                printf("\n*********************Alpha di Trim trovato**************************************\n\n");
+                printf("---------- ALPHA: %lf\t\t DE_TRIM: %lf\n\n", alpha_1, de_1);
+                printf("CZ_tot: %lf\n", CZ_tot);
+                printf("cst * CZ_tot: %lf\n", cst * CZ_tot);
+                printf("m*g*cos(a): %lf\n", body_axes[0]*g*cos(alpha_1*(pi/180)));
+                printf("ABS: %lf\n\n", control);
+                printf("Valore interpolato di CZss: %lf\n", CZss);
+                printf("Valore interpolato di CZalpha: %lf\n", CZalpha);
+
+                deTrim = de_1;
+                double de_ref = - (CMss + CMa * alpha_1 * (pi/180)) / CMde;
+                printf("Valore di de stimato: %lf\n", de_ref*(180/pi));
+                alphaTrim = alpha_1;
+
+                flag_1 = 1;
+            }
         }
-
-        i++;
     }
-        //double cst = 0.5 * rho_h * CI[0] * CI[0] * body_axes[2];
-        //double CX_tot = aer_der_x[i_a][1] * alpha + control_force_der[i_a][1] * de; //cosa è de??
-        //double CZ_tot = aer_der_z[i_a][1] * alpha + control_force_der[i_a][3] * de;
-        //double CY_tot = aer_der_y[i_a][1] * beta + control_force_der[i_a][5] * de;
+    if (flag_1 == 0) printf("Nessun alpha di Trim trovato!\n");
 
-        //double X = cst * CX_tot;
-        //double Z = cst * CZ_tot;
-        //double Y = cst * CY_tot;
+    double thetaTrim = alphaTrim + CI[2];
+    // Componente velocità TAS di Trim
+    double uTrim = CI[0] * cos(alphaTrim*(pi/180));
+    double wTrim = CI[0] * sin(alphaTrim*(pi/180));
 
-    
+    double hTrim = CI[1];
 
-    
+    // VETTORE DEGLI STATI (DINAMICA LONGITUDINALE)- Condizione di Trim
+    double vett_stato[10] = {uTrim, 0, wTrim, 0, 0, 0, 0, thetaTrim, 0, hTrim};
+    double prop[3];
+
+    double CXss = interpolazioneTotale(steady_state_coeff, 1, alphaTrim);
+    double CXalpha = interpolazioneTotale(aer_der_x, 1, alphaTrim);
+    double CXde = interpolazioneTotale(control_force_der, 1, alphaTrim);
+
+    double CX_tot = CXss + CXalpha * alphaTrim * (pi/180) + CXde * deTrim * (pi/180);
+    double tTrim = body_axes[0]*g*sin(thetaTrim*(pi/180)) - 0.5*CX_tot*rho_h*CI[0]*CI[0]*body_axes[2];
+    printf("tTrim: %lf\n", tTrim);
+
+    int RPM = 1500;         // RPM minimi
+
+    while (RPM <= 2700){
+        propel(RPM, rho_h, thetaTrim, alphaTrim, uTrim, geometry_propeller, propeller_profile, data_propeller, prop);
+        if (fabs(tTrim - prop[0]) < 10){
+            printf("\n*********************RPM di Trim trovato**************************************\n\n");
+            printf("---------- RPM: %d\n\n", RPM);
+            RPMTrim = RPM;
+        }
+        printf("RPM: %d\t dT: %lf\n", RPM, fabs(tTrim - prop[0]));
+        RPM += 100;
+    }
 }
