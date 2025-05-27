@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "Interpolazione.h"
+#include "Interpolazione_new.h"
 
 double interpolazioneSemplice(double** mat_1, int colonna, double alpha){
     if (alpha < mat_1[0][0]){

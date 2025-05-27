@@ -11,35 +11,31 @@ void propel(double RPM_ref, double rho1, double theta1, double alpha1, double Ve
     float pitch = 0.0; // pitch del'elica
     float diam=geometry_propeller[0]; //diametro elica
     float Raggio=diam/2.0; //raggio elica
-    float tip=data_propeller[60][3]; //angolo di beccheggio al tip
+    float tip=data_propeller[48][3]; //angolo di beccheggio al tip
     float xt=Raggio; //coordinata dimensionalizzata al tip
-    float hub=data_propeller[13][3]; //angolo di beccheggio all'hub (al 25% del raggio)
-    float xs=0.21*Raggio; //coordinata dimensionalizzata all'hub
+    float hub=data_propeller[0][3]; //angolo di beccheggio all'hub (al 25% del raggio)
+    float xs=data_propeller[0][0]*Raggio; //coordinata dimensionalizzata all'hub
     float n=RPM_ref/60.0; //round-per-second
     float omega=n*2.0*pi; //velocià angolare [rad/s]
     float coef1=(tip-hub)/(xt-xs); //coefficiente #1 di supporto al calcolo dell'angolo di svergolamento theta
     float coef2=hub-coef1*xs+pitch; //coefficiente #2 di supporto al calcolo dell'angolo di svergolamento theta
     float rstep=(xt-xs)/47; //calcolo step delle 47 stazioni        
-    float r1[60]; //creazione vettore delle 60 stazioni (-> CSI in propeller.txt)
-    float t2[60], a2[60],b2[60];
+    float r1[48]; //creazione vettore delle 48 stazioni (-> CSI in propeller.txt)
+    float t2[48], a2[48],b2[48];
     float th, phi1, eff, DtDr,DqDr,cl,cd,CT,CQ, tem1,tem2;
     float a, anew;
     float b, bnew;
     int j=0;
     int finished=0;
-    printf("SONO QUI\n");
     /*Inizializzazione r1*/
-    for(j=0;j<60;j++){
-        if (j<12) r1[j] = 0;
+    for(j=0;j<48;j++){
         r1[j]=xs+j*rstep;           //V ricalcolato oppure va preso dal file
     }
     float rad;
     float Vlocal,V0,V2;
     float thrust=0.0; //inizializzazione vettore spinta
     float torque=0.0;//inizializzazione vettore coppia
-    printf("SONO QUI\n");
-    for(j=12; j<60; j++){
-        printf("SONO QUI %d\n", j);
+    for(j=0; j<49; j++){
         rad=r1[j]; //coordinata j-esima stazione (-> CSI in propeller.txt)
         theta1=coef1*rad+coef2; //calcolo angolo di svergolamento della j-esima stazione        //sostituire con BA(j) + pitch
         t2[j]=theta1; //angolo di svergolamento della j-esima stazione (-> BA su propeller.txt) 

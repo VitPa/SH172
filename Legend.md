@@ -1,5 +1,7 @@
 # Legenda per le variabili utilizzate nel simulatore
 
+## CONDIZIONI INIZIALI - [CI]
+
 ## ENGINE - [engine]
 
 | Indice | Descrizione                                          | Unità     |

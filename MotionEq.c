@@ -37,7 +37,7 @@ void equation(double alpha, double rho_h, double *CI, double *body_axes, double 
         double CZalpha = interpolazioneTotale(aer_der_z, 1, alpha_1);
         double CZde = control_force_der[0][3];
         
-        for (double de_1 = -20.0; de_1 <= 20.0; de_1 += 0.01){
+        for (double de_1 = -20.0; de_1 <= 20.0; de_1 += 0.01){          // Cambiare in while
             double CZ_tot = CZss + CZalpha * alpha_1 * (pi/180) + CZde * de_1 * (pi/180);
             double control = fabs(body_axes[0]*g*cos(alpha_1*(pi/180) + CI[2]*(pi/180)) + cst * CZ_tot);
             double control2 = fabs(CMss + CMa * alpha_1 * (pi/180) + CMde * de_1 * (pi/180));
