@@ -6,9 +6,9 @@
 #define pi 3.14159265
 
 // Modifica: la funzione ora prende un double* prop come argomento di output
-void propel(double RPM_ref, double rho1, double theta1, double alpha1, double Vel, double* geometry_propeller, double* propeller_profile, double** data_propeller, double* prop)
+double propel(double RPM_ref, double rho1, double Vel, double* geometry_propeller, double* propeller_profile, double** data_propeller, double* prop)
 {
-    alpha1 = alpha1*(pi/180.0);
+    float alpha1, theta1;
     float pitch = 0.0; // pitch del'elica
     float diam=geometry_propeller[0]; //diametro elica
     float Raggio=diam/2.0; //raggio elica
@@ -93,13 +93,13 @@ void propel(double RPM_ref, double rho1, double theta1, double alpha1, double Ve
         prop[0] += DtDr*rstep; //sommatoria dei contributi di spinta dalla stazione 1 alla stazione j
         prop[1] += DqDr*rstep; //sommatoria dei contributi di coppia dalla stazione 1 alla stazione j
     }
-    printf("**********************\n");
+    /*printf("**********************\n");
     printf("Thrust: %f N\n",prop[0]);
     printf("Torque: %f Nm\n",prop[1]);
-    printf("**********************\n");
+    printf("**********************\n");*/
 
-    double t = thrust/(rho1*n*n*diam*diam*diam*diam); //coefficiente di spinta adimensionale
-    double q = torque/(rho1*n*n*diam*diam*diam*diam*diam); //coefficiente di coppia adimensionale
+    double t = prop[0]/(rho1*n*n*diam*diam*diam*diam); //coefficiente di spinta adimensionale
+    double q = prop[1]/(rho1*n*n*diam*diam*diam*diam*diam); //coefficiente di coppia adimensionale
     double J = Vel/(n*diam); //rapporto di avanzamento
 
     if (t<0){
@@ -107,5 +107,7 @@ void propel(double RPM_ref, double rho1, double theta1, double alpha1, double Ve
     }else{
         prop[2] = t/q*J/(2.0*pi); //efficienza elica
     }
+
+    return (prop[1]*omega)/1000;
 }
 
