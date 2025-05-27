@@ -8,6 +8,7 @@
 // Modifica: la funzione ora prende un double* prop come argomento di output
 void propel(double RPM_ref, double rho1, double theta1, double alpha1, double Vel, double* geometry_propeller, double* propeller_profile, double** data_propeller, double* prop)
 {
+    alpha1 = alpha1*(pi/180.0);
     float pitch = 0.0; // pitch del'elica
     float diam=geometry_propeller[0]; //diametro elica
     float Raggio=diam/2.0; //raggio elica
@@ -19,16 +20,16 @@ void propel(double RPM_ref, double rho1, double theta1, double alpha1, double Ve
     float omega=n*2.0*pi; //velocià angolare [rad/s]
     float coef1=(tip-hub)/(xt-xs); //coefficiente #1 di supporto al calcolo dell'angolo di svergolamento theta
     float coef2=hub-coef1*xs+pitch; //coefficiente #2 di supporto al calcolo dell'angolo di svergolamento theta
-    float rstep=(xt-xs)/47; //calcolo step delle 47 stazioni        
-    float r1[48]; //creazione vettore delle 48 stazioni (-> CSI in propeller.txt)
-    float t2[48], a2[48],b2[48];
+    float rstep=(xt-xs)/48; //calcolo step delle 47 stazioni        
+    float r1[49]; //creazione vettore delle 48 stazioni (-> CSI in propeller.txt)
+    float t2[49], a2[49],b2[49];
     float th, phi1, eff, DtDr,DqDr,cl,cd,CT,CQ, tem1,tem2;
     float a, anew;
     float b, bnew;
     int j=0;
     int finished=0;
     /*Inizializzazione r1*/
-    for(j=0;j<48;j++){
+    for(j=0;j<49;j++){
         r1[j]=xs+j*rstep;           //V ricalcolato oppure va preso dal file
     }
     float rad;
@@ -37,7 +38,7 @@ void propel(double RPM_ref, double rho1, double theta1, double alpha1, double Ve
     float torque=0.0;//inizializzazione vettore coppia
     for(j=0; j<49; j++){
         rad=r1[j]; //coordinata j-esima stazione (-> CSI in propeller.txt)
-        theta1=coef1*rad+coef2; //calcolo angolo di svergolamento della j-esima stazione        //sostituire con BA(j) + pitch
+        theta1=data_propeller[j][3] + pitch; //calcolo angolo di svergolamento della j-esima stazione        //sostituire con BA(j) + pitch
         t2[j]=theta1; //angolo di svergolamento della j-esima stazione (-> BA su propeller.txt) 
         th=theta1/180.0*pi; //angolo di svergolamento [rad]
         a=0.1; //inizializzazione axial inflow factor (vedi pag.4 PROPEL.pdf)
@@ -55,7 +56,7 @@ void propel(double RPM_ref, double rho1, double theta1, double alpha1, double Ve
             CT = cl*cos(phi1)-cd*sin(phi1); //CT coefficiente di spinta adimensionale
             DtDr=0.5*rho1*Vlocal*Vlocal*geometry_propeller[2]*data_propeller[j][2]*CT; //contributo di spinta della j-esima sezione      //IL NUMERO 2.0 è il numero di pale
             CQ = cd*cos(phi1)+cl*sin(phi1); //CQ coefficiente di coppia adimensionale
-            DqDr=0.5*rho1*Vlocal*Vlocal*2.0*data_propeller[j][2]*rad*CQ; //contributo di coppia della j-esima sezione  //IL NUMERO 2.0 è il numero di pale
+            DqDr=0.5*rho1*Vlocal*Vlocal*geometry_propeller[2]*data_propeller[j][2]*rad*CQ; //contributo di coppia della j-esima sezione  //IL NUMERO 2.0 è il numero di pale
             tem1=DtDr/(4.0*pi*rad*rho1*Vel*Vel*(1+a)); //fattore correttivo del coefficiente "a"
             tem2=DqDr/(4.0*pi*rad*rad*rad*rho1*Vel*(1+a)*omega); //fattore correttivo del coefficiente "b"
             anew=0.5*(a+tem1); //nuovo valore coefficiente "a"
@@ -73,10 +74,24 @@ void propel(double RPM_ref, double rho1, double theta1, double alpha1, double Ve
                 finished=1;
             }
         }
+        /*printf("----------------------------\n");
+        printf("V0 = %lf\n", V0);
+        printf("V2 = %lf\n", V2);
+        printf("phi1 = %lf\n", phi1);
+        printf("alpha1 = %lf\n", alpha1);
+        printf("cl = %lf\n", cl);
+        printf("cd = %lf\n", cd);
+        printf("Vlocal = %lf\n", Vlocal);
+        printf("CT = %lf\n", CT);
+        printf("DtDr = %lf\n", DtDr);
+        printf("CQ = %lf\n", CQ);
+        printf("DqDr = %lf\n", DqDr);
+        printf("tem1 = %lf\n", tem1);
+        printf("tem2 = %lf\n", tem2);*/
         a2[j]=a; //definizione valore finale coefficiente "a" per la j-esima stazione
         b2[j]=b; //definizione valore finale coefficiente "b" per la j-esima stazione
-        prop[0] = thrust+DtDr*rstep; //sommatoria dei contributi di spinta dalla stazione 1 alla stazione j
-        prop[1] = torque+DqDr*rstep; //sommatoria dei contributi di coppia dalla stazione 1 alla stazione j
+        prop[0] += DtDr*rstep; //sommatoria dei contributi di spinta dalla stazione 1 alla stazione j
+        prop[1] += DqDr*rstep; //sommatoria dei contributi di coppia dalla stazione 1 alla stazione j
     }
     printf("**********************\n");
     printf("Thrust: %f N\n",prop[0]);

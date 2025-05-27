@@ -72,7 +72,7 @@ void equation(double alpha, double rho_h, double *CI, double *body_axes, double 
 
     // VETTORE DEGLI STATI (DINAMICA LONGITUDINALE)- Condizione di Trim
     double vett_stato[10] = {uTrim, 0, wTrim, 0, 0, 0, 0, thetaTrim, 0, hTrim};
-    double prop[3];
+    double prop[3] = {0, 0, 0};
 
     double CXss = interpolazioneTotale(steady_state_coeff, 1, alphaTrim);
     double CXalpha = interpolazioneTotale(aer_der_x, 1, alphaTrim);
@@ -85,7 +85,7 @@ void equation(double alpha, double rho_h, double *CI, double *body_axes, double 
     int RPM = 1500;         // RPM minimi
 
     while (RPM <= 2700){
-        propel(RPM, rho_h, thetaTrim, alphaTrim, uTrim, geometry_propeller, propeller_profile, data_propeller, prop);
+        propel(RPM, rho_h, thetaTrim, alphaTrim, CI[0], geometry_propeller, propeller_profile, data_propeller, prop);
         if (fabs(tTrim - prop[0]) < 10){
             printf("\n*********************RPM di Trim trovato**************************************\n\n");
             printf("---------- RPM: %d\n\n", RPM);
