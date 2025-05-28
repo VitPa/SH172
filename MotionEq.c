@@ -22,15 +22,15 @@ void equation(double alpha, double Pmax_h, double rho_h, double *CI, double *bod
         i_a++;
     }
 
+    // ****** TROVARE ALPHA DI TRIM *******
+
     double cst = 0.5 * rho_h * CI[0] * CI[0] * body_axes[2];
     int flag_1 = 0;
     double alpha_1 = 0;
     double ver[2] = {1000000000000.0, 1000000000000.0};
     
     for (int i = 0; i <= 2470; ++i) {
-
         alpha_1 = i * 0.01 - 5.0;
-
         double CZss = interpolazioneTotale(steady_state_coeff, 3, alpha_1);
         double CMss = interpolazioneTotale(steady_state_coeff, 5, alpha_1);
         double CMa = interpolazioneTotale(pitch_moment_der, 1, alpha_1);
@@ -38,7 +38,7 @@ void equation(double alpha, double Pmax_h, double rho_h, double *CI, double *bod
         double CZalpha = interpolazioneTotale(aer_der_z, 1, alpha_1);
         double CZde = control_force_der[0][3];
         
-        for (double de_1 = -20.0; de_1 <= 20.0; de_1 += 0.01){          // Cambiare in while
+        for (double de_1 = -20.0; de_1 <= 20.0; de_1 += 0.01){          // Cambiare in while per quale condizione???
             double CZ_tot = CZss + CZalpha * alpha_1 * (pi/180) + CZde * de_1 * (pi/180);
             double control = fabs(body_axes[0]*g*cos(alpha_1*(pi/180) + CI[2]*(pi/180)) + cst * CZ_tot);
             double control2 = fabs(CMss + CMa * alpha_1 * (pi/180) + CMde * de_1 * (pi/180));
@@ -55,10 +55,11 @@ void equation(double alpha, double Pmax_h, double rho_h, double *CI, double *bod
                 printf("Valore interpolato di CZalpha: %lf\n", CZalpha);
 
                 deTrim = de_1;
-                double de_ref = - (CMss + CMa * alpha_1 * (pi/180)) / CMde;
-                printf("Valore di de stimato: %lf\n", de_ref*(180/pi));
                 alphaTrim = alpha_1;
 
+                double de_ref = - (CMss + CMa * alpha_1 * (pi/180)) / CMde;
+                printf("Valore di de stimato: %lf\n", de_ref*(180/pi));
+                
                 flag_1 = 1;
             }
             if (control < ver[0]) {
@@ -76,11 +77,19 @@ void equation(double alpha, double Pmax_h, double rho_h, double *CI, double *bod
         printf("Il valore più basso: %lf\t%lf\n", ver[0], ver[1]);
     }
 
+    /* Possibile altra implementazione per trovare alpha di trim con il while
+        fare il ciclo con while su un flag che si annulla solo qunado o è arrivato a finire gli alpha disponibili 
+        da controllare, oppure se il valore del residuo calcolato al passo precedente (quindi usare due variabili 
+        che tengono una il valore precedente [inizializzata a zero all'inizio] e l'altra che contiene il valore di control) 
+        è minore di quello al passo corrente. Questo porta quind a stoppare quando si sta invertendo il trend di 
+        decremento e quindi si è trovato il minimo relativo. Controllare però che i valori siano monotoni descrescenti 
+        nella prima fase e che non ci siano altri minimi relativi.
+    */
     double thetaTrim = alphaTrim + CI[2];
+
     // Componente velocità TAS di Trim
     double uTrim = CI[0] * cos(alphaTrim*(pi/180));
     double wTrim = CI[0] * sin(alphaTrim*(pi/180));
-
     double hTrim = CI[1];
 
     // VETTORE DEGLI STATI (DINAMICA LONGITUDINALE)- Condizione di Trim
@@ -90,6 +99,7 @@ void equation(double alpha, double Pmax_h, double rho_h, double *CI, double *bod
     double CXalpha = interpolazioneTotale(aer_der_x, 1, alphaTrim);
     double CXde = interpolazioneTotale(control_force_der, 1, alphaTrim);
 
+    // ******* TROVARE RPM di Trim *******
     double CX_tot = CXss + CXalpha * alphaTrim * (pi/180) + CXde * deTrim * (pi/180);
     double tTrim = body_axes[0]*g*sin(thetaTrim*(pi/180)) - 0.5*CX_tot*rho_h*CI[0]*CI[0]*body_axes[2];
     printf("\n\ntTrim: %lf\n", tTrim);
@@ -99,6 +109,7 @@ void equation(double alpha, double Pmax_h, double rho_h, double *CI, double *bod
     while (RPM <= 2700){
         double prop[3] = {0, 0, 0};
         double Pal = propel(RPM, rho_h, CI[0], geometry_propeller, propeller_profile, data_propeller, prop);
+
         if (fabs(tTrim - prop[0]) < 1){
             printf("\n*********************RPM di Trim trovato**************************************\n\n");
             printf("---------- RPM: %d\n\n", RPM);
@@ -111,8 +122,8 @@ void equation(double alpha, double Pmax_h, double rho_h, double *CI, double *bod
             } else {
                 PalTrim = Pal;
             }
-            printf("Pal: %lf\n", PalTrim);
-            printf("Pal massima: %lf\n", Pmax_h);
+            // printf("Pal: %lf\n", PalTrim);
+            // printf("Pal massima: %lf\n", Pmax_h);
         }
         // printf("RPM: %d\t dT: %lf\n", RPM, fabs(tTrim - prop[0]));
         RPM += 1;
