@@ -2,6 +2,7 @@
 - La validazione va finita. per il momento le equazioni non danno gli stessi valori
 - Calcolare la massa che non deve consumarsi più del limite minimo (In Interpolazione.c)
 - Inserire tutti i warning e error nel codice
+- Inserire le legiche aggiunti (stampa dei valori e eliminazione dell'ogiva) nel file EstrapolazioneDati_ottimizzato.c
 
 ## Da fare ora
 - Risolvere il problema della fase di trimmaggio

@@ -27,7 +27,7 @@ void equation(double alpha, double Pmax_h, double rho_h, double *CI, double *bod
     double cst = 0.5 * rho_h * CI[0] * CI[0] * body_axes[2];
     int flag_1 = 0;
     double alpha_1 = 0;
-    double ver[2] = {1000000000000.0, 1000000000000.0};
+    double score_min = 1000;
     
     for (int i = 0; i <= 2470; ++i) {
         alpha_1 = i * 0.01 - 5.0;
@@ -43,48 +43,37 @@ void equation(double alpha, double Pmax_h, double rho_h, double *CI, double *bod
             double control = fabs(body_axes[0]*g*cos(alpha_1*(pi/180) + CI[2]*(pi/180)) + cst * CZ_tot);
             double control2 = fabs(CMss + CMa * alpha_1 * (pi/180) + CMde * de_1 * (pi/180));
 
-            if (control < 10.0 && control2 < 0.001){
-                printf("\n*********************Alpha di Trim trovato**************************************\n\n");
-                printf("---------- ALPHA: %lf\t\t DE_TRIM: %lf\n\n", alpha_1, de_1);
-                printf("CZ_tot: %lf\n", CZ_tot);
-                printf("cst * CZ_tot: %lf\n", cst * CZ_tot);
-                printf("m*g*cos(a): %lf\n", body_axes[0]*g*cos(alpha_1*(pi/180)));
-                printf("control: %lf\n\n", control);
-                printf("control2: %lf\n\n", control2);
-                printf("Valore interpolato di CZss: %lf\n", CZss);
-                printf("Valore interpolato di CZalpha: %lf\n", CZalpha);
+            if (control < 1.0 && control2 < 0.004){
 
-                deTrim = de_1;
-                alphaTrim = alpha_1;
+                double score = sqrt(control/10*control/10 + control2/0.004*control2/0.004);
+                if (score < score_min) {
+                    score_min = score;
+                    deTrim = de_1;
+                    alphaTrim = alpha_1;
+                }
 
                 double de_ref = - (CMss + CMa * alpha_1 * (pi/180)) / CMde;
                 printf("Valore di de stimato: %lf\n", de_ref*(180/pi));
                 
                 flag_1 = 1;
             }
-            if (control < ver[0]) {
-                // printf("Alpha: %lf\t Control: %lf\t Control2: %.8lf\n", alpha_1, control, control2);
-                ver[0] = control;
-            }
-            if (control2 < ver[1]) {
-                // printf("Alpha: %lf\t Control: %lf\t Control2: %.8lf\n", alpha_1, control, control2);
-                ver[1] = control2;
-            }
         }
     }
     if (flag_1 == 0) {
         printf("Nessun alpha di Trim trovato!\n");
-        printf("Il valore più basso: %lf\t%lf\n", ver[0], ver[1]);
+        //printf("Il valore più basso: %lf\t%lf\n", ver[0], ver[1]);
+    } else {
+        printf("\n*********************Alpha di Trim trovato**************************************\n\n");
+        printf("---------- ALPHA: %lf\t\t DE_TRIM: %lf\n\n", alphaTrim, deTrim);
+        /*printf("CZ_tot: %lf\n", CZ_tot);
+        printf("cst * CZ_tot: %lf\n", cst * CZ_tot);
+        printf("m*g*cos(a): %lf\n", body_axes[0]*g*cos(alpha_1*(pi/180)));
+        printf("control: %lf\n", control);
+        printf("control2: %lf\n\n", control2);
+        printf("Valore interpolato di CZss: %lf\n", CZss);
+        printf("Valore interpolato di CZalpha: %lf\n", CZalpha);*/
     }
 
-    /* Possibile altra implementazione per trovare alpha di trim con il while
-        fare il ciclo con while su un flag che si annulla solo qunado o è arrivato a finire gli alpha disponibili 
-        da controllare, oppure se il valore del residuo calcolato al passo precedente (quindi usare due variabili 
-        che tengono una il valore precedente [inizializzata a zero all'inizio] e l'altra che contiene il valore di control) 
-        è minore di quello al passo corrente. Questo porta quind a stoppare quando si sta invertendo il trend di 
-        decremento e quindi si è trovato il minimo relativo. Controllare però che i valori siano monotoni descrescenti 
-        nella prima fase e che non ci siano altri minimi relativi.
-    */
     double thetaTrim = alphaTrim + CI[2];
 
     // Componente velocità TAS di Trim
@@ -110,7 +99,7 @@ void equation(double alpha, double Pmax_h, double rho_h, double *CI, double *bod
         double prop[3] = {0, 0, 0};
         double Pal = propel(RPM, rho_h, CI[0], geometry_propeller, propeller_profile, data_propeller, prop);
 
-        if (fabs(tTrim - prop[0]) < 1){
+        if (fabs(tTrim - prop[0]) < 1.0){
             printf("\n*********************RPM di Trim trovato**************************************\n\n");
             printf("---------- RPM: %d\n\n", RPM);
             printf("Efficienza elica: %lf\n\n", prop[2]);
@@ -124,6 +113,7 @@ void equation(double alpha, double Pmax_h, double rho_h, double *CI, double *bod
             }
             // printf("Pal: %lf\n", PalTrim);
             // printf("Pal massima: %lf\n", Pmax_h);
+            break;
         }
         // printf("RPM: %d\t dT: %lf\n", RPM, fabs(tTrim - prop[0]));
         RPM += 1;
