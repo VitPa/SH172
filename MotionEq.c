@@ -4,6 +4,7 @@
 #include "MotionEq.h"
 #include "Interpolazione_new.h"
 #include "propeller.h"
+#include "routh.h"
 
 #define g 9.80665
 #define pi 3.14159265
@@ -28,12 +29,13 @@ void equation(double alpha, double Pmax_h, double rho_h, double *CI, double *bod
     int flag_1 = 0;
     double alpha_1 = 0;
     double score_min = 1000;
+    double CZalphaTrim, CMalphaTrim;
     
     for (int i = 0; i <= 2470; ++i) {
         alpha_1 = i * 0.01 - 5.0;
         double CZss = interpolazioneTotale(steady_state_coeff, 3, alpha_1);
         double CMss = interpolazioneTotale(steady_state_coeff, 5, alpha_1);
-        double CMa = interpolazioneTotale(pitch_moment_der, 1, alpha_1);
+        double CMalpha = interpolazioneTotale(pitch_moment_der, 1, alpha_1);
         double CMde = interpolazioneTotale(control_moment_der, 3, alpha_1);
         double CZalpha = interpolazioneTotale(aer_der_z, 1, alpha_1);
         double CZde = control_force_der[0][3];
@@ -41,7 +43,7 @@ void equation(double alpha, double Pmax_h, double rho_h, double *CI, double *bod
         for (double de_1 = -20.0; de_1 <= 20.0; de_1 += 0.01){          // Cambiare in while per quale condizione???
             double CZ_tot = CZss + CZalpha * alpha_1 * (pi/180) + CZde * de_1 * (pi/180);
             double control = fabs(body_axes[0]*g*cos(alpha_1*(pi/180) + CI[2]*(pi/180)) + cst * CZ_tot);
-            double control2 = fabs(CMss + CMa * alpha_1 * (pi/180) + CMde * de_1 * (pi/180));
+            double control2 = fabs(CMss + CMalpha * alpha_1 * (pi/180) + CMde * de_1 * (pi/180));
 
             if (control < 1.0 && control2 < 0.004){
 
@@ -50,9 +52,11 @@ void equation(double alpha, double Pmax_h, double rho_h, double *CI, double *bod
                     score_min = score;
                     deTrim = de_1;
                     alphaTrim = alpha_1;
+                    CZalphaTrim = CZalpha;
+                    CMalphaTrim = CMalpha;
                 }
 
-                double de_ref = - (CMss + CMa * alpha_1 * (pi/180)) / CMde;
+                double de_ref = - (CMss + CMalpha * alpha_1 * (pi/180)) / CMde;
                 printf("Valore di de stimato: %lf\n", de_ref*(180/pi));
                 
                 flag_1 = 1;
@@ -118,4 +122,6 @@ void equation(double alpha, double Pmax_h, double rho_h, double *CI, double *bod
         // printf("RPM: %d\t dT: %lf\n", RPM, fabs(tTrim - prop[0]));
         RPM += 1;
     }
+
+    int a = routh(pitch_moment_der[0][4], body_axes, rho_h, alphaTrim, CI[0], CXalpha, CZalphaTrim, CMalphaTrim, pitch_moment_der[0][2]);
 }
