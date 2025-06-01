@@ -74,6 +74,17 @@ int routh(double Cm_q,double* body_axes, double rho, double alpha_trim, double V
     double T12_ph = fabs(log(0.5)/Reph);
 
     printf("\nTph = %lf\nT12_ph = %lf\n",Tph,T12_ph);
+    
+    double omegaNsp_adm = sqrt(-(2*massa_adm*Cm_alpha+Cm_q*CL_alpha)/(2*massa_adm*inerziaY_adm));
+    double zsp = (inerziaY_adm*CL_alpha-2*massa_adm*(Cm_q+Cm_alphaprimo))/(2*sqrt(-2*massa_adm*inerziaY_adm*(2*massa_adm*Cm_alpha+Cm_q*CL_alpha)));
+    double Resp = -zsp*omegaNsp_adm;
+    double Imsp = omegaNsp_adm*sqrt(fabs(zsp*zsp - 1.0));
+
+    if (Resp)
+
+    printf("\nResp = %lf\nImsp = %lf\n",Resp,Imsp);
+    printf("\nomegaNsp_adm = %lf\n",omegaNsp_adm);
+    printf("\nzsp = %lf\n",zsp);
 
 
 
