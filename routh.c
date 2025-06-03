@@ -80,8 +80,6 @@ int routh(double Cm_q,double* body_axes, double rho, double alpha_trim, double V
     double Resp = -zsp*omegaNsp_adm;
     double Imsp = omegaNsp_adm*sqrt(fabs(zsp*zsp - 1.0));
 
-    if (Resp)
-
     printf("\nResp = %lf\nImsp = %lf\n",Resp,Imsp);
     printf("\nomegaNsp_adm = %lf\n",omegaNsp_adm);
     printf("\nzsp = %lf\n",zsp);
