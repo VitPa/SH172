@@ -23,3 +23,6 @@ Aggiornamento 01/06/2025
 - !!! La generica derivata aerodinamica va semplificata come da slide 32 oppure no?
 - warning sui alpha (e anche gli altri)
 - input di comandi e manovre
+
+WARNING
+macth maggiore di drag rise, warning se la velocità è troppa nella manovra ed errore nel trim

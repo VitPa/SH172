@@ -2,6 +2,8 @@
 
 
 
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -38,6 +40,11 @@ int main(){
 
     printf("\n\nSimulatore di volo per il Cessna 172\n Inserire i dati iniziali\n --------------------------------------------\n\nInserire la velocità inziale: ");
     scanf("%lf", &CI[0]);
+    if (M > (*body_axes)[4]){
+        printf("Warning: il match è maggiore del match di drag rise, inserire un valore di velocità inferiore.\n");
+       printf("\n\nSimulatore di volo per il Cessna 172\n Inserire i dati iniziali\n --------------------------------------------\n\nInserire la velocità inziale: ");
+    scanf("%lf", &CI[0]);
+    } 
     printf("Inserire l'altitudine inziale: ");
     scanf("%lf", &CI[1]);
     printf("Inserire l'angolo di attacco inziale: ");
