@@ -1,3 +1,5 @@
+gcc main.c atmosphere.c estrazionedati.c interpolazione.c motioneq.c interpolazione_new.c propeller.c routh.c -o main.exe && main.exe
+
 ## Da fare dopo
 - La validazione va finita. per il momento le equazioni non danno gli stessi valori
 - Calcolare la massa che non deve consumarsi più del limite minimo (In Interpolazione.c)
