@@ -9,19 +9,7 @@
 #define g 9.80665
 #define pi 3.14159265
 
-void equation(double alpha, double Pmax_h, double rho_h, double *CI, double *body_axes, double **aer_der_x, double **aer_der_y, double **aer_der_z, double **steady_state_coeff, double **control_force_der, double **control_moment_der, double **rotary_der, double **pitch_moment_der, double *geometry_propeller, double *propeller_profile, double **data_propeller, double *fuel_mass) {
-
-    int i = 0, i_e = 0, i_a = 0, flag = 0, de = 0;
-    double alphaTrim = 0.0, deTrim = 0.0, RPMTrim = 0.0, PalTrim = 0.0;
-
-    // Trovare l'indice di alpha 
-    while (flag == 0 && i_a < 126){
-        if (aer_der_x[i_a][0] == alpha){
-            flag = 1;
-            break;
-        }
-        i_a++;
-    }
+void equation(double Pmax_h, double rho_h, double *CI, double **vett_stato, double *body_axes, double **aer_der_x, double **aer_der_z, double **steady_state_coeff, double **control_force_der, double **control_moment_der, double **pitch_moment_der, double *geometry_propeller, double *propeller_profile, double **data_propeller, double *trim) {
 
     // ****** TROVARE ALPHA DI TRIM *******
 
@@ -29,7 +17,7 @@ void equation(double alpha, double Pmax_h, double rho_h, double *CI, double *bod
     int flag_1 = 0;
     double alpha_1 = 0;
     double score_min = 1000;
-    double CZalphaTrim, CMalphaTrim;
+    double CZtrim[0], CMtrim[0];
     
     for (int i = 0; i <= 2470; ++i) {
         alpha_1 = i * 0.01 - 5.0;
@@ -50,10 +38,10 @@ void equation(double alpha, double Pmax_h, double rho_h, double *CI, double *bod
                 double score = sqrt(control/10*control/10 + control2/0.004*control2/0.004);
                 if (score < score_min) {
                     score_min = score;
-                    deTrim = de_1;
-                    alphaTrim = alpha_1;
-                    CZalphaTrim = CZalpha;
-                    CMalphaTrim = CMalpha;
+                    trim[1] = de_1;
+                    trim[0] = alpha_1;
+                    CZtrim[0] = CZalpha;
+                    CMtrim[0] = CMalpha;
                 }
 
                 double de_ref = - (CMss + CMalpha * alpha_1 * (pi/180)) / CMde;
@@ -68,7 +56,7 @@ void equation(double alpha, double Pmax_h, double rho_h, double *CI, double *bod
         //printf("Il valore più basso: %lf\t%lf\n", ver[0], ver[1]);
     } else {
         printf("\n*********************Alpha di Trim trovato**************************************\n\n");
-        printf("---------- ALPHA: %lf\t\t DE_TRIM: %lf\n\n", alphaTrim, deTrim);
+        printf("---------- ALPHA: %lf\t\t DE_TRIM: %lf\n\n", trim[0], trim[1]);
         /*printf("CZ_tot: %lf\n", CZ_tot);
         printf("cst * CZ_tot: %lf\n", cst * CZ_tot);
         printf("m*g*cos(a): %lf\n", body_axes[0]*g*cos(alpha_1*(pi/180)));
@@ -78,22 +66,53 @@ void equation(double alpha, double Pmax_h, double rho_h, double *CI, double *bod
         printf("Valore interpolato di CZalpha: %lf\n", CZalpha);*/
     }
 
-    double thetaTrim = alphaTrim + CI[2];
+    double thetaTrim = trim[0] + CI[2];
 
     // Componente velocità TAS di Trim
-    double uTrim = CI[0] * cos(alphaTrim*(pi/180));
-    double wTrim = CI[0] * sin(alphaTrim*(pi/180));
+    double uTrim = CI[0] * cos(trim[0]*(pi/180));
+    double wTrim = CI[0] * sin(trim[0]*(pi/180));
     double hTrim = CI[1];
 
     // VETTORE DEGLI STATI (DINAMICA LONGITUDINALE)- Condizione di Trim
-    double vett_stato[12] = {uTrim, 0, wTrim, 0, 0, 0, 0, thetaTrim, 0, hTrim, 0, 0};
+    // Creo la prima righa della matrice state (dinamica)
+    double **state = malloc(sizeof(double*));
+    if (state == NULL) {
+        fprintf(stderr, "Errore allocazione state\n");
+        exit(1);
+    }
+    state[0] = calloc(12, sizeof(double));
+    if (state[0] == NULL) {
+        fprintf(stderr, "Errore allocazione riga state\n");
+        free(state);
+        exit(1);
+    }
+    // Riempio la prima riga con i valori di Trim
+    for (int i = 0; i < 12; ++i){
+        switch (i) {
+            case 0:
+                vett_stato[0][i] = uTrim;
+                break;
+            case 2:
+                vett_stato[0][i] = wTrim;
+                break;
+            case 7:
+                vett_stato[0][i] = thetaTrim;
+                break;
+            case 9:
+                vett_stato[0][i] = hTrim;
+                break;
+            default:
+                vett_stato[0][i] = 0;
+                break;
+        }
+    }
 
-    double CXss = interpolazioneTotale(steady_state_coeff, 1, alphaTrim);
-    double CXalpha = interpolazioneTotale(aer_der_x, 1, alphaTrim);
-    double CXde = interpolazioneTotale(control_force_der, 1, alphaTrim);
+    double CXss = interpolazioneTotale(steady_state_coeff, 1, trim[0]);
+    double CXalpha = interpolazioneTotale(aer_der_x, 1, trim[0]);
+    double CXde = interpolazioneTotale(control_force_der, 1, trim[0]);
 
     // ******* TROVARE RPM di Trim *******
-    double CX_tot = CXss + CXalpha * alphaTrim * (pi/180) + CXde * deTrim * (pi/180);
+    double CX_tot = CXss + CXalpha * trim[0] * (pi/180) + CXde * trim[1] * (pi/180);
     double tTrim = body_axes[0]*g*sin(thetaTrim*(pi/180)) - 0.5*CX_tot*rho_h*CI[0]*CI[0]*body_axes[2];
     printf("\n\ntTrim: %lf\n", tTrim);
 
@@ -101,19 +120,20 @@ void equation(double alpha, double Pmax_h, double rho_h, double *CI, double *bod
 
     while (RPM <= 2700){
         double prop[3] = {0, 0, 0};
-        double Pal = propel(RPM, rho_h, CI[0], geometry_propeller, propeller_profile, data_propeller, prop);
+        double Pal;
+        propel(RPM, rho_h, CI[0], geometry_propeller, propeller_profile, data_propeller, prop, &Pal);
 
         if (fabs(tTrim - prop[0]) < 1.0){
             printf("\n*********************RPM di Trim trovato**************************************\n\n");
             printf("---------- RPM: %d\n\n", RPM);
             printf("Efficienza elica: %lf\n\n", prop[2]);
-            RPMTrim = RPM;
+            trim[2] = RPM;
 
             if (Pal>Pmax_h) {
-                PalTrim = Pmax_h;
+                trim[3] = Pmax_h;
                 printf("La potenza è stata limitata a quella massima\n");
             } else {
-                PalTrim = Pal;
+                trim[3] = Pal;
             }
             // printf("Pal: %lf\n", PalTrim);
             // printf("Pal massima: %lf\n", Pmax_h);
@@ -123,5 +143,6 @@ void equation(double alpha, double Pmax_h, double rho_h, double *CI, double *bod
         RPM += 1;
     }
 
-    int a = routh(pitch_moment_der[0][4], body_axes, rho_h, alphaTrim, CI[0], CXalpha, CZalphaTrim, CMalphaTrim, pitch_moment_der[0][2]);
+    // Calcolo la stabilità dell'aeromobile
+    int a = routh(pitch_moment_der[0][4], body_axes, rho_h, trim[0], CI[0], CXalpha, CZtrim[0], CMtrim[0], pitch_moment_der[0][2]);
 }

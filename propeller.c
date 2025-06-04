@@ -6,7 +6,7 @@
 #define pi 3.14159265
 
 // Modifica: la funzione ora prende un double* prop come argomento di output
-double propel(double RPM_ref, double rho1, double Vel, double* geometry_propeller, double* propeller_profile, double** data_propeller, double* prop)
+double propel(double RPM_ref, double rho1, double Vel, double* geometry_propeller, double* propeller_profile, double** data_propeller, double* prop, double *Pal)
 {
     float alpha1, theta1;
     float pitch = 0.0; // pitch del'elica
@@ -108,6 +108,6 @@ double propel(double RPM_ref, double rho1, double Vel, double* geometry_propelle
         prop[2] = t/q*J/(2.0*pi); //efficienza elica
     }
 
-    return (prop[1]*omega)/1000;
+    *Pal = (prop[1]*omega)/1000;
 }
 

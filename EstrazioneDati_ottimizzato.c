@@ -67,6 +67,26 @@ double** caricaMatriceDouble(const char* path, int colonne, int* outRighe) {
     return mat;
 }
 
+// Rialloca la matrice state aggiungendo una riga
+double** reallocState(double** state, int* n_righe, int n_colonne) {
+    // Aumenta il numero di righe
+    int new_rows = *n_righe + 1;
+    // Rialloca il vettore di puntatori alle righe
+    double** tmp = realloc(state, new_rows * sizeof(double*));
+    if (!tmp) {
+        fprintf(stderr, "Errore realloc state\n");
+        return state; // ritorna la vecchia matrice se fallisce
+    }
+    // Alloca la nuova riga
+    tmp[new_rows - 1] = calloc(n_colonne, sizeof(double));
+    if (!tmp[new_rows - 1]) {
+        fprintf(stderr, "Errore calloc nuova riga state\n");
+        return tmp;
+    }
+    *n_righe = new_rows;
+    return tmp;
+}
+
 // Funzione wrapper per caricare tutti i dati richiesti dal simulatore
 int caricaTuttiIDati(double **engine, double **geometry_propeller, double **propeller_profile, double ***data_propeller, double **body_axes, double **deflection_limits, double **fuel_mass, double ***steady_state_coeff, double ***aer_der_x, double ***aer_der_y, double ***aer_der_z, double ***rolling_moment_der, double ***pitch_moment_der, double ***yawing_moment_der, double ***control_force_der, double ***control_moment_der, double ***rotary_der) {
     int ok = 1;
@@ -95,10 +115,10 @@ int caricaTuttiIDati(double **engine, double **geometry_propeller, double **prop
 }
 
 // Funzione per liberare la memoria di tutti i dati caricati
-void liberaTuttiIDati(double *engine, double *geometry_propeller, double *propeller_profile, double **data_propeller, double *body_axes, double *deflection_limits, double *fuel_mass, double **steady_state_coeff, double **aer_der_x, double **aer_der_y, double **aer_der_z, double **rolling_moment_der, double **pitch_moment_der, double **yawing_moment_der, double **control_force_der, double **control_moment_der, double **rotary_der) {
+void liberaTuttiIDati(double *engine, double *geometry_propeller, double *propeller_profile, double **data_propeller, double *body_axes, double *deflection_limits, double *fuel_mass, double **steady_state_coeff, double **aer_der_x, double **aer_der_y, double **aer_der_z, double **rolling_moment_der, double **pitch_moment_der, double **yawing_moment_der, double **control_force_der, double **control_moment_der, double **rotary_der, double **state) {
     free(engine); free(geometry_propeller); free(propeller_profile); free(body_axes); free(deflection_limits); free(fuel_mass);
     // Libera matrici dinamiche
-    double*** matrici[] = {&data_propeller, &steady_state_coeff, &aer_der_x, &aer_der_y, &aer_der_z, &rolling_moment_der, &pitch_moment_der, &yawing_moment_der, &control_force_der, &control_moment_der, &rotary_der};
+    double*** matrici[] = {&data_propeller, &steady_state_coeff, &aer_der_x, &aer_der_y, &aer_der_z, &rolling_moment_der, &pitch_moment_der, &yawing_moment_der, &control_force_der, &control_moment_der, &rotary_der, &state};
     int numMatrici = sizeof(matrici)/sizeof(matrici[0]);
     for (int m = 0; m < numMatrici; ++m) {
         if (*matrici[m]) {

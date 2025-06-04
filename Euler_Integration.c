@@ -14,7 +14,7 @@ void Integration(double *state_trim, double *comandi, double *body_axes, double 
     double V, rho, S, alpha, beta, q_ad, r_ad, p_ad, T;
     double du, dv, dw, dp, dq, dr, dphi, dtheta, dpsi, dh, dx_ned, dy_ned;
     double Jx = body_axes[13], Jy = body_axes[14], Jz = body_axes[15], m = body_axes[0];
-    double prop[3];
+    double prop[3], Pal;
     
     #define g 9.80665
     #define pi 3.14159265
@@ -99,7 +99,7 @@ void Integration(double *state_trim, double *comandi, double *body_axes, double 
             double Cndr = interpolazioneTotale(control_moment_der, 6, alpha);
 
             // Calcolo Spinta
-            T = propel(RPM, rho, V, geometry_propeller, propeller_profile, data_propeller, prop);
+            T = propel(RPM, rho, V, geometry_propeller, propeller_profile, data_propeller, prop, &Pal);
 
             // Calcolo Forze e Momenti (t = 0);
             X = costante*(Cxss*alpha+Cxa*alpha+Cxde*de);
@@ -197,7 +197,7 @@ void Integration(double *state_trim, double *comandi, double *body_axes, double 
             double Cndr = interpolazioneTotale(control_moment_der, 6, alpha);
 
             // Calcolo Spinta
-            T = propel(RPM, rho, V, geometry_propeller, propeller_profile, data_propeller, prop);
+            T = propel(RPM, rho, V, geometry_propeller, propeller_profile, data_propeller, prop, &Pal);
 
             // Definizione di una costante semplificativa
             costante=0.5*rho*V*V*S;

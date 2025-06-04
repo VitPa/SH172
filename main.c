@@ -6,8 +6,10 @@
 #include <ctype.h>
 #include "Atmosphere.h"
 #include "EstrazioneDati.h"
-#include "Interpolazione.h"
+#include "EstrazioneDati_ottimizzato.h"
+#include "Interpolazione_new.h"
 #include "MotionEq.h"
+#include "Integration.h"
 
 int main(){
 
@@ -28,10 +30,12 @@ int main(){
     double **control_force_der = NULL;
     double **control_moment_der = NULL;
     double **rotary_der = NULL;
+    double **state = NULL;
     double Int_ssc[6], Int_adx[7], Int_ady[6], Int_adz[7], Int_rmd[6], Int_pmd[7], Int_ymd[6], Int_cfd[6], Int_cmd[6], Int_rd[6];
-    double CI[3];
+    double CI[3], trim[4];
     double Pmax_h = 0, press0 = 0, temp0 = 0, rho0 = 0, vsuono0 = 0, press_h = 0, temp_h = 0, rho_h = 0, vsuono_h = 0;
-    int flagatm;
+    double dt = 0.01, deltaT_fs;
+    int flagatm, state_rows = 1;
 
     printf("\n\nSimulatore di volo per il Cessna 172\n Inserire i dati iniziali\n --------------------------------------------\n\nInserire la velocità inziale: ");
     scanf("%lf", &CI[0]);
@@ -53,30 +57,28 @@ int main(){
 
     AtmosphereCalc(CI, &engine, &Pmax_h, &press0, &temp0, &rho0, &vsuono0, &press_h, &temp_h, &rho_h, &vsuono_h, &flagatm);
 
-    equation(5.0, Pmax_h, rho_h, CI, body_axes, aer_der_x, aer_der_y, aer_der_z, steady_state_coeff, control_force_der, 
-        control_moment_der, rotary_der, pitch_moment_der, geometry_propeller, propeller_profile, data_propeller, fuel_mass);
-    /*do {
-        // inizializzazione - Equazioni della dinamica
-
-        // inizializzazione - CONDIZIONI DI TRIM (){ autovalori e autovettori, angoli di Trim, numero di giri, coefficienti aer tot}
+    equation(Pmax_h, rho_h, CI, state, body_axes, aer_der_x, aer_der_z, steady_state_coeff, control_force_der, 
+        control_moment_der, pitch_moment_der, geometry_propeller, propeller_profile, data_propeller, trim);
 
 
-        // Interpoliamo per calcolare i dati aerodinamici corretti
-        InterpolazioneCoeff(0, &body_axes, CI, &temp_h, 2.0, Int_ssc, Int_adx, Int_ady, Int_adz, Int_rmd, 
-        Int_pmd, Int_ymd, Int_cfd, Int_cmd, Int_rd, &steady_state_coeff, &aer_der_x, &aer_der_y, 
-        &aer_der_z, &rolling_moment_der, &pitch_moment_der, &yawing_moment_der, &control_force_der, 
-        &control_moment_der, &rotary_der);
+    printf("Inserire il tempo di simulazione: ");
+    scanf("%lf", &deltaT_fs);
+    
+    int i = 0;
+    for(double Ts = 0.00; Ts <= deltaT_fs; Ts += dt){
+        
+        AtmosphereCalc(CI, &engine, &Pmax_h, &press0, &temp0, &rho0, &vsuono0, &press_h, &temp_h, &rho_h, &vsuono_h, &flagatm);
 
+        reallocState(state, &state_rows, 12);
 
+        eulerEquation(i, state, command, rho_h, trim[2], body_axes, steady_state_coeff, aer_der_x, aer_der_y, aer_der_z, 
+            rolling_moment_der, pitch_moment_der, yawing_moment_der, control_force_der, control_moment_der, geometry_propeller, 
+            propeller_profile, data_propeller);
 
-    } while (1);*/
+        //Arrivati all'ultima iterazione, in base a come è scritta la funzione, calcola comunque i valori di state al 
+        // passo successvo anche se al passo successivo lasimulazione sarà terminata. È corretto?
+        ++i;
+    }
 
     return 0;
-
-    
-
-    // inizializzazione - COMANDI DI VOLO (comando desiderato semplice) {calcolo e creazione del vetore comando}
-
-    // loop - EQUAZIONI DEL MOTO (Tutti i dati aerodinamici e di potenza, comandi input)  { studiare la stabilità statica e dinamica, 
-    //                                                                                      calcolare i dati aggiornati cambiati in base alle manovre}
 }
