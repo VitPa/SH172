@@ -6,16 +6,16 @@ gcc main.c atmosphere.c estrazionedati.c interpolazione.c motioneq.c interpolazi
 - Inserire tutti i warning e error nel codice
 - Inserire le logiche aggiuntive (stampa dei valori e eliminazione dell'ogiva) nel file EstrapolazioneDati_ottimizzato.c
 - Risolvere il problema che quando fa il ciclo si ha un'errore a 19.79. Probabilmente è in Interpolazione_new.c
+- Fare in modo che il ciclo di funzionamento che itera per tutti gli istanti di tempo sia dal main.
 
 ## Da fare ora
-- Trovare autovalori e autovettori
 - Implementare la parte dinamica del simulatore
+- Implementare calcolo manetta
 
 ## Domande
 - Controllare gli rpm minimi e massimi della pala
 - I valori di soglia sono corretti?
 - Se trova più condizioni di alpha/de di trim, quale prendiamo? quella in cui abbiamo i residui più piccoli?
-
 
 Aggiornamento 01/06/2025
 - !!! prenotarci per martedi mattina possibilmente prima delle 13

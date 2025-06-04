@@ -86,7 +86,7 @@ void equation(double alpha, double Pmax_h, double rho_h, double *CI, double *bod
     double hTrim = CI[1];
 
     // VETTORE DEGLI STATI (DINAMICA LONGITUDINALE)- Condizione di Trim
-    double vett_stato[10] = {uTrim, 0, wTrim, 0, 0, 0, 0, thetaTrim, 0, hTrim};
+    double vett_stato[12] = {uTrim, 0, wTrim, 0, 0, 0, 0, thetaTrim, 0, hTrim, 0, 0};
 
     double CXss = interpolazioneTotale(steady_state_coeff, 1, alphaTrim);
     double CXalpha = interpolazioneTotale(aer_der_x, 1, alphaTrim);
