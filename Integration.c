@@ -1,7 +1,15 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include "Integration.h"
+#include "Interpolazione_new.h"
+#include "propeller.h"
+
+
 #define g 9.80665
 #define pi 3.14159265
 
-void eulerEquation(int i,double **state, double **command, double rho, double RPM, double *body_axes, double **steady_state_coefficients, double **aer_der_x, double **aer_der_y, double **aer_der_z, double **rolling_moment_der, double **pitch_moment_der, double **yawing_moment_der, double **control_force_der, double **control_moment_der, double **geometry_propeller, double **propeller_profile, double **data_propeller){
+void eulerEquation(int i,double **state, /*double **command*/ double command[][4], double rho, double RPM, double *body_axes, double **steady_state_coefficients, double **aer_der_x, double **aer_der_y, double **aer_der_z, double **rolling_moment_der, double **pitch_moment_der, double **yawing_moment_der, double **control_force_der, double **control_moment_der, double *geometry_propeller, double *propeller_profile, double **data_propeller){
     // Inizializzo le variabili
     double u,v,w,p,q,r,phi,theta,psi,h,x_ned,y_ned;
     double da, de, dr, manetta;
@@ -10,7 +18,7 @@ void eulerEquation(int i,double **state, double **command, double rho, double RP
     double q_ad, r_ad, p_ad;
     double T, prop[3], Pal;
     double X, Y, Z, L, M, N;
-    double du, dv, dw, dp, dq, dr, dphi, dtheta, dpsi, dh, dx_ned, dy_ned;
+    double du, dv, dw, dp, dq, dphi, dtheta, dpsi, dh, dx_ned, dy_ned;
     double dt=0.01;
     // Richiamo componenti vettore di stato state:
     u     = state[i][0];
@@ -38,7 +46,7 @@ void eulerEquation(int i,double **state, double **command, double rho, double RP
     costante=0.5*rho*V*V*S;
 
     // Definizione alpha e beta iniziali (t = 0):
-    alpha = atan2(w/u);
+    alpha = atan2(w,u);
     beta = asin(v/V);
 
     //Calcolo velocità angolari adimensionali
@@ -116,4 +124,8 @@ void eulerEquation(int i,double **state, double **command, double rho, double RP
     state[i+1][9]  = h + dt*h;
     state[i+1][10] = x_ned + dt*dx_ned;
     state[i+1][11] = y_ned + dt*dy_ned;
+
+    printf("Posizione x: %f\n", state[i+1][10]);
+    printf("Posizione y: %f\n", state[i+1][11]);
+    
 }

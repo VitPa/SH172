@@ -9,7 +9,7 @@
 #define g 9.80665
 #define pi 3.14159265
 
-void equation(double Pmax_h, double rho_h, double *CI, double **vett_stato, double *body_axes, double **aer_der_x, double **aer_der_z, double **steady_state_coeff, double **control_force_der, double **control_moment_der, double **pitch_moment_der, double *geometry_propeller, double *propeller_profile, double **data_propeller, double *trim) {
+void equation(double Pmax_h, double rho_h, double *CI, double ***vett_stato, double *body_axes, double **aer_der_x, double **aer_der_z, double **steady_state_coeff, double **control_force_der, double **control_moment_der, double **pitch_moment_der, double *geometry_propeller, double *propeller_profile, double **data_propeller, double *trim) {
 
     // ****** TROVARE ALPHA DI TRIM *******
 
@@ -74,35 +74,35 @@ void equation(double Pmax_h, double rho_h, double *CI, double **vett_stato, doub
     double hTrim = CI[1];
 
     // VETTORE DEGLI STATI (DINAMICA LONGITUDINALE)- Condizione di Trim
-    // Creo la prima righa della matrice state (dinamica)
-    double **state = malloc(sizeof(double*));
-    if (state == NULL) {
-        fprintf(stderr, "Errore allocazione state\n");
+    // Creo la prima righa della matrice vett_stato (dinamica)
+    *vett_stato = malloc(sizeof(double*));
+    if (*vett_stato == NULL) {
+        fprintf(stderr, "Errore allocazione vett_stato\n");
         exit(1);
     }
-    state[0] = calloc(12, sizeof(double));
-    if (state[0] == NULL) {
-        fprintf(stderr, "Errore allocazione riga state\n");
-        free(state);
+    (*vett_stato)[0] = calloc(12, sizeof(double));
+    if ((*vett_stato)[0] == NULL) {
+        fprintf(stderr, "Errore allocazione riga vett_stato\n");
+        free(*vett_stato);
         exit(1);
     }
     // Riempio la prima riga con i valori di Trim
     for (int i = 0; i < 12; ++i){
         switch (i) {
             case 0:
-                vett_stato[0][i] = uTrim;
+                (*vett_stato)[0][i] = uTrim;
                 break;
             case 2:
-                vett_stato[0][i] = wTrim;
+                (*vett_stato)[0][i] = wTrim;
                 break;
             case 7:
-                vett_stato[0][i] = thetaTrim;
+                (*vett_stato)[0][i] = thetaTrim;
                 break;
             case 9:
-                vett_stato[0][i] = hTrim;
+                (*vett_stato)[0][i] = hTrim;
                 break;
             default:
-                vett_stato[0][i] = 0;
+                (*vett_stato)[0][i] = 0;
                 break;
         }
     }

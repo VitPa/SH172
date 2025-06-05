@@ -10,7 +10,7 @@ gcc main.c atmosphere.c estrazionedati.c interpolazione.c motioneq.c interpolazi
 
 ## Da fare ora
 - Implementare la parte dinamica del simulatore
-- Implementare calcolo manetta
+- Implementare calcolo manetta che poi servirò per determinare gli RPM da dare ad eulero
 
 ## Domande
 - Controllare gli rpm minimi e massimi della pala
