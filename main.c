@@ -88,5 +88,9 @@ int main(){
         ++i;
     }
 
+    liberaTuttiIDati(&engine, &geometry_propeller, &propeller_profile, &data_propeller, &body_axes, &deflection_limits, 
+        &fuel_mass, &steady_state_coeff, &aer_der_x, &aer_der_y, &aer_der_z, &rolling_moment_der, &pitch_moment_der, 
+        &yawing_moment_der, &control_force_der, &control_moment_der, &rotary_der, &state);
+
     return 0;
 }
