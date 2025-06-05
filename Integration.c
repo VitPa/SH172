@@ -126,6 +126,6 @@ void eulerEquation(int i,double **state, /*double **command*/ double command[][4
     state[i+1][11] = y_ned + dt*dy_ned;
 
     printf("Posizione x: %f\n", state[i+1][10]);
-    printf("Posizione y: %f\n", state[i+1][11]);
+    printf("Posizione y: %f\n\n", state[i+1][11]);
     
 }

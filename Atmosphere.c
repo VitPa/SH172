@@ -137,6 +137,7 @@ int AtmosphereCalc (double *CI, double **datiengine, double *Pmax_h,double *pres
                     double *press_h,double *temp_h,double *rho_h,double *vsuono_h, int *flagatm)
 {
     double R=287.05, gamma=1.3954;
+    static int stampa = 0;
     switch(*flagatm)
     {
         case 1: // calcola le condizioni atmosferiche e di pot per i valori a SL di default o inseriti dall'utente
@@ -146,22 +147,27 @@ int AtmosphereCalc (double *CI, double **datiengine, double *Pmax_h,double *pres
             *rho_h=*press_h/(R*(*temp_h));
             *Pmax_h= (*datiengine)[0] * pow(*rho_h/(*rho0),(*datiengine)[1]);
             *vsuono_h = sqrt(gamma*R*(*temp_h));
-
-            printf("\nI dati atmosferici e di potenza per la quota di %d m sono:\n\n", (int) CI[1]);
-            printf("Temperatura: \t\t%f [K]\n",*temp_h);
-            printf("Pressione: \t\t%f [Pa]\n",*press_h);
-            printf("Desita': \t\t%f [kg/m^3]\n",*rho_h);
-            printf("Potenza: \t\t%f [kW]\n",*Pmax_h);
+            if (stampa == 0){
+                printf("\nI dati atmosferici e di potenza per la quota di %d m sono:\n\n", (int) CI[1]);
+                printf("Temperatura: \t\t%f [K]\n",*temp_h);
+                printf("Pressione: \t\t%f [Pa]\n",*press_h);
+                printf("Desita': \t\t%f [kg/m^3]\n",*rho_h);
+                printf("Potenza: \t\t%f [kW]\n",*Pmax_h);
+                stampa = 1;
+            }
             break;
         case 2:// usa i valori scelti dall'utente
             *temp_h=*temp_h+273.15;
             *Pmax_h= (*datiengine)[0] * pow(*rho_h/(*rho0),(*datiengine)[1]);
 
-            printf("\nI dati atmosferici e di potenza per la quota di %f m sono:\n\n",CI[1]);
-            printf("Temperatura: \t\t%f [K]\n",*temp_h);
-            printf("Pressione: \t\t%f [Pa]\n",*press_h);
-            printf("Densita': \t\t%f [kg/m^3]\n",*rho_h);
-            printf("Potenza: \t\t%f [kW]\n",*Pmax_h);
+            if (stampa == 0){
+                printf("\nI dati atmosferici e di potenza per la quota di %f m sono:\n\n",CI[1]);
+                printf("Temperatura: \t\t%f [K]\n",*temp_h);
+                printf("Pressione: \t\t%f [Pa]\n",*press_h);
+                printf("Densita': \t\t%f [kg/m^3]\n",*rho_h);
+                printf("Potenza: \t\t%f [kW]\n",*Pmax_h);
+                stampa = 1;
+            }
             break;
     }
     return 0;

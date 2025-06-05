@@ -66,7 +66,7 @@ int main(){
     scanf("%lf", &deltaT_fs);
 
     for (int i = 0; i < deltaT_fs/dt; ++i){
-        command[i][0] = 0.01    ;
+        command[i][0] = 0.01;
         command[i][1] = trim[1];
         command[i][2] = 0;
         command[i][3] = 0;
