@@ -13,6 +13,13 @@
 
 int main(){
 
+    /*
+    Implementare all'inzio un parte di codice che fa decidere (oppure si passa come argomento) 
+    se far partire il simulatore in modalità utente o modalità test. Quindi verbosa o no. In più 
+    si può fare una terza modalità in cui si stampano (magari chiedendo funzione per funzione) 
+    tutti i calcoli intermedi per un debug ancora più avanzato
+    */
+
     double *engine = NULL;
     double *geometry_propeller = NULL;
     double *propeller_profile = NULL;
@@ -88,9 +95,9 @@ int main(){
         ++i;
     }
 
-    liberaTuttiIDati(&engine, &geometry_propeller, &propeller_profile, &data_propeller, &body_axes, &deflection_limits, 
-        &fuel_mass, &steady_state_coeff, &aer_der_x, &aer_der_y, &aer_der_z, &rolling_moment_der, &pitch_moment_der, 
-        &yawing_moment_der, &control_force_der, &control_moment_der, &rotary_der, &state);
+    liberaTuttiIDati(engine, geometry_propeller, propeller_profile, data_propeller, body_axes, deflection_limits, 
+        fuel_mass, steady_state_coeff, aer_der_x, aer_der_y, aer_der_z, rolling_moment_der, pitch_moment_der, 
+        yawing_moment_der, control_force_der, control_moment_der, rotary_der, state);
 
     return 0;
 }
