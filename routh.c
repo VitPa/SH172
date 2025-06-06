@@ -74,15 +74,24 @@ int routh(double Cm_q,double* body_axes, double rho, double alpha_trim, double V
     double T12_ph = fabs(log(0.5)/Reph);
 
     printf("\nTph = %lf\nT12_ph = %lf\n",Tph,T12_ph);
+
+    printf("\n-----------------------------------\n");
     
-    double omegaNsp_adm = sqrt(-(2*massa_adm*Cm_alpha+Cm_q*CL_alpha)/(2*massa_adm*inerziaY_adm));
+    //double omegaNsp_adm = sqrt(-(2*massa_adm*Cm_alpha+Cm_q*CL_alpha)/(2*massa_adm*inerziaY_adm));
+    double omegaNsp_adm = sqrt(-Cm_alpha/inerziaY_adm - (Cm_q*CL_alpha)/(2*massa_adm*inerziaY_adm));
+    double omegaNsp = (omegaNsp_adm*2*V)/(body_axes[3]);
     double zsp = (inerziaY_adm*CL_alpha-2*massa_adm*(Cm_q+Cm_alphaprimo))/(2*sqrt(-2*massa_adm*inerziaY_adm*(2*massa_adm*Cm_alpha+Cm_q*CL_alpha)));
-    double Resp = -zsp*omegaNsp_adm;
-    double Imsp = omegaNsp_adm*sqrt(fabs(zsp*zsp - 1.0));
+    double Resp = -zsp*omegaNsp;
+    double Imsp = omegaNsp*sqrt(fabs(zsp*zsp - 1.0));
 
     printf("\nResp = %lf\nImsp = %lf\n",Resp,Imsp);
-    printf("\nomegaNsp_adm = %lf\n",omegaNsp_adm);
+    printf("\nomegaNsp_adm = %lf\nomegaNsp = %lf\n",omegaNsp_adm, omegaNsp);
     printf("\nzsp = %lf\n",zsp);
+
+    double Tsp = 2*pi/Imsp;
+    double T12_sp = fabs(log(0.5)/Resp);
+
+    printf("\nTsp = %lf\nT12_sp = %lf\n",Tsp,T12_sp);
 
 
 
