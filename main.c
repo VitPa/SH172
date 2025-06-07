@@ -22,28 +22,14 @@ int main(){
     */
 
     double *engine = NULL;
-    double *geometry_propeller = NULL;
-    double *propeller_profile = NULL;
-    double **data_propeller = NULL;
-    double *body_axes = NULL;
-    double *deflection_limits = NULL;
-    double *fuel_mass = NULL;
-    double **steady_state_coeff = NULL;
-    double **aer_der_x = NULL;
-    double **aer_der_y = NULL;
-    double **aer_der_z = NULL;
-    double **rolling_moment_der = NULL;
-    double **pitch_moment_der = NULL;
-    double **yawing_moment_der = NULL;
-    double **control_force_der = NULL;
-    double **control_moment_der = NULL;
-    double **rotary_der = NULL;
+    double *geometry_propeller = NULL, *propeller_profile = NULL, **data_propeller = NULL;
+    double *body_axes = NULL, *deflection_limits = NULL, *fuel_mass = NULL;
+    double **steady_state_coeff = NULL, **aer_der_x = NULL, **aer_der_y = NULL,**aer_der_z = NULL;
+    double **rolling_moment_der = NULL, **pitch_moment_der = NULL, **yawing_moment_der = NULL;
+    double **control_force_der = NULL, **control_moment_der = NULL, **rotary_der = NULL;
     double **state = NULL;
-    double Int_ssc[6], Int_adx[7], Int_ady[6], Int_adz[7], Int_rmd[6], Int_pmd[7], Int_ymd[6], Int_cfd[6], Int_cmd[6], Int_rd[6];
-    double CI[3], trim[4], command[10000][4];
-    double Pmax_h, press_h, temp_h, rho_h, vsuono_h;
-    double dt = 0.01, deltaT_fs;
-    int flagatm, state_rows = 1;
+    double trim[4], command[10000][4];
+    int state_rows = 1;
 
     // Caricamento variabili da file .txt
     datiFiles(0, &engine, &geometry_propeller, &propeller_profile, &data_propeller, &body_axes, &deflection_limits,
@@ -51,6 +37,9 @@ int main(){
         &pitch_moment_der, &yawing_moment_der, &control_force_der, &control_moment_der, &rotary_der);
 
     // Caricamento condizioni iniziali
+    int flagatm;
+    double Pmax_h, press_h, temp_h, rho_h, vsuono_h;
+    double CI[3];
     loadCI(CI);
     AtmosphereChoice(&press_h, &temp_h, &rho_h, &vsuono_h, &flagatm);
     AtmosphereCalc(CI[1], engine, &Pmax_h, &press_h, &temp_h, &rho_h, &vsuono_h, flagatm);
@@ -61,6 +50,7 @@ int main(){
         control_moment_der, pitch_moment_der, geometry_propeller, propeller_profile, data_propeller, trim);
 
     // Inserimento manovra
+    double dt = 0.01, deltaT_fs;
     printf("Inserire il tempo di simulazione: ");
     scanf("%lf", &deltaT_fs);
 
