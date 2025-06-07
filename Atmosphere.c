@@ -34,7 +34,7 @@ void AtmosphereChoice (double *press_h,double *temp_h,double *rho_h,double *vsuo
         if(input!=1 && input!=2 && input!=3)
         {
             scanf("%*[^\n]"); //svuota il buffer di scanf se immetto un carattere invece che un numero
-            printf("[!]WARNING immettere un numero da 1 a 3\n");
+            printf("[~]WARNING: immettere un numero da 1 a 3\n");
         }
         switch(input)
         {
@@ -42,75 +42,64 @@ void AtmosphereChoice (double *press_h,double *temp_h,double *rho_h,double *vsuo
                 *flagatm = 1;
                 break;
             case 2: //modifica i valori iniziali di default
-                printf("Inserire un valore di pressione (h=0) in Pa:");
-                scanf("%lf", press0);
-                if(press0<0) {
-                    do { //controllo che il numero immesso sia maggiore di zero
-                        printf("[!]WARNING immettere un numero positivo\n");
-                        printf("Inserire un valore di pressione (h=0) in Pa:");
-                        scanf("%lf", press0);
-                    } while (press0<0);
-                }
+                printf("Inserire un valore di pressione (h=0) [Pa]:");    
+                do {
+                    scanf("%*[^\n]");
+                    if(scanf("%lf", &press0) != 0 && press0>0) break;
+                    printf("[~]WARNING immettere un numero positivo --> ");
+                } while (1);
 
-                printf("Inserire un valore di temperatura (h=0) in C:");
-                scanf("%lf", temp0);
+                printf("Inserire un valore di temperatura (h=0) [C]:");
+                do {
+                    scanf("%*[^\n]");
+                    if(scanf("%lf", &temp0) != 0) break;
+                    printf("[~]WARNING immettere un numero positivo --> ");
+                } while (1);
 
-                printf("Inserire un valore di densita' (h=0) in kg/m^3:");
-                scanf("%lf", rho0);
-                if(rho0<0) {
-                    do { //controllo che il numero immesso sia maggiore di zero
-                        printf("[!]WARNING immettere un numero positivo\n");
-                        printf("Inserire un valore di densita' (h=0) in kg/m^3:");
-                        scanf("%lf", rho0);
-                    } while (rho0 < 0);
-                }
+                printf("Inserire un valore di densita' (h=0) [kg/m^3]:");
+                do {
+                    scanf("%*[^\n]");
+                    if(scanf("%lf", &rho0) != 0 && rho0>0) break;
+                    printf("[~]WARNING immettere un numero positivo --> ");
+                } while(1);
 
                 printf("Inserire un valore di velocita' (h=0) del suono in m/s:");
-                scanf("%lf", vsuono0);
-                if(vsuono0<0) {
-                    do { //controllo che il numero immesso sia maggiore di zero o effettivamente un numero
-                        printf("[!]WARNING immettere un numero positivo\n");
-                        printf("Inserire un valore di velocita' (h=0) del suono in m/s:");
-                        scanf("%lf", vsuono0);
-                    } while (vsuono0 < 0);
-                }
+                do {
+                    scanf("%*[^\n]");
+                    if(scanf("%lf", &vsuono0) != 0 && vsuono0>0) break;
+                    printf("[~]WARNING immettere un numero positivo --> ");
+                } while (1);
 
                 *flagatm = 1;
                 break;
             case 3: // immette i valori manualmente a una data quota senza richiederla poi
-                printf("Inserire un valore di pressione in Pa:");
-                scanf("%lf", press_h);
-                if(*press_h<0) {
-                    do { //controllo che il numero immesso sia maggiore di zero
-                        printf("[!]WARNING immettere un numero positivo\n");
-                        printf("Inserire un valore di pressione in Pa:");
-                        scanf("%lf", press_h);
-                    } while (*press_h < 0);
-                }
+                printf("Inserire un valore di pressione [Pa]:");
+                do {
+                    scanf("%*[^\n]");
+                    if(scanf("%lf", &press_h) != 0 && press_h>0) break;
+                    printf("[!]WARNING immettere un numero positivo\n");
+                } while (1);
 
-                printf("Inserire un valore di temperatura in C:");
-                scanf("%lf", temp_h);
+                printf("Inserire un valore di temperatura [C]:");
+                do {
+                    scanf("%*[^\n]");
+                    if(scanf("%lf", &temp_h) != 0) break;
+                    printf("[~]WARNING immettere un numero positivo --> ");
+                } while (1);
 
-                printf("Inserire un valore di densita' in kg/m^3:");
-                scanf("%lf", rho_h);
-                if(*rho_h<0) {
-                    do { //controllo che il numero immesso sia maggiore di zero
-                        printf("[!]WARNING immettere un numero positivo\n");
-                        printf("Inserire un valore di densita' in kg/m^3:");
-                        scanf("%lf", rho_h);
-                    } while (*rho_h < 0);
-                }
+                printf("Inserire un valore di densita' [kg/m^3]:");
+                do {
+                    scanf("%*[^\n]");
+                    if(scanf("%lf", &rho_h) != 0 && rho_h>0) break;
+                    printf("[!]WARNING immettere un numero positivo\n");
+                } while (1);
 
-                printf("Inserire un valore di velocita' del suono in m/s:");
-                scanf("%lf", vsuono_h);
-                if(*vsuono_h<0) {
-                    do { //controllo che il numero immesso sia maggiore di zero o effettivamente un numero
-                        printf("[!]WARNING immettere un numero positivo\n");
-                        printf("Inserire un valore di velocita' del suono in m/s:");
-                        scanf("%lf", vsuono_h);
-                    } while (*vsuono_h < 0);
-
-                }
+                printf("Inserire un valore di velocita' del suono [m/s]:");
+                do {
+                    scanf("%*[^\n]");
+                    if(scanf("%lf", &vsuono_h) != 0 && vsuono_h>0) break;
+                    printf("[!]WARNING immettere un numero positivo\n");
+                } while (1);
                 *flagatm = 2;
                 break;
         }
