@@ -4,7 +4,6 @@
 #include <complex.h>
 #include <math.h>
 
-#define MAX_ELEMENTI 30
 #define pi 3.14159265
 
 int routh(double Cm_q,double* body_axes, double rho, double alpha_trim, double V, double Cx_alpha, double Cz_alpha, double Cm_alpha, double Cm_alphaprimo){

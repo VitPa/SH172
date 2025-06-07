@@ -1,12 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "propeller.h"
 
 #define pi 3.14159265
 
 // Modifica: la funzione ora prende un double* prop come argomento di output
-double propel(double RPM_ref, double rho1, double Vel, double* geometry_propeller, double* propeller_profile, double** data_propeller, double* prop, double *Pal)
+double propel(double RPM_ref, double Pmax_h, double rho1, double Vel, double* geometry_propeller, double* propeller_profile, double** data_propeller, double* prop, double *Pal)
 {
     float alpha1, theta1;
     float pitch = 0.0; // pitch del'elica
@@ -98,16 +97,23 @@ double propel(double RPM_ref, double rho1, double Vel, double* geometry_propelle
     printf("Torque: %f Nm\n",prop[1]);
     printf("**********************\n");*/
 
-    double t = prop[0]/(rho1*n*n*diam*diam*diam*diam); //coefficiente di spinta adimensionale
-    double q = prop[1]/(rho1*n*n*diam*diam*diam*diam*diam); //coefficiente di coppia adimensionale
+    double t = prop[0]/(rho1*pow(n,2)*pow(diam,4)); //coefficiente di spinta adimensionale
+    double q = prop[1]/(rho1*pow(n,2)*pow(diam,5)); //coefficiente di coppia adimensionale
     double J = Vel/(n*diam); //rapporto di avanzamento
 
     if (t<0){
         prop[2] = 0.0; //efficienza elica
     }else{
-        prop[2] = t/q*J/(2.0*pi); //efficienza elica
+        prop[2] = t/q*(J*diam)/(2.0*pi); //efficienza elica
     }
 
     *Pal = (prop[1]*omega)/1000;
-}
 
+    if (*Pal>Pmax_h) {
+        *Pal = Pmax_h;
+    }
+}
+double massConsumption(double Kc, double Pa, double np, double mass, double time){
+    printf("%g\n", Kc*Pa/np);
+    return mass - (Kc*Pa*1000/np)*time;
+}

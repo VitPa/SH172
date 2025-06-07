@@ -3,7 +3,6 @@
 #include <string.h>
 #include <math.h>
 #include <ctype.h>
-#include "Atmosphere.h"
 
 static double press0 = 101325;    // Pa
 static double temp0 = 15;         // C
@@ -114,10 +113,9 @@ void AtmosphereCalc (double h, double *datiengine, double *Pmax_h,  double *pres
     switch(flagatm)
     {
         case 1: // calcola le condizioni atmosferiche e di pot per i valori a SL di default o inseriti dall'utente
-
-            temp0 += 273.15;
-            *temp_h = temp0 - 0.0065*h;
-            *press_h = press0*(pow((*temp_h/(temp0)),5.2561));
+            double temp = temp0 + 273.15;
+            *temp_h = temp - 0.0065*h;
+            *press_h = press0*(pow((*temp_h/(temp)),5.2561));
             *rho_h = *press_h/(R*(*temp_h));
             *Pmax_h = datiengine[0] * pow(*rho_h/(rho0),datiengine[1]);
             *vsuono_h = sqrt(gamma*R*(*temp_h));

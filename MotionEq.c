@@ -1,15 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "MotionEq.h"
-#include "Interpolazione_new.h"
+#include "Interpolazione.h"
 #include "propeller.h"
 #include "routh.h"
 
 #define g 9.80665
 #define pi 3.14159265
 
-void equation(double Pmax_h, double rho_h, double *CI, double ***vett_stato, double *body_axes, double **aer_der_x, double **aer_der_z, double **steady_state_coeff, double **control_force_der, double **control_moment_der, double **pitch_moment_der, double *geometry_propeller, double *propeller_profile, double **data_propeller, double *trim) {
+void equation(double *engine, double Pmax_h, double rho_h, double *CI, double ***vett_stato, double *body_axes, double **aer_der_x, double **aer_der_z, double **steady_state_coeff, double **control_force_der, double **control_moment_der, double **pitch_moment_der, double *geometry_propeller, double *propeller_profile, double **data_propeller, double *trim) {
 
     // ****** TROVARE ALPHA DI TRIM *******
 
@@ -42,11 +41,9 @@ void equation(double Pmax_h, double rho_h, double *CI, double ***vett_stato, dou
                     trim[0] = alpha_1;
                     CZtrim = CZalpha;
                     CMtrim = CMalpha;
+                    double de_ref = - (CMss + CMalpha * alpha_1 * (pi/180)) / CMde;
+                    printf("Valore di de stimato: %lf\n", de_ref*(180/pi));
                 }
-
-                double de_ref = - (CMss + CMalpha * alpha_1 * (pi/180)) / CMde;
-                printf("Valore di de stimato: %lf\n", de_ref*(180/pi));
-                
                 flag_1 = 1;
             }
         }
@@ -116,27 +113,18 @@ void equation(double Pmax_h, double rho_h, double *CI, double ***vett_stato, dou
     double tTrim = body_axes[0]*g*sin(thetaTrim) - 0.5*CX_tot*rho_h*CI[0]*CI[0]*body_axes[2];
     printf("\n\ntTrim: %lf\n", tTrim);
 
-    int RPM = 1500;         // RPM minimi
-
-    while (RPM <= 2700){
-        double prop[3] = {0, 0, 0};
+    int RPM = (int) engine[2];
+    int RPM_max = (int) engine[3];
+    while (RPM <= RPM_max){
         double Pal;
-        propel(RPM, rho_h, CI[0], geometry_propeller, propeller_profile, data_propeller, prop, &Pal);
+        double prop[3] = {0, 0, 0};
+        propel(RPM, Pmax_h, rho_h, CI[0], geometry_propeller, propeller_profile, data_propeller, prop, &Pal);
 
         if (fabs(tTrim - prop[0]) < 1.0){
             printf("\n*********************RPM di Trim trovato**************************************\n\n");
             printf("---------- RPM: %d\n\n", RPM);
             printf("Efficienza elica: %lf\n\n", prop[2]);
             trim[2] = RPM;
-
-            if (Pal>Pmax_h) {
-                trim[3] = Pmax_h;
-                printf("La potenza è stata limitata a quella massima\n");
-            } else {
-                trim[3] = Pal;
-            }
-            // printf("Pal: %lf\n", PalTrim);
-            // printf("Pal massima: %lf\n", Pmax_h);
             break;
         }
         // printf("RPM: %d\t dT: %lf\n", RPM, fabs(tTrim - prop[0]));

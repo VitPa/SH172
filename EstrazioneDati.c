@@ -1,512 +1,190 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "EstrazioneDati.h"
 
-void datiFiles(int stampa, double **engine, double **geometry_propeller, double **propeller_profile, double ***data_propeller, double **body_axes, double **deflection_limits,
-    double **fuel_mass, double ***steady_state_coeff, double ***aer_der_x, double ***aer_der_y, double ***aer_der_z, double ***rolling_moment_der, 
-    double ***pitch_moment_der, double ***yawing_moment_der, double ***control_force_der, double ***control_moment_der, double ***rotary_der){
+static int dimVett[6];
+static int dimMat[12];
 
-    int eng_num_valori = 0;
-    int prop_num_val = 0;
-    int geometry_num;
-    int count = 0;
-    int dba_num = 0;
-    int count0 = 0;
-    int body_num, deflection_num, count1, count2, count3, count4, count5, count6, count7, count8, count9;
+static FILE* apriFile(const char *path, const char *mode) {
+    FILE* f = fopen(path, mode);
+    if (!f) fprintf(stderr, "Errore apertura file: %s\n", path);
+    return f;
+}
 
-    FILE *file1 = fopen("dati/engine.txt", "r");
-    if (file1 == NULL) {
-        printf("Impossibile aprire il file engine.txt\n");
-    } else {
-
-        char eng_riga[1024];
-        while (fgets(eng_riga, 1024, file1) != NULL) {
-            
-            if (eng_riga[0] == '*') {
-                continue;
-            }
-
-            double eng_valore;
-            if (sscanf(eng_riga, "%lf", &eng_valore) == 1) {
-                
-                *engine = realloc(*engine, (eng_num_valori + 1) * sizeof(double));
-                (*engine)[eng_num_valori] = eng_valore;
-                eng_num_valori++;
-            }
+double* caricaVettoreDouble(const char *path, int checkSection, int *outSize) {
+    FILE* f = apriFile(path, "r");
+    if (!f) return NULL;
+    double* arr = NULL;
+    int n = 0, section = 0, flag = 1;
+    double val;
+    char riga[256];
+    while (fgets(riga, sizeof(riga), f)) {
+        if (riga[0] == '*' || riga[1] == '*') {
+            if (flag == 1) {flag = 0; ++section;}
+            continue;
         }
-
-        fclose(file1);
+        if (sscanf(riga, "%lf", &val) == 1) {
+            if (section == checkSection){
+                arr = realloc(arr, (n+1)*sizeof(double));
+                arr[n++] = val;
+            }
+            flag = 1;
+        }
     }
+    fclose(f);
+    if (outSize) *outSize = n;
+    return arr;
+}
 
-    FILE *file2 = fopen("dati/propeller.txt", "r");
-    if (file2 == NULL) {
-        printf("Impossibile aprire il file propeller.txt\n");
-    } else {
-        int section = 0;
-        int check = 0;
-
-        char prop_riga[1024];
-        while (fgets(prop_riga, 1024, file2) != NULL) {
-            
-            if (prop_riga[0] == '*') {
-                if (check == 1){
-                    switch (section){
-                        case 0:
-                            geometry_num = prop_num_val;
-                            prop_num_val = 0;
-                            section = 1;
-                            check = 0;
-                            break;
-                        case 1:
-                            section = 2;
-                            check = 0;
-                            break;
-                        case 2:
-                            section = 3;
-                            check = 0;
-                            break;      
+double** caricaMatriceDouble(const char *path, int colonne, int checkSection, int *outRighe) {
+    FILE* f = apriFile(path, "r");
+    if (!f) return NULL;
+    double **mat = NULL, t;
+    int n = 0, section = 0, flag = 1;
+    char riga[512];
+    while (fgets(riga, sizeof(riga), f)) {
+        if (riga[0] == '*' || riga[1] == '*') {
+            if (flag == 1) {flag = 0; ++section;}
+            continue;
+        }
+        if (sscanf(riga, "%lf", &t) == 1) {
+            if (section == checkSection){
+                double *temp = malloc(colonne * sizeof(double));
+                int letti = 0;
+                char *ptr = riga;
+                for (int i = 0; i < colonne; ++i) {
+                    while (*ptr == '\t' || *ptr == ' ') ++ptr;
+                    if (sscanf(ptr, "%lf", &temp[i]) == 1) {
+                        // Avanza ptr alla prossima tabulazione/spazio
+                        char *next = ptr;
+                        while (*next && *next != '\t' && *next != ' ' && *next != '\n') ++next;
+                        ptr = next;
+                        letti++;
+                    } else {
+                        break;
                     }
                 }
-                continue;
-            }
-
-            double prop_value;
-            double data_value[4];     //vettore temporaneo per salvataggio dati da file
-            switch (section){
-                case 0:
-                    if (sscanf(prop_riga, "%lf", &prop_value) == 0){
-                        break;
-                    } else {
-                        *geometry_propeller = realloc(*geometry_propeller, (prop_num_val + 1) * sizeof(double));
-                        (*geometry_propeller)[prop_num_val] = prop_value;
-                        prop_num_val++;
-                        check = 1;
-                        break;
-                    }
-                case 1:
-                    if (sscanf(prop_riga, "%lf", &prop_value) == 0){
-                        break;
-                    } else {
-                        *propeller_profile = realloc(*propeller_profile, (prop_num_val + 1) * sizeof(double));
-                        (*propeller_profile)[prop_num_val] = prop_value;
-                        prop_num_val++;
-                        check = 1;
-                        break;
-                    }
-                case 2:
-                    if (sscanf(prop_riga, "%lf\t%lf\t%lf\t%lf", &data_value[0], &data_value[1], &data_value[2], &data_value[3]) == 0){
-                        break;
-                    } else {
-                        if (data_value[0] <= 0.19){
-                            break;
-                        }
-
-                        *data_propeller = realloc(*data_propeller, (count + 1) * sizeof(double *));
-                        (*data_propeller)[count] = malloc(4 * sizeof(double));
-                        for (int j = 0; j < 4; j++){
-                            (*data_propeller)[count][j] = data_value[j];
-                        }
-                        count++;
-                        check = 1;
-                        break;
-                    }
-            }
-        }
-
-        fclose(file2);
-    }
-
-    FILE *file3 = fopen("dati/dba.txt", "r");
-    if (file3 == NULL) {
-        printf("Impossibile aprire il file dba.txt\n");
-    } else {
-        int section = 0;
-        int check = 0;
-
-        char prop_riga[1024];
-        while (fgets(prop_riga, 1024, file2) != NULL) {
-            
-            if (prop_riga[0] == '*' || prop_riga[1] == '*') {
-                if (check == 1){
-                    switch (section){
-                        case 0:
-                            body_num = dba_num;
-                            dba_num = 0;
-                            section = 1;
-                            check = 0;
-                            break;
-                        case 1:
-                            deflection_num = dba_num;
-                            dba_num = 0;
-                            section = 2;
-                            check = 0;
-                            break;
-                        case 2:
-                            section = 3;
-                            check = 0;
-                            break;
-                        case 3:
-                            section = 4;
-                            check = 0;
-                            count1 = count0;
-                            count0 = 0;
-                            break;
-                        case 4:
-                            section = 5;
-                            check = 0;
-                            count2 = count0;
-                            count0 = 0;
-                            break;
-                        case 5:
-                            section = 6;
-                            check = 0;
-                            count3 = count0;
-                            count0 = 0;
-                            break;
-                        case 6:
-                            section = 7;
-                            check = 0;
-                            count4 = count0;
-                            count0 = 0;
-                            break;
-                        case 7:
-                            section = 8;
-                            check = 0;
-                            count5 = count0;
-                            count0 = 0;
-                            break;
-                        case 8:
-                            section = 9;
-                            check = 0;
-                            count6 = count0;
-                            count0 = 0;
-                            break;
-                        case 9:
-                            section = 10;
-                            check = 0;
-                            count7 = count0;
-                            count0 = 0;
-                            break;
-                        case 10:
-                            section = 11;
-                            check = 0;
-                            count8 = count0;
-                            count0 = 0;
-                            break;
-                        case 11:
-                            section = 12;
-                            check = 0;
-                            count9 = count0;
-                            count0 = 0;
-                            break;
-                    }
+                if (letti == colonne) {
+                    mat = realloc(mat, (n+1)*sizeof(double*));
+                    mat[n++] = temp;
+                } else {
+                    free(temp);
                 }
-                continue;
             }
-
-            double dba_value;
-            double data_dba_value[8];     //vettore temporaneo per salvataggio dati da file
-            switch (section){
-                case 0:
-                    if (sscanf(prop_riga, "%lf", &dba_value) == 0){
-                        break;
-                    } else {
-                        *body_axes = realloc(*body_axes, (dba_num + 1) * sizeof(double));
-                        (*body_axes)[dba_num] = dba_value;
-                        dba_num++;
-                        check = 1;
-                        break;
-                    }
-                case 1:
-                    if (sscanf(prop_riga, "%lf", &dba_value) == 0){
-                        break;
-                    } else {
-                        *deflection_limits = realloc(*deflection_limits, (dba_num + 1) * sizeof(double));
-                        (*deflection_limits)[dba_num] = dba_value;
-                        dba_num++;
-                        check = 1;
-                        break;
-                    }
-                case 2:
-                    if (sscanf(prop_riga, "%lf", &dba_value) == 0){
-                        break;
-                    } else {
-                        *fuel_mass = realloc(*fuel_mass, (dba_num + 1) * sizeof(double));
-                        (*fuel_mass)[dba_num] = dba_value;
-                        dba_num++;
-                        check = 1;
-                        break;
-                    }
-                case 3:
-                    if (sscanf(prop_riga, "%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf", &data_dba_value[0], &data_dba_value[1], &data_dba_value[2], &data_dba_value[3], &data_dba_value[4], &data_dba_value[5], &data_dba_value[6]) == 0){
-                        break;
-                    } else {
-                        *steady_state_coeff = realloc(*steady_state_coeff, (count0 + 1) * sizeof(double *));
-                        (*steady_state_coeff)[count0] = malloc(7 * sizeof(double));
-                        for (int j = 0; j < 7; j++){
-                            (*steady_state_coeff)[count0][j] = data_dba_value[j];
-                        }
-                        count0++;
-                        check = 1;
-                        break;
-                    }
-                case 4:
-                    if (sscanf(prop_riga, "%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf", &data_dba_value[0], &data_dba_value[1], &data_dba_value[2], &data_dba_value[3], &data_dba_value[4], &data_dba_value[5], &data_dba_value[6], &data_dba_value[7]) == 0){
-                        break;
-                    } else {
-                        *aer_der_x = realloc(*aer_der_x, (count0 + 1) * sizeof(double *));
-                        (*aer_der_x)[count0] = malloc(8 * sizeof(double));
-                        for (int j = 0; j < 8; j++){
-                            (*aer_der_x)[count0][j] = data_dba_value[j];
-                        }
-                        count0++;
-                        check = 1;
-                        break;
-                    }
-                case 5:
-                    if (sscanf(prop_riga, "%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf", &data_dba_value[0], &data_dba_value[1], &data_dba_value[2], &data_dba_value[3], &data_dba_value[4], &data_dba_value[5], &data_dba_value[6]) == 0){
-                        break;
-                    } else {
-                        *aer_der_y = realloc(*aer_der_y, (count0 + 1) * sizeof(double *));
-                        (*aer_der_y)[count0] = malloc(7 * sizeof(double));
-                        for (int j = 0; j < 7; j++){
-                            (*aer_der_y)[count0][j] = data_dba_value[j];
-                        }
-                        count0++;
-                        check = 1;
-                        break;
-                    }
-                case 6:
-                    if (sscanf(prop_riga, "%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf", &data_dba_value[0], &data_dba_value[1], &data_dba_value[2], &data_dba_value[3], &data_dba_value[4], &data_dba_value[5], &data_dba_value[6], &data_dba_value[7]) == 0){
-                        break;
-                    } else {
-                        *aer_der_z = realloc(*aer_der_z, (count0 + 1) * sizeof(double *));
-                        (*aer_der_z)[count0] = malloc(8 * sizeof(double));
-                        for (int j = 0; j < 8; j++){
-                            (*aer_der_z)[count0][j] = data_dba_value[j];
-                        }
-                        count0++;
-                        check = 1;
-                        break;
-                    }
-                case 7:
-                    if (sscanf(prop_riga, "%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf", &data_dba_value[0], &data_dba_value[1], &data_dba_value[2], &data_dba_value[3], &data_dba_value[4], &data_dba_value[5], &data_dba_value[6]) == 0){
-                        break;
-                    } else {
-                        *rolling_moment_der = realloc(*rolling_moment_der, (count0 + 1) * sizeof(double *));
-                        (*rolling_moment_der)[count0] = malloc(7 * sizeof(double));
-                        for (int j = 0; j < 7; j++){
-                            (*rolling_moment_der)[count0][j] = data_dba_value[j];
-                        }
-                        count0++;
-                        check = 1;
-                        break;
-                    }
-                case 8:
-                    if (sscanf(prop_riga, "%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf", &data_dba_value[0], &data_dba_value[1], &data_dba_value[2], &data_dba_value[3], &data_dba_value[4], &data_dba_value[5], &data_dba_value[6], &data_dba_value[7]) == 0){
-                        break;
-                    } else {
-                        *pitch_moment_der = realloc(*pitch_moment_der, (count0 + 1) * sizeof(double *));
-                        (*pitch_moment_der)[count0] = malloc(8 * sizeof(double));
-                        for (int j = 0; j < 8; j++){
-                            (*pitch_moment_der)[count0][j] = data_dba_value[j];
-                        }
-                        count0++;
-                        check = 1;
-                        break;
-                    }
-                case 9:
-                    if (sscanf(prop_riga, "%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf", &data_dba_value[0], &data_dba_value[1], &data_dba_value[2], &data_dba_value[3], &data_dba_value[4], &data_dba_value[5], &data_dba_value[6]) == 0){
-                        break;
-                    } else {
-                        *yawing_moment_der = realloc(*yawing_moment_der, (count0 + 1) * sizeof(double *));
-                        (*yawing_moment_der)[count0] = malloc(7 * sizeof(double));
-                        for (int j = 0; j < 7; j++){
-                            (*yawing_moment_der)[count0][j] = data_dba_value[j];
-                        }
-                        count0++;
-                        check = 1;
-                        break;
-                    }
-                case 10:
-                    if (sscanf(prop_riga, "%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf", &data_dba_value[0], &data_dba_value[1], &data_dba_value[2], &data_dba_value[3], &data_dba_value[4], &data_dba_value[5], &data_dba_value[6]) == 0){
-                        break;
-                    } else {
-                        *control_force_der = realloc(*control_force_der, (count0 + 1) * sizeof(double *));
-                        (*control_force_der)[count0] = malloc(7 * sizeof(double));
-                        for (int j = 0; j < 7; j++){
-                            (*control_force_der)[count0][j] = data_dba_value[j];
-                        }
-                        count0++;
-                        check = 1;
-                        break;
-                    }
-                case 11:
-                    if (sscanf(prop_riga, "%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf", &data_dba_value[0], &data_dba_value[1], &data_dba_value[2], &data_dba_value[3], &data_dba_value[4], &data_dba_value[5], &data_dba_value[6]) == 0){
-                        break;
-                    } else {
-                        *control_moment_der = realloc(*control_moment_der, (count0 + 1) * sizeof(double *));
-                        (*control_moment_der)[count0] = malloc(7 * sizeof(double));
-                        for (int j = 0; j < 7; j++){
-                            (*control_moment_der)[count0][j] = data_dba_value[j];
-                        }
-                        count0++;
-                        check = 1;
-                        break;
-                    }
-                case 12:
-                    if (sscanf(prop_riga, "%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf", &data_dba_value[0], &data_dba_value[1], &data_dba_value[2], &data_dba_value[3], &data_dba_value[4], &data_dba_value[5], &data_dba_value[6]) == 0){
-                        break;
-                    } else {
-                        *rotary_der = realloc(*rotary_der, (count0 + 1) * sizeof(double *));
-                        (*rotary_der)[count0] = malloc(7 * sizeof(double));
-                        for (int j = 0; j < 7; j++){
-                            (*rotary_der)[count0][j] = data_dba_value[j];
-                        }
-                        count0++;
-                        check = 1;
-                        break;
-                    }
-            }
+            flag = 1;   
         }
-
-        fclose(file3);
     }
+    fclose(f);
+    if (outRighe) *outRighe = n;
+    return mat;
+}
 
-    if(stampa == 1){
-        printf("Engine: \n");
-        for (int i = 0; i < eng_num_valori; i++) {
-            printf("%.10lf\n", (*engine)[i]);
+// Rialloca la matrice state aggiungendo una riga
+double** reallocState(double **state, int n_colonne) {
+    int new_rows = dimMat[11] + 1;
+    double **tmp = realloc(state, new_rows * sizeof(double*));
+    if (!tmp) {
+        printf("[!]ERROR: Errore realloc state\n");
+        system("PAUSE"); 
+        exit(0);
+    }
+    tmp[new_rows - 1] = calloc(n_colonne, sizeof(double));
+    if (!tmp[new_rows - 1]) {
+        printf("[!]ERROR: Errore calloc nuova riga state\n");
+        system("PAUSE"); 
+        exit(0);
+    }
+    dimMat[11] = new_rows;
+    return tmp;
+}
+
+void stampaVettore(const char* nome, double* v, int n) {
+    printf("\n\n--- %s (vettore, %d elementi) ---\n", nome, n);
+    for (int i = 0; i < n; ++i) {
+        printf("%g\t", v[i]);
+    }
+}
+
+void stampaMatrice(const char* nome, double** m, int righe, int colonne) {
+    printf("\n\n--- %s (matrice, %d x %d) ---\n", nome, righe, colonne);
+    for (int i = 0; i < righe; ++i) {
+        for (int j = 0; j < colonne; ++j) {
+            printf(" %g\t", m[i][j]);
         }
+        printf("\n");
+    }
+}
 
-        printf("\n\n\n");
+// Funzione wrapper per caricare tutti i dati richiesti dal simulatore
+void caricaTuttiIDati(double **engine, double **geometry_propeller, double **propeller_profile, double ***data_propeller, double **body_axes, double **deflection_limits, double **fuel_mass, double ***steady_state_coeff, double ***aer_der_x, double ***aer_der_y, double ***aer_der_z, double ***rolling_moment_der, double ***pitch_moment_der, double ***yawing_moment_der, double ***control_force_der, double ***control_moment_der, double ***rotary_der) {
+    int ok = 1;
+    dimMat[11]=1;
+    // VETTORI
+    *engine = caricaVettoreDouble("dati/engine.txt", 1, &dimVett[0]); 
+    if (!*engine) {printf("[!]ERROR: Errore caricamento vettore engine\n"); system("PAUSE"); exit(0);}
+    *geometry_propeller = caricaVettoreDouble("dati/propeller.txt", 1, &dimVett[1]); 
+    if (!*geometry_propeller) {printf("[!]ERROR: Errore caricamento vettore geometry_propeller\n"); system("PAUSE"); exit(0);}
+    *propeller_profile = caricaVettoreDouble("dati/propeller.txt", 2, &dimVett[2]); 
+    if(!*propeller_profile) {printf("[!]ERROR: Errore caricamento vettore propeller_profile\n"); system("PAUSE"); exit(0);}
+    *body_axes = caricaVettoreDouble("dati/dba.txt", 1, &dimVett[3]); 
+    if (!*body_axes) {printf("[!]ERROR: Errore caricamento vettore body_axes\n"); system("PAUSE"); exit(0);}
+    *deflection_limits = caricaVettoreDouble("dati/dba.txt", 2, &dimVett[4]); 
+    if (!*deflection_limits) {printf("[!]ERROR: Errore caricamento vettore deflection_limits\n"); system("PAUSE"); exit(0);}
+    *fuel_mass = caricaVettoreDouble("dati/dba.txt", 3, &dimVett[5]); 
+    if (!*fuel_mass) {printf("[!]ERROR: Errore caricamento vettore fuel_mass\n"); system("PAUSE"); exit(0);}
+    // MATRICI
+    *data_propeller = caricaMatriceDouble("dati/propeller.txt", 4, 3, &dimMat[0]);
+    *steady_state_coeff = caricaMatriceDouble("dati/dba.txt", 7, 4, &dimMat[1]);
+    *aer_der_x = caricaMatriceDouble("dati/dba.txt", 8, 5, &dimMat[2]);
+    *aer_der_y = caricaMatriceDouble("dati/dba.txt", 7, 6, &dimMat[3]);
+    *aer_der_z = caricaMatriceDouble("dati/dba.txt", 8, 7, &dimMat[4]);
+    *rolling_moment_der = caricaMatriceDouble("dati/dba.txt", 7, 8, &dimMat[5]);
+    *pitch_moment_der = caricaMatriceDouble("dati/dba.txt", 8, 9, &dimMat[6]);
+    *yawing_moment_der = caricaMatriceDouble("dati/dba.txt", 7, 10, &dimMat[7]);
+    *control_force_der = caricaMatriceDouble("dati/dba.txt", 7, 11, &dimMat[8]);
+    *control_moment_der = caricaMatriceDouble("dati/dba.txt", 7, 12, &dimMat[9]);
+    *rotary_der = caricaMatriceDouble("dati/dba.txt", 7, 13, &dimMat[10]);
+    // Controlla che tutte le allocazioni siano andate a buon fine
+    if (!*data_propeller || !*steady_state_coeff || !*aer_der_x || !*aer_der_y || !*aer_der_z || !*rolling_moment_der || !*pitch_moment_der || !*yawing_moment_der || !*control_force_der || !*control_moment_der || !*rotary_der) {printf("[!]ERROR: Errore caricamento matrici\n"); system("PAUSE"); exit(0);}
+}
 
-        printf("Propeller: \n");
-        for (int i = 0; i < geometry_num; i++) {
-            printf("%.10lf\n", (*geometry_propeller)[i]);
-        }
-        printf("\n\n\n");
+void stampaTuttiIDati(double *engine, double *geometry_propeller, double *propeller_profile, double **data_propeller, double *body_axes, double *deflection_limits, double *fuel_mass, double **steady_state_coeff, double **aer_der_x, double **aer_der_y, double **aer_der_z, double **rolling_moment_der, double **pitch_moment_der, double **yawing_moment_der, double **control_force_der, double **control_moment_der, double **rotary_der) {
+    stampaVettore("engine", engine, dimVett[0]);
+    stampaVettore("geometry_propeller", geometry_propeller, dimVett[1]);
+    stampaVettore("propeller_profile", propeller_profile, dimVett[2]);
+    stampaVettore("body_axes", body_axes, dimVett[3]);
+    stampaVettore("deflection_limits", deflection_limits, dimVett[4]);
+    stampaVettore("fuel_mass", fuel_mass, dimVett[5]);
 
-        for (int i = 0; i < prop_num_val; i++) {
-            printf("%.10lf\n", (*propeller_profile)[i]);
-        }
+    stampaMatrice("data_propeller", data_propeller, dimMat[0], 4);
+    stampaMatrice("steady_state_coeff", steady_state_coeff, dimMat[1], 7);
+    stampaMatrice("aer_der_x", aer_der_x, dimMat[2], 8);
+    stampaMatrice("aer_der_y", aer_der_y, dimMat[3], 7);
+    stampaMatrice("aer_der_z", aer_der_z, dimMat[4], 8);
+    stampaMatrice("rolling_moment_der", rolling_moment_der, dimMat[5], 7);
+    stampaMatrice("pitch_moment_der", pitch_moment_der, dimMat[6], 8);
+    stampaMatrice("yawing_moment_der", yawing_moment_der, dimMat[7], 7);
+    stampaMatrice("control_force_der", control_force_der, dimMat[8], 7);
+    stampaMatrice("control_moment_der", control_moment_der, dimMat[9], 7);
+    stampaMatrice("rotary_der", rotary_der, dimMat[10], 7);
+}
 
-        printf("\n\n\n");
-
-        for (int i = 0; i < count; i++){
-            for (int j = 0; j < 4; j++) {
-                printf("%.4lf\t", (*data_propeller)[i][j]);
+// Funzione per liberare la memoria di tutti i dati caricati
+void liberaTuttiIDati(double *engine, double *geometry_propeller, double *propeller_profile, double **data_propeller, double *body_axes, double *deflection_limits, double *fuel_mass, double **steady_state_coeff, double **aer_der_x, double **aer_der_y, double **aer_der_z, double **rolling_moment_der, double **pitch_moment_der, double **yawing_moment_der, double **control_force_der, double **control_moment_der, double **rotary_der, double **state) {
+    free(engine); free(geometry_propeller); free(propeller_profile); free(body_axes); free(deflection_limits); free(fuel_mass);
+    // Libera matrici dinamiche
+    double** matrici[] = {
+        data_propeller, steady_state_coeff, aer_der_x, aer_der_y, aer_der_z,
+        rolling_moment_der, pitch_moment_der, yawing_moment_der,
+        control_force_der, control_moment_der, rotary_der, state
+    };
+    int numMatrici = sizeof(matrici)/sizeof(matrici[0]);
+    for (int m = 0; m < numMatrici; ++m) {
+        if (matrici[m]) {
+            int nRighe = dimMat[m];
+            for (int i = 0; i < nRighe; ++i) {
+                free(matrici[m][i]);
             }
-            printf("\n");
-        }
-
-        printf("\n\n\n");
-
-        printf("DBA: \n");
-
-        for (int i = 0; i < body_num; i++) {
-            printf("%.3lf\n", (*body_axes)[i]);
-        }
-        printf("\n\n\n");
-
-        for (int i = 0; i < deflection_num; i++) {
-            printf("%.3lf\n", (*deflection_limits)[i]);
-        }
-
-        printf("\n\n\n");
-
-        for (int i = 0; i < dba_num; i++) {
-            printf("%.3lf\n", (*fuel_mass)[i]);
-        }
-
-        printf("\n\n\n");
-
-        for (int i = 0; i < count1; i++){
-            for (int j = 0; j < 7; j++) {
-                printf("%.4lf\t", (*steady_state_coeff)[i][j]);
-            }
-            printf("\n");
-        }
-
-        printf("\n\n\n");
-
-        for (int i = 0; i < count2; i++){
-            for (int j = 0; j < 8; j++) {
-                printf("%.4lf\t", (*aer_der_x)[i][j]);
-            }
-            printf("\n");
-        }
-
-        printf("\n\n\n");
-
-        for (int i = 0; i < count3; i++){
-            for (int j = 0; j < 7; j++) {
-                printf("%.4lf\t", (*aer_der_y)[i][j]);
-            }
-            printf("\n");
-        }
-
-        printf("\n\n\n");
-
-        for (int i = 0; i < count4; i++){
-            for (int j = 0; j < 8; j++) {
-                printf("%.4lf\t", (*aer_der_z)[i][j]);
-            }
-            printf("\n");
-        }
-
-        printf("\n\n\n");
-
-        for (int i = 0; i < count5; i++){
-            for (int j = 0; j < 7; j++) {
-                printf("%.4lf\t", (*rolling_moment_der)[i][j]);
-            }
-            printf("\n");
-        }
-
-        printf("\n\n\n");
-
-        for (int i = 0; i < count6; i++){
-            for (int j = 0; j < 8; j++) {
-                printf("%.4lf\t", (*pitch_moment_der)[i][j]);
-            }
-            printf("\n");
-        }
-
-        printf("\n\n\n");
-
-        for (int i = 0; i < count7; i++){
-            for (int j = 0; j < 7; j++) {
-                printf("%.4lf\t", (*yawing_moment_der)[i][j]);
-            }
-            printf("\n");
-        }
-
-        printf("\n\n\n");
-
-        for (int i = 0; i < count8; i++){
-            for (int j = 0; j < 7; j++) {
-                printf("%.4lf\t", (*control_force_der)[i][j]);
-            }
-            printf("\n");
-        }
-
-        printf("\n\n\n");
-
-        for (int i = 0; i < count9; i++){
-            for (int j = 0; j < 7; j++) {
-                printf("%.4lf\t", (*control_moment_der)[i][j]);
-            }
-            printf("\n");
-        }
-
-        printf("\n\n\n");
-
-        for (int i = 0; i < count0; i++){
-            for (int j = 0; j < 7; j++) {
-                printf("%.4lf\t", (*rotary_der)[i][j]);
-            }
-            printf("\n");
+            free(matrici[m]);
         }
     }
 }

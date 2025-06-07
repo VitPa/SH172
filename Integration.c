@@ -1,15 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "Integration.h"
-#include "Interpolazione_new.h"
+#include "Interpolazione.h"
 #include "propeller.h"
 
 
 #define g 9.80665
 #define pi 3.14159265
 
-void eulerEquation(int i,double **state, /*double **command*/ double command[][4], double rho, double RPM, double *body_axes, double **steady_state_coefficients, double **aer_der_x, double **aer_der_y, double **aer_der_z, double **rolling_moment_der, double **pitch_moment_der, double **yawing_moment_der, double **control_force_der, double **control_moment_der, double *geometry_propeller, double *propeller_profile, double **data_propeller){
+void eulerEquation(double dt, int i, double **state, /*double **command*/ double command[][4], double Pmax_h, double rho, double RPM,double *engine, double *body_axes, double **steady_state_coefficients, double **aer_der_x, double **aer_der_y, double **aer_der_z, double **rolling_moment_der, double **pitch_moment_der, double **yawing_moment_der, double **control_force_der, double **control_moment_der, double *geometry_propeller, double *propeller_profile, double **data_propeller){
     printf("rho: %lf\n", rho);
     
     // Inizializzo le variabili
@@ -18,10 +17,9 @@ void eulerEquation(int i,double **state, /*double **command*/ double command[][4
     double S, V, costante;
     double alpha, beta;
     double q_ad, r_ad, p_ad;
-    double T, prop[3], Pal;
+    double T, prop[3] =  {0.0, 0.0, 0.0}, Pal = 0.0;
     double X, Y, Z, L, M, N;
     double du, dv, dw, dp, dq, dphi, dtheta, dpsi, dh, dx_ned, dy_ned;
-    double dt=0.01;
     // Richiamo componenti vettore di stato state:
     u     = state[i][0];
     v     = state[i][1];
@@ -43,11 +41,20 @@ void eulerEquation(int i,double **state, /*double **command*/ double command[][4
     manetta = command[i][3];
 
     // Velostatetà totale iniziale (t = 0);
-    S = body_axes[2];
     V=sqrt(u*u + v*v + w*w);
-    costante=0.5*rho*V*V*S;
 
-    printf("V: %lf\n", V);
+    // Calcolo Spinta
+    propel(RPM, Pmax_h, rho, V, geometry_propeller, propeller_profile, data_propeller, prop, &Pal);
+    T = prop[0];
+    printf("Spinta: %lf\n", T);
+    printf("Pal: %lf\n", Pal);
+
+    // Calcolo consumo di carburante
+    body_axes[0] = massConsumption(engine[5], Pal, prop[2], body_axes[0], dt);
+    printf("Massa: %lf\n", body_axes[0]);
+
+    S = body_axes[2];
+    costante=0.5*rho*V*V*S;
 
     // Definizione alpha e beta iniziali (t = 0):
     alpha = atan2(w,u);
@@ -88,10 +95,6 @@ void eulerEquation(int i,double **state, /*double **command*/ double command[][4
     double Cnda = interpolazioneTotale(control_moment_der, 5, alpha);
     double Cndr = interpolazioneTotale(control_moment_der, 6, alpha);
 
-    // Calcolo Spinta
-    propel(RPM, rho, V, geometry_propeller, propeller_profile, data_propeller, prop, &Pal);
-    T = prop[0];
-
     //Calcolo i momenti di Inerzia sui vari assi e la massa
     double Jx = body_axes[13], Jy = body_axes[14], Jz = body_axes[15], m = body_axes[0];
 
@@ -103,20 +106,20 @@ void eulerEquation(int i,double **state, /*double **command*/ double command[][4
     M = costante*(Cmss + Cma*alpha + Cmq*q + Cmde*de);
     N = costante*(Cnss + Cnb*beta + Cnp*p + Cnr*r + Cnda*da + Cndr*dr);
 
-    printf("x: %lf\n", X);
+    /*printf("x: %lf\n", X);
     printf("y: %lf\n", Y);
     printf("z: %lf\n", Z);
     printf("L: %lf\n", L);
     printf("M: %lf\n", M);
-    printf("N: %lf\n", N);
+    printf("N: %lf\n", N);*/
 
     // Incrementi tempo t = 0[s].
     du     = (r*v-q*w)-g*sin(theta)+X/m+T/m;  
     dv     = (p*w-r*u)+g*sin(phi)*cos(theta)+Y/m;
     dw     = (q*u-p*v)+g*cos(phi)*cos(theta)+Z/m;
-    printf("(q*u-p*v): %lf\n", (q*u-p*v));
+    /*printf("(q*u-p*v): %lf\n", (q*u-p*v));
     printf("g*cos(phi)*cos(theta): %lf\n", g*cos(phi)*cos(theta));
-    printf("Z/m: %lf\n", Z/m);
+    printf("Z/m: %lf\n", Z/m);*/
     dp     = -(Jz-Jy)*q*r/Jx+L/Jx;
     dq     = -(Jx-Jz)*p*r/Jy+M/Jy;
     dr     = -(Jy-Jx)*p*q/Jz+N/Jz;
@@ -127,7 +130,7 @@ void eulerEquation(int i,double **state, /*double **command*/ double command[][4
     dx_ned = u*cos(psi)*cos(theta) + v*(cos(psi)*sin(theta)*sin(phi) - sin(psi)*cos(phi)) + w*(cos(psi)*sin(theta)*cos(phi) + sin(psi)*sin(phi));
     dy_ned = u*sin(psi)*cos(theta) + v*(sin(psi)*sin(theta)*sin(phi) + cos(psi)*cos(phi)) + w*(sin(psi)*sin(theta)*cos(phi) - cos(psi)*sin(phi));
 
-    printf("du: %lf\n", du);
+    /*printf("du: %lf\n", du);
     printf("dv: %lf\n", dv);
     printf("dw: %lf\n", dw);
     printf("dp: %lf\n", dp);
@@ -138,7 +141,7 @@ void eulerEquation(int i,double **state, /*double **command*/ double command[][4
     printf("dpsi: %lf\n", dpsi);
     printf("dh: %lf\n", dh);
     printf("dx_ned: %lf\n", dx_ned);
-    printf("dy_ned: %lf\n", dy_ned);
+    printf("dy_ned: %lf\n", dy_ned);*/
     
     // Vettore di stato dopo condizione di trim.
     state[i+1][0]  = u + dt*du;
@@ -154,11 +157,11 @@ void eulerEquation(int i,double **state, /*double **command*/ double command[][4
     state[i+1][10] = x_ned + dt*dx_ned;
     state[i+1][11] = y_ned + dt*dy_ned;
 
-    printf("Posizione x: %f\n", state[i][10]);
+    /*printf("Posizione x: %f\n", state[i][10]);
     printf("Posizione y: %f\n", state[i][11]);
     printf("Velocità u: %f\n", state[i][0]);
     printf("Velocità w: %f\n", state[i][2]);
-    printf("Altezza: %f\n", state[i][9]);
+    printf("Altezza: %f\n", state[i][9]);*/
     printf("---------\n");
     
 }
