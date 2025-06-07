@@ -11,10 +11,10 @@ double propel(double RPM_ref, double Pmax_h, double rho1, double Vel, double* ge
     float pitch = 0.0; // pitch del'elica
     float diam=geometry_propeller[0]; //diametro elica
     float Raggio=diam/2.0; //raggio elica
-    float tip=data_propeller[48][3]; //angolo di beccheggio al tip
+    float tip=data_propeller[48][3]*(pi/180); //angolo di beccheggio al tip
     float xt=Raggio; //coordinata dimensionalizzata al tip
-    float hub=data_propeller[0][3]; //angolo di beccheggio all'hub (al 25% del raggio)
-    float xs=data_propeller[0][0]*Raggio; //coordinata dimensionalizzata all'hub
+    float hub=data_propeller[0][3]*(pi/180); //angolo di beccheggio all'hub (al 25% del raggio)
+    float xs=data_propeller[0][0]*(pi/180)*Raggio; //coordinata dimensionalizzata all'hub
     float n=RPM_ref/60.0; //round-per-second
     float omega=n*2.0*pi; //velocià angolare [rad/s]
     float coef1=(tip-hub)/(xt-xs); //coefficiente #1 di supporto al calcolo dell'angolo di svergolamento theta
@@ -37,7 +37,7 @@ double propel(double RPM_ref, double Pmax_h, double rho1, double Vel, double* ge
     float torque=0.0;//inizializzazione vettore coppia
     for(j=0; j<49; j++){
         rad=r1[j]; //coordinata j-esima stazione (-> CSI in propeller.txt)
-        theta1=data_propeller[j][3] + pitch; //calcolo angolo di svergolamento della j-esima stazione        //sostituire con BA(j) + pitch
+        theta1=data_propeller[j][3]*(pi/180) + pitch; //calcolo angolo di svergolamento della j-esima stazione        //sostituire con BA(j) + pitch
         t2[j]=theta1; //angolo di svergolamento della j-esima stazione (-> BA su propeller.txt) 
         th=theta1/180.0*pi; //angolo di svergolamento [rad]
         a=0.1; //inizializzazione axial inflow factor (vedi pag.4 PROPEL.pdf)

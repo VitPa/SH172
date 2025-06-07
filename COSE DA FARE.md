@@ -9,8 +9,10 @@ gcc main.c atmosphere.c estrazionedati.c interpolazione.c motioneq.c interpolazi
 - Fare in modo che il ciclo di funzionamento che itera per tutti gli istanti di tempo sia dal main.
 
 ## Da fare ora
-- Implementare la parte dinamica del simulatore
+- Implementare le manovre
 - Implementare calcolo manetta che poi servirò per determinare gli RPM da dare ad eulero
+- Capire perchè a valori prossimi a 20 l'interpolazione non funziona
+- Capire perchè in propel.c la V va ad inf
 
 ## Domande
 - Controllare gli rpm minimi e massimi della pala

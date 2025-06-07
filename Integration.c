@@ -52,6 +52,7 @@ void eulerEquation(double dt, int i, double **state, /*double **command*/ double
     // Calcolo consumo di carburante
     body_axes[0] = massConsumption(engine[5], Pal, prop[2], body_axes[0], dt);
     printf("Massa: %lf\n", body_axes[0]);
+    // if (body_axes[0] < ??)                   CAPIRE COME CALCOLARE LA CONDIZIONE DI ERRORE PER IL CARBURANTE
 
     S = body_axes[2];
     costante=0.5*rho*V*V*S;

@@ -1,16 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
 #include "EstrazioneDati.h"
 #include "Interpolazione.h"
 
 void main() {
-    //Programma utilizzato per validare i dati dei file in input e per validare l'interpolazione effettuata
-
-    double alpha = 1;  // inseriamo un valore di alpha per validare i dati sui file
-    double CL, CD, CL0 = 0.3832, CLa = 3.9849, aplha_0 = -0.09616302, CD0 = 0.0235, CDa = 0.154, CDa2 = 1.0476;
-    double CX, CZ;
-    int trovato = 1, i = 0;
+    int trovato = 1, k = 0;
 
     double *engine = NULL;
     double *geometry_propeller = NULL;
@@ -30,23 +26,78 @@ void main() {
     double **control_moment_der = NULL;
     double **rotary_der = NULL;
 
-    datiFiles(0, &engine, &geometry_propeller, &propeller_profile, &data_propeller, &body_axes, &deflection_limits,
+    caricaTuttiIDati(&engine, &geometry_propeller, &propeller_profile, &data_propeller, &body_axes, &deflection_limits,
         &fuel_mass, &steady_state_coeff, &aer_der_x, &aer_der_y, &aer_der_z, &rolling_moment_der, 
         &pitch_moment_der, &yawing_moment_der, &control_force_der, &control_moment_der, &rotary_der);
+    stampaTuttiIDati(engine, geometry_propeller, propeller_profile, data_propeller, body_axes, deflection_limits,
+        fuel_mass, steady_state_coeff, aer_der_x, aer_der_y, aer_der_z, rolling_moment_der, 
+        pitch_moment_der, yawing_moment_der, control_force_der, control_moment_der, rotary_der);
 
-    CL = CL0 + CLa * alpha;
-    CD = CD0 + CDa * alpha + CDa2 * alpha * alpha;
-    CX = - (CD * cos(alpha) + CL * sin(alpha));
-    CZ = - (CD * sin(alpha) + CL * cos(alpha));
+    double** matrici[] = {
+    data_propeller, steady_state_coeff, aer_der_x, aer_der_y, aer_der_z,
+    rolling_moment_der, pitch_moment_der, yawing_moment_der,
+    control_force_der, control_moment_der, rotary_der
+    };
+    const char *nomi[] = {
+        "data_propeller", "steady_state_coeff", "aer_der_x", "aer_der_y", "aer_der_z",
+        "rolling_moment_der", "pitch_moment_der", "yawing_moment_der",
+        "control_force_der", "control_moment_der", "rotary_der"
+    };
 
-    while (trovato) {
-        if(steady_state_coeff[i][0] == alpha){
-            trovato = 0;
-        } else {
-            i++;
-        }
+    srand(time(NULL));
+    double alpha_rand = -5.0 + 25.0 * ((double)rand() / RAND_MAX);
+    int i =(rand() % sizeof(matrici) / sizeof(matrici[0]));
+    while(matrici[i][++k][0] < alpha_rand);
+
+    int colonna = (i==0) ? rand()%4 : ((i==2 || i==4 || i==6) ? rand()%8 : rand()%7);
+
+    double InterpVet = interpolazioneTotale(matrici[i], colonna, alpha_rand);
+    /*printf("\nTest interpolazione su matrice %d (random):\n", i);
+    printf("Alpha di riferimento (random): %g\n", alpha_rand);
+    printf("Valori di riferimento: %g (riga %d), %g (riga %d)\n",
+        matrici[i][k-1][colonna], k-1, matrici[i][k][colonna], k);
+    printf("Valore interpolato: %g\n", InterpVet);
+    if ((InterpVet<=steady_state_coeff[k-1][0] && InterpVet>=steady_state_coeff[k][0]) || InterpVet>=steady_state_coeff[k-1][0] && InterpVet<=steady_state_coeff[k][0]){
+        printf("Valore interpolato correttamente\n");
+    }*/
+
+    double x0 = matrici[i][k-1][0];
+    double x1 = matrici[i][k][0];
+
+    // Stampa formattata e grafica
+    printf("\nTest interpolazione su matrice '%s':\n", nomi[i]);
+    printf("Alpha di riferimento (random): %g\n", alpha_rand);
+    printf("Colonna di riferimento (random): %d\n", colonna);
+    printf("Valori di alpha di riferimento: %g (riga %d), %g (riga %d)\n", x0, k, x1, k+1);
+
+    x0 = matrici[i][k-1][colonna];
+    x1 = matrici[i][k][colonna];
+
+    // Visualizzazione grafica
+    double min = (x0 < x1) ? x0 : x1;
+    double max = (x0 > x1) ? x0 : x1;
+    int bar_len = 40;
+    int pos = (int)(((InterpVet - min) / (max - min)) * bar_len);
+    if (pos < 0) pos = 0;
+    if (pos > bar_len) pos = bar_len;
+
+    printf("\nVisualizzazione grafica:\n");
+    printf("Estremo1: %g", x0);
+    for (int i = 0; i < bar_len + 2; ++i) printf(" ");
+    printf("Estremo2: %g\n", x1);
+
+    printf("[");
+    for (int i = 0; i < bar_len; ++i) {
+        if (i == pos)
+            printf("|");
+        else
+            printf("-");
     }
+    printf("]\n");
 
-    printf("Il valore di CX sperimentale: %lf, il valore validato: %lf\n", steady_state_coeff[i][1], CX);
-    printf("Il valore di CZ sperimentale: %lf, il valore validato: %lf\n", steady_state_coeff[i][3], CZ);
+    for (int i = 0; i < ((pos==0) ? bar_len/2 : pos + 1); ++i) {
+        printf(" ");
+    }
+    printf("^\n");
+    printf("\t\tValore interpolato: %g\n", InterpVet);
 }
