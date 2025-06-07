@@ -58,7 +58,7 @@ int main(){
 
     AtmosphereChoice(&press0, &temp0, &rho0, &vsuono0, &press_h, &temp_h, &rho_h, &vsuono_h, CI, &flagatm);
 
-    AtmosphereCalc(CI, &engine, &Pmax_h, &press0, &temp0, &rho0, &vsuono0, &press_h, &temp_h, &rho_h, &vsuono_h, &flagatm);
+    AtmosphereCalc(CI[1], engine, &Pmax_h, &press0, &temp0, &rho0, &vsuono0, &press_h, &temp_h, &rho_h, &vsuono_h, flagatm);
 
     if (CI[0]/(sqrt(1.4 * 287.05 * temp_h)) > body_axes[4]){
         printf("Warning: il match è maggiore del match di drag rise, inserire un valore di velocità inferiore.\n");
@@ -73,7 +73,7 @@ int main(){
     scanf("%lf", &deltaT_fs);
 
     for (int i = 0; i < deltaT_fs/dt; ++i){
-        command[i][0] = 0.01;
+        command[i][0] = 0;
         command[i][1] = trim[1];
         command[i][2] = 0;
         command[i][3] = 0;
@@ -82,7 +82,7 @@ int main(){
     int i = 0;
     for(double Ts = 0.00; Ts <= deltaT_fs; Ts += dt){
         
-        AtmosphereCalc(CI, &engine, &Pmax_h, &press0, &temp0, &rho0, &vsuono0, &press_h, &temp_h, &rho_h, &vsuono_h, &flagatm);
+        AtmosphereCalc(state[i][9], engine, &Pmax_h, &press0, &temp0, &rho0, &vsuono0, &press_h, &temp_h, &rho_h, &vsuono_h, flagatm);
 
         state = reallocState(state, &state_rows, 12);
 
@@ -90,7 +90,7 @@ int main(){
             rolling_moment_der, pitch_moment_der, yawing_moment_der, control_force_der, control_moment_der, geometry_propeller, 
             propeller_profile, data_propeller);
 
-        //Arrivati all'ultima iterazione, in base a come è scritta la funzione, calcola comunque i valori di state al 
+        // Arrivati all'ultima iterazione, in base a come è scritta la funzione, calcola comunque i valori di state al 
         // passo successvo anche se al passo successivo lasimulazione sarà terminata. È corretto?
         ++i;
     }

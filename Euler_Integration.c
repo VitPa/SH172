@@ -120,8 +120,8 @@ void Integration(double *state_trim, double *comandi, double *body_axes, double 
             dtheta = q*cos(phi) - r*sin(phi);
             dpsi   = q*sin(phi)/cos(theta) + r*cos(phi)/cos(theta);
             dh     = -u*sin(theta) + v*cos(theta)*sin(phi) + w*cos(theta)*cos(phi);
-            dx_ned = u*cos(psi)*cos(theta) + v*(cos(psi)*sin(theta)*sin(phi) - sin(psi)*cos(theta)) + w*(cos(psi)*sin(theta)*cos(phi) + sin(psi)*sin(phi));
-            dy_ned = u*sin(psi)*cos(theta) - v*(sin(psi)*sin(theta)*sin(phi) - cos(psi)*cos(phi)) + w*(sin(psi)*sin(theta)*cos(phi) - cos(psi)*sin(phi));
+            dx_ned = u*cos(psi)*cos(theta) + v*(cos(psi)*sin(theta)*sin(phi) - sin(psi)*cos(phi)) + w*(cos(psi)*sin(theta)*cos(phi) + sin(psi)*sin(phi));
+            dy_ned = u*sin(psi)*cos(theta) + v*(sin(psi)*sin(theta)*sin(phi) + cos(psi)*cos(phi)) + w*(sin(psi)*sin(theta)*cos(phi) - cos(psi)*sin(phi));
             
             // Vettore di stato dopo condizione di trim.
             state[i+1][0]  = u + dt*du;

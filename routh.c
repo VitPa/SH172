@@ -7,33 +7,36 @@
 #define MAX_ELEMENTI 30
 #define pi 3.14159265
 
-int routh(double Cm_q,double* body_axes, double rho, double alpha_trim, double V, double Cx_alpha, double Cz_alpha, double Cmalpha_dati, double Cmalpha_primo){
+int routh(double Cm_q,double* body_axes, double rho, double alpha_trim, double V, double Cx_alpha, double Cz_alpha, double Cm_alpha, double Cm_alphaprimo){
 
     //Variabili geometriche
     double massa_adm;
     double inerziaY_adm;
     double omega_ph, omega_sp;
 
+    alpha_trim = alpha_trim*(pi/180);
+
     //Massa e Momento di inerzia adimensionali
     massa_adm = 2*body_axes[0]/(rho*body_axes[2]*body_axes[3]);
     inerziaY_adm = 8*body_axes[14]/(rho*body_axes[2]*pow(body_axes[3],3));
 
+    printf("massa_adm: %lf\n", massa_adm);
+    printf("inerziaY_adm: %lf\n", inerziaY_adm);
+
     //Variabili Aerodinamiche
-    double CL_alpha,CLalpha_primo,Cm_alpha,Cm_alphaprimo, CLe,CDe,CDalpha, Cwe,CTu;
+    double CL_alpha,CLalpha_primo, CLe,CDe,CDalpha, Cwe,CTu;
     double k = 0.047, Cd0 = 0.0235;
 
     //Impostiamo il Clalpha nel nuovo (SdR)
     CL_alpha = Cx_alpha*sin(alpha_trim) - Cz_alpha*cos(alpha_trim); // da modificare
-    // printf("\nCl_alpha = %lf",CL_alpha); // da modificare
     CLalpha_primo = 1.56; // (rad^-1)
-    Cm_alpha = Cmalpha_dati;  //da modificare
-    Cm_alphaprimo = Cmalpha_primo; // da modificare
     CLe = body_axes[0]*9.81*2/(rho*body_axes[2]*V*V);
     CDe = Cd0 + k*CLe*CLe;  //k = 0.047 CD0 = 0.0235
     CDalpha = 2*k*CL_alpha*CLe; //
     Cwe = CLe;
     CTu = -3*CDe; //-0.0841
 
+    printf("CL_alpha: %lf\nCLalpha_primo: %lf\nCLe: %lf\nCDe: %lf\nCDalpha: %lf\nCwe: %lf\nCTu: %lf\n",CL_alpha,CLalpha_primo,CLe,CDe,CDalpha,Cwe,CTu);
 
     if(Cm_alpha>0){
         printf("\nERRORE: -11  - Il Cessna e' staticamente instabile.");
@@ -51,7 +54,7 @@ int routh(double Cm_q,double* body_axes, double rho, double alpha_trim, double V
     E = -2*Cm_alpha*Cwe*Cwe;
     Delta = B*C*D - A*D*D - B*B*E;
 
-    // printf("\nA = %lf\nB = %lf\nC = %lf\nD = %lf\nE = %lf\nDelta = %lf",A,B,C,D,E,Delta);
+    printf("\nA = %lf\nB = %lf\nC = %lf\nD = %lf\nE = %lf\nDelta = %lf\n",A,B,C,D,E,Delta);
 
 
     if(B<0||Delta<0||D<0||E<0){
@@ -77,10 +80,15 @@ int routh(double Cm_q,double* body_axes, double rho, double alpha_trim, double V
 
     printf("\n-----------------------------------\n");
     
-    //double omegaNsp_adm = sqrt(-(2*massa_adm*Cm_alpha+Cm_q*CL_alpha)/(2*massa_adm*inerziaY_adm));
-    double omegaNsp_adm = sqrt(-Cm_alpha/inerziaY_adm - (Cm_q*CL_alpha)/(2*massa_adm*inerziaY_adm));
+    //double omegaNsp_adm = sqrt(-Cm_alpha/inerziaY_adm);
+     double omegaNsp_adm = sqrt(-(2*massa_adm*Cm_alpha+Cm_q*CL_alpha)/(2*massa_adm*inerziaY_adm));
+    //double omegaNsp_adm = sqrt(-Cm_alpha/inerziaY_adm-(Cm_q*CL_alpha)/(2*massa_adm*inerziaY_adm));
+    //printf("A: %lf\nB: %lf", Cm_alpha/inerziaY_adm, (Cm_q*CL_alpha)/(2*massa_adm*inerziaY_adm));
+    //printf("Cmq: %lf\nCLa_alpha: %lf", Cm_q, Cm_alpha);
     double omegaNsp = (omegaNsp_adm*2*V)/(body_axes[3]);
     double zsp = (inerziaY_adm*CL_alpha-2*massa_adm*(Cm_q+Cm_alphaprimo))/(2*sqrt(-2*massa_adm*inerziaY_adm*(2*massa_adm*Cm_alpha+Cm_q*CL_alpha)));
+   // double omegasp = omegaNsp*sqrt(fabs(zsp*zsp - 1));
+
     double Resp = -zsp*omegaNsp;
     double Imsp = omegaNsp*sqrt(fabs(zsp*zsp - 1.0));
 

@@ -17,7 +17,7 @@ void equation(double Pmax_h, double rho_h, double *CI, double ***vett_stato, dou
     int flag_1 = 0;
     double alpha_1 = 0;
     double score_min = 1000;
-    double CZtrim[0], CMtrim[0];
+    double CZtrim, CMtrim;
     
     for (int i = 0; i <= 2470; ++i) {
         alpha_1 = i * 0.01 - 5.0;
@@ -40,8 +40,8 @@ void equation(double Pmax_h, double rho_h, double *CI, double ***vett_stato, dou
                     score_min = score;
                     trim[1] = de_1;
                     trim[0] = alpha_1;
-                    CZtrim[0] = CZalpha;
-                    CMtrim[0] = CMalpha;
+                    CZtrim = CZalpha;
+                    CMtrim = CMalpha;
                 }
 
                 double de_ref = - (CMss + CMalpha * alpha_1 * (pi/180)) / CMde;
@@ -66,7 +66,7 @@ void equation(double Pmax_h, double rho_h, double *CI, double ***vett_stato, dou
         printf("Valore interpolato di CZalpha: %lf\n", CZalpha);*/
     }
 
-    double thetaTrim = trim[0] + CI[2];
+    double thetaTrim = (trim[0] + CI[2])*(pi/180);  
 
     // Componente velocità TAS di Trim
     double uTrim = CI[0] * cos(trim[0]*(pi/180));
@@ -113,7 +113,7 @@ void equation(double Pmax_h, double rho_h, double *CI, double ***vett_stato, dou
 
     // ******* TROVARE RPM di Trim *******
     double CX_tot = CXss + CXalpha * trim[0] * (pi/180) + CXde * trim[1] * (pi/180);
-    double tTrim = body_axes[0]*g*sin(thetaTrim*(pi/180)) - 0.5*CX_tot*rho_h*CI[0]*CI[0]*body_axes[2];
+    double tTrim = body_axes[0]*g*sin(thetaTrim) - 0.5*CX_tot*rho_h*CI[0]*CI[0]*body_axes[2];
     printf("\n\ntTrim: %lf\n", tTrim);
 
     int RPM = 1500;         // RPM minimi
@@ -144,5 +144,5 @@ void equation(double Pmax_h, double rho_h, double *CI, double ***vett_stato, dou
     }
 
     // Calcolo la stabilità dell'aeromobile
-    int a = routh(pitch_moment_der[0][4], body_axes, rho_h, trim[0], CI[0], CXalpha, CZtrim[0], CMtrim[0], pitch_moment_der[0][2]);
+    int a = routh(pitch_moment_der[0][4], body_axes, rho_h, trim[0], CI[0], CXalpha, CZtrim, CMtrim, pitch_moment_der[0][2]);
 }
