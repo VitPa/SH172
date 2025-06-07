@@ -10,6 +10,7 @@
 #include "Interpolazione_new.h"
 #include "MotionEq.h"
 #include "Integration.h"
+#include "InitialCondition.h"
 
 int main(){
 
@@ -40,7 +41,7 @@ int main(){
     double **state = NULL;
     double Int_ssc[6], Int_adx[7], Int_ady[6], Int_adz[7], Int_rmd[6], Int_pmd[7], Int_ymd[6], Int_cfd[6], Int_cmd[6], Int_rd[6];
     double CI[3], trim[4], command[10000][4];
-    double Pmax_h = 0, press0 = 0, temp0 = 0, rho0 = 0, vsuono0 = 0, press_h = 0, temp_h = 0, rho_h = 0, vsuono_h = 0;
+    double Pmax_h, press_h, temp_h, rho_h, vsuono_h;
     double dt = 0.01, deltaT_fs;
     int flagatm, state_rows = 1;
 
@@ -48,22 +49,10 @@ int main(){
         &fuel_mass, &steady_state_coeff, &aer_der_x, &aer_der_y, &aer_der_z, &rolling_moment_der, 
         &pitch_moment_der, &yawing_moment_der, &control_force_der, &control_moment_der, &rotary_der);
 
-    printf("\n\nSimulatore di volo per il Cessna 172\n Inserire i dati iniziali\n --------------------------------------------\n\nInserire la velocità inziale: ");
-    scanf("%lf", &CI[0]); 
-    printf("Inserire l'altitudine inziale: ");
-    scanf("%lf", &CI[1]);
-    printf("Inserire l'angolo di attacco inziale: ");
-    scanf("%lf", &CI[2]);
-    printf("\n");
-
-    AtmosphereChoice(&press0, &temp0, &rho0, &vsuono0, &press_h, &temp_h, &rho_h, &vsuono_h, CI, &flagatm);
-
-    AtmosphereCalc(CI[1], engine, &Pmax_h, &press0, &temp0, &rho0, &vsuono0, &press_h, &temp_h, &rho_h, &vsuono_h, flagatm);
-
-    if (CI[0]/(sqrt(1.4 * 287.05 * temp_h)) > body_axes[4]){
-        printf("Warning: il match è maggiore del match di drag rise, inserire un valore di velocità inferiore.\n");
-        exit(0);
-    }
+    loadCI(CI);
+    AtmosphereChoice(&press_h, &temp_h, &rho_h, &vsuono_h, &flagatm);
+    AtmosphereCalc(CI[1], engine, &Pmax_h, &press_h, &temp_h, &rho_h, &vsuono_h, flagatm);
+    checkMdgAlt(CI[0], CI[1], body_axes[4], temp_h);
 
     equation(Pmax_h, rho_h, CI, &state, body_axes, aer_der_x, aer_der_z, steady_state_coeff, control_force_der, 
         control_moment_der, pitch_moment_der, geometry_propeller, propeller_profile, data_propeller, trim);
@@ -82,7 +71,7 @@ int main(){
     int i = 0;
     for(double Ts = 0.00; Ts <= deltaT_fs; Ts += dt){
         
-        AtmosphereCalc(state[i][9], engine, &Pmax_h, &press0, &temp0, &rho0, &vsuono0, &press_h, &temp_h, &rho_h, &vsuono_h, flagatm);
+        AtmosphereCalc(state[i][9], engine, &Pmax_h, &press_h, &temp_h, &rho_h, &vsuono_h, flagatm);
 
         state = reallocState(state, &state_rows, 12);
 

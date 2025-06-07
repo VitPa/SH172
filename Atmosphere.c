@@ -12,7 +12,7 @@ static double vsuono0 = 340;      // m/s
 
 // il codice mostra i dati atmosferici di default a video e permette di modificarli.
 
-void AtmosphereChoice (double *press_h,double *temp_h,double *rho_h,double *vsuono_h, double *CI, int *flagatm)
+void AtmosphereChoice (double *press_h,double *temp_h,double *rho_h,double *vsuono_h, int *flagatm)
 {
     int input;
 
@@ -111,18 +111,6 @@ void AtmosphereChoice (double *press_h,double *temp_h,double *rho_h,double *vsuo
                     } while (*vsuono_h < 0);
 
                 }
-                /*if(CI[1]<0)
-                {
-                    printf("[!]ERRORE: I valori inseriti corrispondono ad una quota minore di zero\nSIMULAZIONE TERMINATA!");
-                    system("PAUSE");
-                    exit(14);
-                }
-                else if(CI[1]>4116)
-                {
-                    printf("[!]ERRORE: I valori inseriti corrispondono ad una quota maggiore di quella di tangenza\nSIMULAZIONE TERMINATA!\n");
-                    system("PAUSE");
-                    exit(14);
-                }*/
                 *flagatm = 2;
                 break;
         }
