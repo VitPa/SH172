@@ -45,19 +45,22 @@ int main(){
     double dt = 0.01, deltaT_fs;
     int flagatm, state_rows = 1;
 
+    // Caricamento variabili da file .txt
     datiFiles(0, &engine, &geometry_propeller, &propeller_profile, &data_propeller, &body_axes, &deflection_limits,
         &fuel_mass, &steady_state_coeff, &aer_der_x, &aer_der_y, &aer_der_z, &rolling_moment_der, 
         &pitch_moment_der, &yawing_moment_der, &control_force_der, &control_moment_der, &rotary_der);
 
+    // Caricamento condizioni iniziali
     loadCI(CI);
     AtmosphereChoice(&press_h, &temp_h, &rho_h, &vsuono_h, &flagatm);
     AtmosphereCalc(CI[1], engine, &Pmax_h, &press_h, &temp_h, &rho_h, &vsuono_h, flagatm);
     checkMdgAlt(CI[0], CI[1], body_axes[4], temp_h);
 
+    // Calcolo del trim e stabilità con Routh
     equation(Pmax_h, rho_h, CI, &state, body_axes, aer_der_x, aer_der_z, steady_state_coeff, control_force_der, 
         control_moment_der, pitch_moment_der, geometry_propeller, propeller_profile, data_propeller, trim);
 
-
+    // Inserimento manovra
     printf("Inserire il tempo di simulazione: ");
     scanf("%lf", &deltaT_fs);
 
@@ -68,22 +71,29 @@ int main(){
         command[i][3] = 0;
     }
     
+    // Ciclo di simulazione
     int i = 0;
     for(double Ts = 0.00; Ts <= deltaT_fs; Ts += dt){
         
+        // Ricalcolo variabili atmoferiche
         AtmosphereCalc(state[i][9], engine, &Pmax_h, &press_h, &temp_h, &rho_h, &vsuono_h, flagatm);
 
+        // Aumento la dimensione del vettore di stato di una riga
         state = reallocState(state, &state_rows, 12);
 
+        // Integro con Eulero le equazioni del moto
         eulerEquation(i, state, command, rho_h, trim[2], body_axes, steady_state_coeff, aer_der_x, aer_der_y, aer_der_z, 
             rolling_moment_der, pitch_moment_der, yawing_moment_der, control_force_der, control_moment_der, geometry_propeller, 
             propeller_profile, data_propeller);
 
-        // Arrivati all'ultima iterazione, in base a come è scritta la funzione, calcola comunque i valori di state al 
-        // passo successvo anche se al passo successivo lasimulazione sarà terminata. È corretto?
+        /* 
+        Arrivati all'ultima iterazione, in base a come è scritta la funzione, calcola comunque i valori di state al 
+        passo successvo anche se al passo successivo lasimulazione sarà terminata. È corretto?
+        */
         ++i;
     }
 
+    // Libera la memoria
     liberaTuttiIDati(engine, geometry_propeller, propeller_profile, data_propeller, body_axes, deflection_limits, 
         fuel_mass, steady_state_coeff, aer_der_x, aer_der_y, aer_der_z, rolling_moment_der, pitch_moment_der, 
         yawing_moment_der, control_force_der, control_moment_der, rotary_der, state);
