@@ -34,12 +34,12 @@ void main() {
         pitch_moment_der, yawing_moment_der, control_force_der, control_moment_der, rotary_der);
 
     double** matrici[] = {
-    data_propeller, steady_state_coeff, aer_der_x, aer_der_y, aer_der_z,
+    steady_state_coeff, aer_der_x, aer_der_y, aer_der_z,
     rolling_moment_der, pitch_moment_der, yawing_moment_der,
     control_force_der, control_moment_der, rotary_der
     };
     const char *nomi[] = {
-        "data_propeller", "steady_state_coeff", "aer_der_x", "aer_der_y", "aer_der_z",
+        "steady_state_coeff", "aer_der_x", "aer_der_y", "aer_der_z",
         "rolling_moment_der", "pitch_moment_der", "yawing_moment_der",
         "control_force_der", "control_moment_der", "rotary_der"
     };
@@ -47,19 +47,14 @@ void main() {
     srand(time(NULL));
     double alpha_rand = -5.0 + 25.0 * ((double)rand() / RAND_MAX);
     int i =(rand() % sizeof(matrici) / sizeof(matrici[0]));
+    if(alpha_rand < -5) alpha_rand = -5;
+    else if(alpha_rand > 20) alpha_rand = 20;
     while(matrici[i][++k][0] < alpha_rand);
 
-    int colonna = (i==0) ? rand()%4 : ((i==2 || i==4 || i==6) ? rand()%8 : rand()%7);
+    int colonna = (i==2 || i==4 || i==6) ? rand()%8 : rand()%7;
+    colonna = 0;
 
     double InterpVet = interpolazioneTotale(matrici[i], colonna, alpha_rand);
-    /*printf("\nTest interpolazione su matrice %d (random):\n", i);
-    printf("Alpha di riferimento (random): %g\n", alpha_rand);
-    printf("Valori di riferimento: %g (riga %d), %g (riga %d)\n",
-        matrici[i][k-1][colonna], k-1, matrici[i][k][colonna], k);
-    printf("Valore interpolato: %g\n", InterpVet);
-    if ((InterpVet<=steady_state_coeff[k-1][0] && InterpVet>=steady_state_coeff[k][0]) || InterpVet>=steady_state_coeff[k-1][0] && InterpVet<=steady_state_coeff[k][0]){
-        printf("Valore interpolato correttamente\n");
-    }*/
 
     double x0 = matrici[i][k-1][0];
     double x1 = matrici[i][k][0];
@@ -100,4 +95,6 @@ void main() {
     }
     printf("^\n");
     printf("\t\tValore interpolato: %g\n", InterpVet);
+
+    system("PAUSE");
 }
