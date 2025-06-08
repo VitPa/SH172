@@ -118,12 +118,9 @@ void eulerEquation(double dt, int i, double **state, /*double **command*/ double
     du     = (r*v-q*w)-g*sin(theta)+X/m+T/m;  
     dv     = (p*w-r*u)+g*sin(phi)*cos(theta)+Y/m;
     dw     = (q*u-p*v)+g*cos(phi)*cos(theta)+Z/m;
-    /*printf("(q*u-p*v): %lf\n", (q*u-p*v));
-    printf("g*cos(phi)*cos(theta): %lf\n", g*cos(phi)*cos(theta));
-    printf("Z/m: %lf\n", Z/m);*/
-    dp     = -(Jz-Jy)*q*r/Jx+L/Jx;
-    dq     = -(Jx-Jz)*p*r/Jy+M/Jy;
-    dr     = -(Jy-Jx)*p*q/Jz+N/Jz;
+    dp     = -(Jz-Jy)*q*r/Jx+L/Jx;  // -(Jz-Jy)*q*r/Jx+(p*q+dr)*Jxz/Jx+L/Jx
+    dq     = -(Jx-Jz)*p*r/Jy+M/Jy;  // -(Jx-Jz)*p*r/Jy-(p*p-r*r)*Jxz/Jy+M/Jy
+    dr     = -(Jy-Jx)*p*q/Jz+N/Jz;  // -(Jy-Jx)*p*q/Jz-(q*r-dp)*Jxz/Jz+N/Jz
     dphi   = p + q*sin(phi)*tan(theta) + r*cos(phi)*tan(theta);
     dtheta = q*cos(phi) - r*sin(phi);
     dpsi   = q*sin(phi)/cos(theta) + r*cos(phi)/cos(theta);

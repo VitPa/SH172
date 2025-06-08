@@ -54,10 +54,10 @@ int main(){
     double CI[3];
 
     loadCI(CI);
+    checkVelAlt(&CI[0], &CI[1], &CI[2]);
+
     AtmosphereChoice(&press_h, &temp_h, &rho_h, &vsuono_h, &flagatm);
     AtmosphereCalc(CI[1], engine, &Pmax_h, &press_h, &temp_h, &rho_h, &vsuono_h, flagatm);
-
-    checkVelAlt(&CI[0], CI[1], body_axes[4], temp_h);
 
     // Calcolo del trim e stabilità con Routh
     equation(engine, Pmax_h, rho_h, CI, &state, body_axes, aer_der_x, aer_der_z, steady_state_coeff, control_force_der, 
@@ -90,9 +90,11 @@ int main(){
             rolling_moment_der, pitch_moment_der, yawing_moment_der, control_force_der, control_moment_der, geometry_propeller, 
             propeller_profile, data_propeller);
 
+        physicalCheck(fabs(sqrt(pow(state[i][0], 2)+pow(state[i][1], 2)+pow(state[i][2], 2))), state[i][9], body_axes[4], vsuono_h);
+
         /* 
         Arrivati all'ultima iterazione, in base a come è scritta la funzione, calcola comunque i valori di state al 
-        passo successvo anche se al passo successivo lasimulazione sarà terminata. È corretto?
+        passo successvo anche se al passo successivo la simulazione sarà terminata. È corretto?
         */
         ++i;
     }
