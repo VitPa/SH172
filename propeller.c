@@ -1,12 +1,26 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include "EstrazioneDati.h"
 
 #define pi 3.14159265
 
 // Modifica: la funzione ora prende un double* prop come argomento di output
-double propel(double RPM_ref, double Pmax_h, double rho1, double Vel, double* geometry_propeller, double* propeller_profile, double** data_propeller, double* prop, double *Pal)
+double propel(double RPM_ref, double Pmax_h, double rho1, double Vel, double* geometry_propeller, double* propeller_profile, double** d_propeller, double* prop, double *Pal)
 {
+    double data_propeller[49][4];
+    int k = 0, z = 0;
+    for(int i=11; i<60; ++i){
+        for(int j=0; j<4; ++j){
+            data_propeller[k][z] = d_propeller[i][j];
+            ++z;
+        }
+        ++k;
+        z=0;
+    }
+
+    //stampaMatrice("data propeller", data_propeller, 49, 4);
+    
     float alpha1, theta1;
     float pitch = 0.0; // pitch del'elica
     float diam=geometry_propeller[0]; //diametro elica
@@ -14,12 +28,12 @@ double propel(double RPM_ref, double Pmax_h, double rho1, double Vel, double* ge
     float tip=data_propeller[48][3]*(pi/180); //angolo di beccheggio al tip
     float xt=Raggio; //coordinata dimensionalizzata al tip
     float hub=data_propeller[0][3]*(pi/180); //angolo di beccheggio all'hub (al 25% del raggio)
-    float xs=data_propeller[0][0]*(pi/180)*Raggio; //coordinata dimensionalizzata all'hub
+    float xs=data_propeller[0][0]*Raggio; //coordinata dimensionalizzata all'hub
     float n=RPM_ref/60.0; //round-per-second
     float omega=n*2.0*pi; //velocià angolare [rad/s]
     float coef1=(tip-hub)/(xt-xs); //coefficiente #1 di supporto al calcolo dell'angolo di svergolamento theta
     float coef2=hub-coef1*xs+pitch; //coefficiente #2 di supporto al calcolo dell'angolo di svergolamento theta
-    float rstep=(xt-xs)/48; //calcolo step delle 47 stazioni        
+    float rstep=(xt-xs)/48; //calcolo step delle 48 stazioni        
     float r1[49]; //creazione vettore delle 48 stazioni (-> CSI in propeller.txt)
     float t2[49], a2[49],b2[49];
     float th, phi1, eff, DtDr,DqDr,cl,cd,CT,CQ, tem1,tem2;
@@ -39,7 +53,7 @@ double propel(double RPM_ref, double Pmax_h, double rho1, double Vel, double* ge
         rad=r1[j]; //coordinata j-esima stazione (-> CSI in propeller.txt)
         theta1=data_propeller[j][3]*(pi/180) + pitch; //calcolo angolo di svergolamento della j-esima stazione        //sostituire con BA(j) + pitch
         t2[j]=theta1; //angolo di svergolamento della j-esima stazione (-> BA su propeller.txt) 
-        th=theta1/180.0*pi; //angolo di svergolamento [rad]
+        th=theta1; //angolo di svergolamento [rad]
         a=0.1; //inizializzazione axial inflow factor (vedi pag.4 PROPEL.pdf)
         b=0.01; //inizializzazione angular inflow (swirl) factor (vedi pag.4 PROPEL.pdf)
         finished=0; //inizializzione flag
@@ -53,9 +67,9 @@ double propel(double RPM_ref, double Pmax_h, double rho1, double Vel, double* ge
             cd=propeller_profile[5]+propeller_profile[4]*alpha1+propeller_profile[3]*alpha1*alpha1; // CD coefficiente di resistenza CD = CD0+CD1*CL+CD2*CL^2 (NB nel nostro caso, CD = CD0+CD_alpha*alpha+CD_alpha2*alpha^2 -> slide lezione 2)
             Vlocal=sqrt(V0*V0+V2*V2); // velocità locale del flusso
             CT = cl*cos(phi1)-cd*sin(phi1); //CT coefficiente di spinta adimensionale
-            DtDr=0.5*rho1*Vlocal*Vlocal*geometry_propeller[2]*data_propeller[j][2]*CT; //contributo di spinta della j-esima sezione      //IL NUMERO 2.0 è il numero di pale
+            DtDr=0.5*rho1*Vlocal*Vlocal*geometry_propeller[2]*data_propeller[j][2]*Raggio*CT; //contributo di spinta della j-esima sezione      //IL NUMERO 2.0 è il numero di pale
             CQ = cd*cos(phi1)+cl*sin(phi1); //CQ coefficiente di coppia adimensionale
-            DqDr=0.5*rho1*Vlocal*Vlocal*geometry_propeller[2]*data_propeller[j][2]*rad*CQ; //contributo di coppia della j-esima sezione  //IL NUMERO 2.0 è il numero di pale
+            DqDr=0.5*rho1*Vlocal*Vlocal*geometry_propeller[2]*data_propeller[j][2]*Raggio*Raggio*rad*CQ; //contributo di coppia della j-esima sezione  //IL NUMERO 2.0 è il numero di pale
             tem1=DtDr/(4.0*pi*rad*rho1*Vel*Vel*(1+a)); //fattore correttivo del coefficiente "a"
             tem2=DqDr/(4.0*pi*rad*rad*rad*rho1*Vel*(1+a)*omega); //fattore correttivo del coefficiente "b"
             anew=0.5*(a+tem1); //nuovo valore coefficiente "a"
@@ -114,6 +128,5 @@ double propel(double RPM_ref, double Pmax_h, double rho1, double Vel, double* ge
     }
 }
 double massConsumption(double Kc, double Pa, double np, double mass, double time){
-    printf("%g\n", Kc*Pa/np);
     return mass - (Kc*Pa*1000/np)*time;
 }

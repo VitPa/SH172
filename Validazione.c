@@ -52,7 +52,6 @@ void main() {
     while(matrici[i][++k][0] < alpha_rand);
 
     int colonna = (i==2 || i==4 || i==6) ? rand()%8 : rand()%7;
-    colonna = 0;
 
     double InterpVet = interpolazioneTotale(matrici[i], colonna, alpha_rand);
 
@@ -97,4 +96,9 @@ void main() {
     printf("\t\tValore interpolato: %g\n", InterpVet);
 
     system("PAUSE");
+
+
+    /*
+    Stampa la legenda e fai scegliere all'utente la matrice, la colonna e l'alpha. Poi stampa i risultati
+    */
 }

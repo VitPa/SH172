@@ -25,6 +25,9 @@ int main(){
    l'utente deve intervenire oppure no).
    In ogni caso tutti i warning ed errori li deve stampare anche su un file di log
    */
+  /*
+  Inserire la scritta "Premere invio per i messaggi di default" in tutti i messaggi per le condizioni
+  */
 
     double *engine = NULL;
     double *geometry_propeller = NULL, *propeller_profile = NULL, **data_propeller = NULL;
@@ -96,6 +99,11 @@ int main(){
         Arrivati all'ultima iterazione, in base a come è scritta la funzione, calcola comunque i valori di state al 
         passo successvo anche se al passo successivo la simulazione sarà terminata. È corretto?
         */
+
+        for(int j = 0; j < 12; j++){
+            printf("%lf\t", state[i][j]);
+        }
+        printf("\n");
         ++i;
     }
 
@@ -104,5 +112,6 @@ int main(){
         fuel_mass, steady_state_coeff, aer_der_x, aer_der_y, aer_der_z, rolling_moment_der, pitch_moment_der, 
         yawing_moment_der, control_force_der, control_moment_der, rotary_der, state);
     free(command);
+    system("PAUSE");
     return 0;
 }

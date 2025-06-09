@@ -80,7 +80,7 @@ int routh(double Cm_q,double* body_axes, double rho, double alpha_trim, double V
     printf("\n-----------------------------------\n");
     
     //double omegaNsp_adm = sqrt(-Cm_alpha/inerziaY_adm);
-     double omegaNsp_adm = sqrt(-(2*massa_adm*Cm_alpha+Cm_q*CL_alpha)/(2*massa_adm*inerziaY_adm));
+    double omegaNsp_adm = sqrt(-(2*massa_adm*Cm_alpha+Cm_q*CL_alpha)/(2*massa_adm*inerziaY_adm));  //Modello completo non semplificato  
     //double omegaNsp_adm = sqrt(-Cm_alpha/inerziaY_adm-(Cm_q*CL_alpha)/(2*massa_adm*inerziaY_adm));
     //printf("A: %lf\nB: %lf", Cm_alpha/inerziaY_adm, (Cm_q*CL_alpha)/(2*massa_adm*inerziaY_adm));
     //printf("Cmq: %lf\nCLa_alpha: %lf", Cm_q, Cm_alpha);

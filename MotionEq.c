@@ -30,7 +30,7 @@ void equation(double *engine, double Pmax_h, double rho_h, double *CI, double **
         for (double de_1 = -20.0; de_1 <= 20.0; de_1 += 0.01){
             double CZ_tot = CZss + CZalpha * alpha_1 * (pi/180) + CZde * de_1 * (pi/180);
             double control = fabs(body_axes[0]*g*cos(alpha_1*(pi/180) + CI[2]*(pi/180)) + cst * CZ_tot);
-            double control2 = fabs(CMss + CMalpha * alpha_1 * (pi/180) + CMde * de_1 * (pi/180));
+            double control2 = fabs(CMss + CMalpha * alpha_1*(pi/180) + CMde * de_1 * (pi/180));
 
             if (control < 1.0 && control2 < 0.004){
 
