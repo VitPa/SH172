@@ -4,10 +4,12 @@ gcc main.c atmosphere.c estrazionedati.c interpolazione.c motioneq.c interpolazi
 - Inserire le logiche aggiuntive (stampa dei valori e eliminazione dell'ogiva) nel file EstrapolazioneDati_ottimizzato.c
 
 ## Da fare ora
+- Controllare perchè la spinta si abbassa e si alza ma in un'intorno diverso da quello di trimmaggio
 - Implementare le manovre
 - Implementare calcolo manetta che poi servirà per determinare gli RPM da dare ad eulero
 - Va fatta la validazione del propel
 - Inserire tutti i warning e error nel codice
+- Se non trova qualcosa dei valori di trim, deve interrompere la simulazione
 
 ## Domande
 - Con i quaternioni fare la parte di eulero
