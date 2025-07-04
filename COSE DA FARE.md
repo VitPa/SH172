@@ -1,23 +1,20 @@
 gcc main.c atmosphere.c estrazionedati.c interpolazione.c motioneq.c interpolazione_new.c propeller.c routh.c -o main.exe && main.exe
 
 ## Da fare dopo
-- La validazione va finita. per il momento le equazioni non danno gli stessi valori
-- Calcolare la massa che non deve consumarsi più del limite minimo (In Interpolazione.c)
-- Inserire tutti i warning e error nel codice
 - Inserire le logiche aggiuntive (stampa dei valori e eliminazione dell'ogiva) nel file EstrapolazioneDati_ottimizzato.c
-- Risolvere il problema che quando fa il ciclo si ha un'errore a 19.79. Probabilmente è in Interpolazione_new.c
-- Fare in modo che il ciclo di funzionamento che itera per tutti gli istanti di tempo sia dal main.
 
 ## Da fare ora
 - Implementare le manovre
-- Implementare calcolo manetta che poi servirò per determinare gli RPM da dare ad eulero
-- Capire perchè a valori prossimi a 20 l'interpolazione non funziona
-- Capire perchè in propel.c la V va ad inf
+- Implementare calcolo manetta che poi servirà per determinare gli RPM da dare ad eulero
+- Va fatta la validazione del propel
+- Inserire tutti i warning e error nel codice
 
 ## Domande
-- Controllare gli rpm minimi e massimi della pala
-- I valori di soglia sono corretti?
-- Se trova più condizioni di alpha/de di trim, quale prendiamo? quella in cui abbiamo i residui più piccoli?
+- Con i quaternioni fare la parte di eulero
+- Bisogna creare file separati per ogni validazione? Quindi tre diversi main ed eseguibili oppure solo uno con tutto (magari con un menù)?
+
+## AI FINI DELL'ESAME
+- Per la parte di inserimento dati fare una cosa del tipo che il terminale si modifichi dinamicamente. Quindi fare in modo che quando metto la velocità (ad esempio) il terminale mi stampi sopra come siamo messi a variabili (quindi un resoconto delle variabili riempite e di quelle ancora vuote). Ogni volta che inserisco un valore il terminale deve contenere solo la nuova domanda per inserire l'altra variabile e il resoconto sopra.
 
 Aggiornamento 01/06/2025
 - !!! prenotarci per martedi mattina possibilmente prima delle 13
@@ -27,6 +24,3 @@ Aggiornamento 01/06/2025
 - !!! La generica derivata aerodinamica va semplificata come da slide 32 oppure no?
 - warning sui alpha (e anche gli altri)
 - input di comandi e manovre
-
-WARNING
-macth maggiore di drag rise, warning se la velocità è troppa nella manovra ed errore nel trim
