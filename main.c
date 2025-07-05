@@ -18,16 +18,16 @@ int main(){
     si può fare una terza modalità in cui si stampano (magari chiedendo funzione per funzione) 
     tutti i calcoli intermedi per un debug ancora più avanzato
     */
-   /*
-   Implementae una struct o una nuova funzione per la gestione degli errori. Ti deve permettere di
-   fare (system("PAUSE"); exit(0);) se è un'errore oppure gestire il warning, magari passando il 
-   messaggio da stampare e distinguere tra warning silenzioso o warning non silenzioso (cioè se 
-   l'utente deve intervenire oppure no).
-   In ogni caso tutti i warning ed errori li deve stampare anche su un file di log
-   */
-  /*
-  Inserire la scritta "Premere invio per i messaggi di default" in tutti i messaggi per le condizioni
-  */
+    /*
+    Implementae una struct o una nuova funzione per la gestione degli errori. Ti deve permettere di
+    fare (system("PAUSE"); exit(0);) se è un'errore oppure gestire il warning, magari passando il 
+    messaggio da stampare e distinguere tra warning silenzioso o warning non silenzioso (cioè se 
+    l'utente deve intervenire oppure no).
+    In ogni caso tutti i warning ed errori li deve stampare anche su un file di log
+    */
+    /*
+    Inserire la scritta "Premere invio per i messaggi di default" in tutti i messaggi per le condizioni
+    */
 
     double *engine = NULL;
     double *geometry_propeller = NULL, *propeller_profile = NULL, **data_propeller = NULL;
@@ -69,7 +69,7 @@ int main(){
     // Inserimento manovra
     double dt = 0.01, deltaT_fs;
     printf("Inserire il tempo di simulazione: ");
-    scanf("%lf", &deltaT_fs);
+    scanf("%.2lf", &deltaT_fs);
 
     for (int i = 0; i < deltaT_fs/dt; ++i){
         command[i][0] = 0;

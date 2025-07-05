@@ -2,8 +2,10 @@ gcc main.c atmosphere.c estrazionedati.c interpolazione.c motioneq.c interpolazi
 
 ## Da fare dopo
 - Inserire le logiche aggiuntive (stampa dei valori e eliminazione dell'ogiva) nel file EstrapolazioneDati_ottimizzato.c
+- Tradurre o tutto in Inglese o tutto in Italiano
 
 ## Da fare ora
+- RIPRENDI DA => verificare che i comandi si sommano e non che vengono sovrascritti (tutti)!
 - Controllare perchè la spinta si abbassa e si alza ma in un'intorno diverso da quello di trimmaggio
 - Implementare le manovre
 - Implementare calcolo manetta che poi servirà per determinare gli RPM da dare ad eulero

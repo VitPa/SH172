@@ -1,11 +1,16 @@
 #ifndef ESTRAZIONE_DATI_H
 #define ESTRAZIONE_DATI_H
 
+extern int dimMat[13];
+extern double RPMmax, RPMmin;
+
 double* caricaVettoreDouble(const char *path, int checkSection, int *outSize);
 
 double** caricaMatriceDouble(const char *path, int colonne, int checkSection, int *outRighe);
 
 double** reallocState(double **state, int n_colonne);
+
+double** reallocCommand(double **command, int n_colonne);
 
 void stampaVettore(const char* nome, double* v, int n);
 
