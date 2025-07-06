@@ -1,5 +1,5 @@
 double** load_command(double dt, double Tfs, double RPMtrim, double eTrim);
-void defaultManeuver(double dt, double Tfs, double **command, double RPMtrim, double eTrim);
+void defaultManeuver(double dt, double Tfs, double **command);
 void customManeuver(double dt, double Tfs, double **command);
 void step(double A, double start_command, double duration_command, double dt, double Tfs, double **command, int column);
 void zero(double dt, double Tfs, double **command, int column);

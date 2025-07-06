@@ -8,7 +8,7 @@
 #define g 9.80665
 #define pi 3.14159265
 
-void eulerEquation(double dt, int i, double **state, /*double **command*/ double command[][4], double Pmax_h, double rho, double RPM,double *engine, double *body_axes, double **steady_state_coefficients, double **aer_der_x, double **aer_der_y, double **aer_der_z, double **rolling_moment_der, double **pitch_moment_der, double **yawing_moment_der, double **control_force_der, double **control_moment_der, double *geometry_propeller, double *propeller_profile, double **data_propeller){
+void eulerEquation(double dt, int i, double **state, double **command, double Pmax_h, double rho, double RPM,double *engine, double *body_axes, double **steady_state_coefficients, double **aer_der_x, double **aer_der_y, double **aer_der_z, double **rolling_moment_der, double **pitch_moment_der, double **yawing_moment_der, double **control_force_der, double **control_moment_der, double *geometry_propeller, double *propeller_profile, double **data_propeller){
     //printf("rho: %lf\n", rho);
     
     // Inizializzo le variabili
@@ -35,9 +35,9 @@ void eulerEquation(double dt, int i, double **state, /*double **command*/ double
     y_ned = state[i][11];
 
     //Richiamo componenti dei comandi
-    da    = command[i][0];
+    da    = command[i][0] *(pi/180);
     de    = command[i][1] *(pi/180);
-    dr    = command[i][2];
+    dr    = command[i][2] *(pi/180);
     manetta = command[i][3];
 
     // Velostatetà totale iniziale (t = 0);
@@ -46,13 +46,13 @@ void eulerEquation(double dt, int i, double **state, /*double **command*/ double
     // Calcolo Spinta
     propel(RPM, Pmax_h, rho, V, geometry_propeller, propeller_profile, data_propeller, prop, &Pal);
     T = prop[0];
-    /*printf("Spinta: %lf\n", T);
-    printf("Pal: %lf\n", Pal);*/
+    //printf("Spinta: %lf\n", T);
+    /*printf("Pal: %lf\n", Pal);*/
 
     // Calcolo consumo di carburante
     body_axes[0] = massConsumption(engine[5], Pal, prop[2], body_axes[0], dt);
-    //printf("Massa: %lf\n", body_axes[0]);
-    // if (body_axes[0] < ??)                   CAPIRE COME CALCOLARE LA CONDIZIONE DI ERRORE PER IL CARBURANTE
+    printf("Massa: %lf\n", body_axes[0]);
+    // if (body_axes[0] < ??)                   //CAPIRE COME CALCOLARE LA CONDIZIONE DI ERRORE PER IL CARBURANTE
 
     S = body_axes[2];
     costante=0.5*rho*V*V*S;
@@ -103,17 +103,19 @@ void eulerEquation(double dt, int i, double **state, /*double **command*/ double
     // Calcolo Forze e Momenti (t = 0);
     X = costante*(Cxss+Cxa*alpha+Cxde*de);
     Y = costante*(Cyb*beta+Cyp*p_ad+Cyr*r_ad+Cydr*dr);
-    Z = costante*(Czss+Cza*alpha+Czq*q_ad+Czde*de);
-    L = costante*body_axes[2]*(Clb*beta+Clp*p_ad+Clr*r_ad+Clda*da+Cldr*dr);
+    Z = costante*(Czss+Cza*alpha+Czde*de);  //Abbiamo eliminato Czq*q_ad+
+    L = costante*body_axes[1]*(Clb*beta+Clp*p_ad+Clr*r_ad+Clda*da+Cldr*dr);
     M = costante*body_axes[3]*(Cmss+Cma*alpha+Cmq*q_ad+Cmde*de);
-    N = costante*body_axes[2]*(Cnss+Cnb*beta+Cnp*p_ad+Cnr*r_ad+Cnda*da+Cndr*dr);
+    N = costante*body_axes[1]*(Cnss+Cnb*beta+Cnp*p_ad+Cnr*r_ad+Cnda*da+Cndr*dr);
 
     /*printf("x: %lf\n", X);
-    printf("y: %lf\n", Y);
-    printf("z: %lf\n", Z);
-    printf("L: %lf\n", L);
+    printf("y: %lf\n", Y);*/
+    //printf("z: %lf\n", Z);
+    /*printf("L: %lf\n", L);
     printf("M: %lf\n", M);
     printf("N: %lf\n", N);*/
+
+    //printf("z-massa: %lf\n", Z+body_axes[0]*g);
 
     // Incrementi tempo t = 0[s].
     du     = (r*v-q*w)-g*sin(theta)+X/m+T/m;  

@@ -9,6 +9,7 @@
 #include "MotionEq.h"
 #include "Integration.h"
 #include "InitialCondition.h"
+#include "Command.h"
 
 int main(){
 
@@ -37,11 +38,7 @@ int main(){
     double **control_force_der = NULL, **control_moment_der = NULL, **rotary_der = NULL;
     double **state = NULL;
     double trim[4];
-    double (*command)[4] = malloc(1000000 * sizeof(*command));
-    if (!command) {
-        printf("Errore allocazione memoria per command\n");
-        return 1;
-    }
+    double **command = NULL;
 
     // Caricamento variabili da file .txt
     caricaTuttiIDati(&engine, &geometry_propeller, &propeller_profile, &data_propeller, &body_axes, &deflection_limits,
@@ -69,18 +66,18 @@ int main(){
     // Inserimento manovra
     double dt = 0.01, deltaT_fs;
     printf("Inserire il tempo di simulazione: ");
-    scanf("%.2lf", &deltaT_fs);
+    scanf("%lf", &deltaT_fs);
 
-    for (int i = 0; i < deltaT_fs/dt; ++i){
-        command[i][0] = 0;
-        command[i][1] = trim[1];
-        command[i][2] = 0;
-        command[i][3] = 0;
-    }
+    command = load_command(dt, deltaT_fs, trim[2], trim[1]);
     
     // Ciclo di simulazione
     int i = 0;
-    for(double Ts = 0.00; Ts <= deltaT_fs; Ts += dt){
+    FILE *fp = fopen("DATI_ANALISI.txt", "w");
+    if (fp == NULL) {
+        printf("Errore nell'apertura del file DATI_ANALISI.txt\n");
+        return 1;
+    }
+    for(double Ts = 0.00; Ts <=deltaT_fs; Ts += dt){
         
         // Ricalcolo variabili atmoferiche
         AtmosphereCalc(state[i][9], engine, &Pmax_h, &press_h, &temp_h, &rho_h, &vsuono_h, flagatm);
@@ -100,18 +97,23 @@ int main(){
         passo successvo anche se al passo successivo la simulazione sarà terminata. È corretto?
         */
 
+        printf("%.2lf", Ts);
+
         for(int j = 0; j < 12; j++){
-            printf("%lf\t", state[i][j]);
+            printf("   -   %.4lf", state[i][j]);
         }
         printf("\n");
+
+        fprintf(fp, "%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t\n",Ts,state[i][0],state[i][1],state[i][2],state[i][3],state[i][4],state[i][5],state[i][6],state[i][7],state[i][8],state[i][9],state[i][10],state[i][11]);
         ++i;
     }
+    fclose(fp);
 
     // Libera la memoria
     liberaTuttiIDati(engine, geometry_propeller, propeller_profile, data_propeller, body_axes, deflection_limits, 
         fuel_mass, steady_state_coeff, aer_der_x, aer_der_y, aer_der_z, rolling_moment_der, pitch_moment_der, 
-        yawing_moment_der, control_force_der, control_moment_der, rotary_der, state);
-    free(command);
+        yawing_moment_der, control_force_der, control_moment_der, rotary_der, state, command);
+    //free(command);
     system("PAUSE");
     return 0;
 }

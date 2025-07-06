@@ -138,7 +138,8 @@ void stampaMatrice(const char* nome, double** m, int righe, int colonne) {
 void caricaTuttiIDati(double **engine, double **geometry_propeller, double **propeller_profile, double ***data_propeller, double **body_axes, double **deflection_limits, double **fuel_mass, double ***steady_state_coeff, double ***aer_der_x, double ***aer_der_y, double ***aer_der_z, double ***rolling_moment_der, double ***pitch_moment_der, double ***yawing_moment_der, double ***control_force_der, double ***control_moment_der, double ***rotary_der) {
     int ok = 1;
     dimMat[11]=1;
-    dimMat[12]=1;
+    dimMat[12]=0;
+    
     // VETTORI
     *engine = caricaVettoreDouble("dati/engine.txt", 1, &dimVett[0]); 
     if (!*engine) {printf("[!]ERROR: Errore caricamento vettore engine\n"); system("PAUSE"); exit(0);}
@@ -154,6 +155,7 @@ void caricaTuttiIDati(double **engine, double **geometry_propeller, double **pro
     if (!*deflection_limits) {printf("[!]ERROR: Errore caricamento vettore deflection_limits\n"); system("PAUSE"); exit(0);}
     *fuel_mass = caricaVettoreDouble("dati/dba.txt", 3, &dimVett[5]); 
     if (!*fuel_mass) {printf("[!]ERROR: Errore caricamento vettore fuel_mass\n"); system("PAUSE"); exit(0);}
+    
     // MATRICI
     *data_propeller = caricaMatriceDouble("dati/propeller.txt", 4, 3, &dimMat[0]);
     *steady_state_coeff = caricaMatriceDouble("dati/dba.txt", 7, 4, &dimMat[1]);
