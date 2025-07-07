@@ -1,5 +1,3 @@
-gcc main.c atmosphere.c estrazionedati.c interpolazione.c motioneq.c interpolazione_new.c propeller.c routh.c -o main.exe && main.exe
-
 ## Da fare dopo
 - [Ozionale] Inserire le logiche aggiuntive (stampa dei valori e eliminazione dell'ogiva) nel file EstrapolazioneDati_ottimizzato.c
 - Tradurre o tutto in Inglese o tutto in Italiano
