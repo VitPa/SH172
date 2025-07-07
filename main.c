@@ -89,7 +89,7 @@ int main(){
 
         if (eulerEquation(dt, i, state, command, Pmax_h, rho_h, engine, body_axes, steady_state_coeff, aer_der_x, aer_der_y, aer_der_z, 
             rolling_moment_der, pitch_moment_der, yawing_moment_der, control_force_der, control_moment_der, geometry_propeller, 
-            propeller_profile, data_propeller)){
+            propeller_profile, data_propeller, fuel_mass)){
                 break;
             }
 
