@@ -9,7 +9,7 @@ static int n;
 
 double** load_command(double dt, double Tfs, double RPMtrim, double eTrim){
     int choise;
-    RPMt = RPMtrim;
+    RPMt = 100 * (RPMtrim - RPMmin) / (RPMmax - RPMmin);
     et = eTrim;
     n = ((int)(Tfs/dt))+1;
     
@@ -100,7 +100,6 @@ void customManeuver(double dt, double Tfs, double **command){
                         A=100; 
                         printf("[~]WARNING: Ampiezza maggiore del massimo consentito... Impostata ampiezza a 100%%\n");
                     }
-                    A = RPMmin + (RPMmax - RPMmin) * (A - 0) / (100 - 0);  //Mappatura manetta [0, 100] -> [RPMmin, RPMmax]
                 }else if (i==1){
                     if(A+et<-20){
                         A=-20-et; 

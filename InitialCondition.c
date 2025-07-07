@@ -31,16 +31,16 @@ void checkVelAlt(double *V, double *h, double *gamma) {
 }
 
 void physicalCheck(double V, double h, double Mdg, double vsuono_h) {
-    static int f1 = 0, f2 = 0, f3 = 0;
+    static int f1 = 0, f2 = 0, f3 = 0; // Prevents impulsive values from terminating the simulation
     if (V/(sqrt(vsuono_h)) > Mdg){
-        if(++f1>1) { printf("[!]ERROR: La velocità è maggiore del match di drag rise.\nSIMULAZIONE TERMINATA!");system("PAUSE"); exit(0);}
+        if(++f1>2) { printf("[!]ERROR: La velocità è maggiore del match di drag rise.\nSIMULAZIONE TERMINATA!");system("PAUSE"); exit(0);}
     }
     if(h<0){
-        if(++f2>1) {printf("[!]ERROR: Il velivolo ha raggiunto quota zero.\nSIMULAZIONE TERMINATA!"); system("PAUSE"); exit(0);}
+        if(++f2>2) {printf("[!]ERROR: Il velivolo ha raggiunto quota zero.\nSIMULAZIONE TERMINATA!"); system("PAUSE"); exit(0);}
     }
     else if(h==4116) printf("[~]WARNING: Il velivolo ha raggiunto la quota di tangenza.\n");
     else if(h>4116){
-        if(++f3>1) {printf("[!]ERROR: Il velivolo ha raggiunto la quota di tangenza.\nSIMULAZIONE TERMINATA!\n"); system("PAUSE"); exit(0);}
+        if(++f3>2) {printf("[!]ERROR: Il velivolo ha raggiunto la quota di tangenza.\nSIMULAZIONE TERMINATA!\n"); system("PAUSE"); exit(0);}
     }
     f1 = 0, f2 = 0, f3 = 0;
 }
@@ -52,7 +52,7 @@ void loadCI(double *CI) {
     printf("Per i valori di default premere Invio . . .\n");
     printf("--------------------------------------------\n\n");
     
-    printf("Inserire la velocità inziale [m/s]: ");
+    printf("Inserire la velocità inziale [m/s] (default: 52): ");
     do{
         fgets(input, 100, stdin);
         if(input[0]=='\n') {
@@ -63,7 +63,7 @@ void loadCI(double *CI) {
         if(sscanf(input,"%lf",&CI[0])!=0) break;
         printf("[~]WARNING: Immettere un valore numerico --> ");
     }while(1);
-    printf("Inserire l'altitudine inziale [m]: ");
+    printf("\nInserire l'altitudine inziale [m] (default: 1000): ");
     do{
         fgets(input, 100, stdin);
         if(input[0]=='\n') {
@@ -74,7 +74,7 @@ void loadCI(double *CI) {
         if(sscanf(input,"%lf",&CI[1])!=0) break;
         printf("[~]WARNING: Immettere un valore numerico --> ");
     }while(1);
-    printf("Inserire l'angolo di attacco inziale [deg]: ");
+    printf("\nInserire l'angolo di attacco inziale [deg] (default: 0): ");
     do{
         fgets(input, 100, stdin);
         if(input[0]=='\n') {

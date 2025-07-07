@@ -8,7 +8,9 @@
 #define g 9.80665
 #define pi 3.14159265
 
-int eulerEquation(double dt, int i, double **state, double **command, double Pmax_h, double rho,double *engine, double *body_axes, double **steady_state_coefficients, double **aer_der_x, double **aer_der_y, double **aer_der_z, double **rolling_moment_der, double **pitch_moment_der, double **yawing_moment_der, double **control_force_der, double **control_moment_der, double *geometry_propeller, double *propeller_profile, double **data_propeller){
+static double MTOW = -1.0;
+
+int eulerEquation(double dt, int i, double **state, double **command, double Pmax_h, double rho, double *engine, double *body_axes, double **steady_state_coefficients, double **aer_der_x, double **aer_der_y, double **aer_der_z, double **rolling_moment_der, double **pitch_moment_der, double **yawing_moment_der, double **control_force_der, double **control_moment_der, double *geometry_propeller, double *propeller_profile, double **data_propeller, double *fuel_mass){
     FILE *agg = fopen("DATI_AGGIUNTIVI.txt", "a");
     if (agg == NULL) {
         printf("Errore nell'apertura del file DATI_ANALISI.txt\n");
@@ -42,7 +44,7 @@ int eulerEquation(double dt, int i, double **state, double **command, double Pma
     da    = command[i][0] *(pi/180);
     de    = command[i][1] *(pi/180);
     dr    = command[i][2] *(pi/180);
-    manetta = command[i][3];
+    manetta = engine[2] + (engine[3] - engine[2]) * (command[i][3]) / (100);  //Mappatura manetta [0, 100] -> [RPMmin, RPMmax];
 
     // Velostatetà totale iniziale (t = 0);
     V=sqrt(u*u + v*v + w*w);
@@ -60,9 +62,14 @@ int eulerEquation(double dt, int i, double **state, double **command, double Pma
     /*printf("Pal: %lf\n", Pal);*/
 
     // Calcolo consumo di carburante
-    body_axes[0] = massConsumption(engine[5], Pal, prop[2], body_axes[0], dt);
-    //printf("Massa: %lf\n", body_axes[0]);
-    // if (body_axes[0] < ??)                   //CAPIRE COME CALCOLARE LA CONDIZIONE DI ERRORE PER IL CARBURANTE
+    if (MTOW <0) MTOW = body_axes[0];
+    if(fuel_mass[0] == 1){
+        body_axes[0] = massConsumption(engine[5], Pal, prop[2], body_axes[0], dt);
+        if(body_axes[0] < 0.5*MTOW){
+            printf("[!] ERROR: Carburante esaurito\n");
+            return 1;
+        }
+    }
 
     S = body_axes[2];
     costante=0.5*rho*V*V*S;
@@ -128,15 +135,15 @@ int eulerEquation(double dt, int i, double **state, double **command, double Pma
     //printf("z-massa: %lf\n", Z+body_axes[0]*g);
 
     // Incrementi tempo t = 0[s].
-    du     = (r*v-q*w)-g*sin(theta)+X/m+T/m;
-    dv     = (p*w-r*u)+g*sin(phi)*cos(theta)+Y/m;
-    dw     = (q*u-p*v)+g*cos(phi)*cos(theta)+Z/m;
-    dp     = -(Jz-Jy)*q*r/Jx+L/Jx;
-    dq     = -(Jx-Jz)*p*r/Jy+M/Jy;
-    dr     = -(Jy-Jx)*p*q/Jz+N/Jz;
+    du     = (r*v-q*w) - g*sin(theta) + X/m + T/m;
+    dv     = (p*w-r*u) + g*sin(phi)*cos(theta) + Y/m;
+    dw     = (q*u-p*v) + g*cos(phi)*cos(theta) + Z/m;
+    dp     = (-(Jz-Jy)*q*r)/Jx + L/Jx;
+    dq     = (-(Jx-Jz)*p*r)/Jy + M/Jy;
+    dr     = (-(Jy-Jx)*p*q)/Jz + N/Jz;
     dphi   = p + q*sin(phi)*tan(theta) + r*cos(phi)*tan(theta);
     dtheta = q*cos(phi) - r*sin(phi);
-    dpsi   = q*sin(phi)/cos(theta) + r*cos(phi)/cos(theta);
+    dpsi   = q*(sin(phi)/cos(theta)) + r*(cos(phi)/cos(theta));
     dh     = -u*sin(theta) + v*cos(theta)*sin(phi) + w*cos(theta)*cos(phi);
     dx_ned = u*cos(psi)*cos(theta) + v*(cos(psi)*sin(theta)*sin(phi) - sin(psi)*cos(phi)) + w*(cos(psi)*sin(theta)*cos(phi) + sin(psi)*sin(phi));
     dy_ned = u*sin(psi)*cos(theta) + v*(sin(psi)*sin(theta)*sin(phi) + cos(psi)*cos(phi)) + w*(sin(psi)*sin(theta)*cos(phi) - cos(psi)*sin(phi));

@@ -18,8 +18,6 @@ double propel(double RPM_ref, double Pmax_h, double rho1, double Vel, double* ge
         ++k;
         z=0;
     }
-
-    //stampaMatrice("data propeller", data_propeller, 49, 4);
     
     float alpha1, theta1;
     float pitch = 0.0; // pitch del'elica
@@ -87,29 +85,11 @@ double propel(double RPM_ref, double Pmax_h, double rho1, double Vel, double* ge
                 finished=1;
             }
         }
-        /*printf("----------------------------\n");
-        printf("V0 = %lf\n", V0);
-        printf("V2 = %lf\n", V2);
-        printf("phi1 = %lf\n", phi1);
-        printf("alpha1 = %lf\n", alpha1);
-        printf("cl = %lf\n", cl);
-        printf("cd = %lf\n", cd);
-        printf("Vlocal = %lf\n", Vlocal);
-        printf("CT = %lf\n", CT);
-        printf("DtDr = %lf\n", DtDr);
-        printf("CQ = %lf\n", CQ);
-        printf("DqDr = %lf\n", DqDr);
-        printf("tem1 = %lf\n", tem1);
-        printf("tem2 = %lf\n", tem2);*/
         a2[j]=a; //definizione valore finale coefficiente "a" per la j-esima stazione
         b2[j]=b; //definizione valore finale coefficiente "b" per la j-esima stazione
         prop[0] += DtDr*rstep; //sommatoria dei contributi di spinta dalla stazione 1 alla stazione j
         prop[1] += DqDr*rstep; //sommatoria dei contributi di coppia dalla stazione 1 alla stazione j
     }
-    /*printf("**********************\n");
-    printf("Thrust: %f N\n",prop[0]);
-    printf("Torque: %f Nm\n",prop[1]);
-    printf("**********************\n");*/
 
     double t = prop[0]/(rho1*pow(n,2)*pow(diam,4)); //coefficiente di spinta adimensionale
     double q = prop[1]/(rho1*pow(n,2)*pow(diam,5)); //coefficiente di coppia adimensionale
