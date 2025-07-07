@@ -34,15 +34,15 @@ void equation(double *engine, double Pmax_h, double rho_h, double *CI, double **
 
             if (control < 1.0 && control2 < 0.004){
 
-                double score = sqrt(control/10*control/10 + control2/0.004*control2/0.004);
+                double score = sqrt(pow(control/10,2) + pow(control2/0.004,2));
                 if (score < score_min) {
                     score_min = score;
                     trim[1] = de_1;
                     trim[0] = alpha_1;
                     CZtrim = CZalpha;
                     CMtrim = CMalpha;
-                    double de_ref = - (CMss + CMalpha * alpha_1 * (pi/180)) / CMde;
-                    printf("Valore di de stimato: %lf\n", de_ref*(180/pi));
+                    //double de_ref = - (CMss + CMalpha * alpha_1 * (pi/180)) / CMde;
+                    //printf("Valore di de stimato: %lf\n", de_ref*(180/pi));
                 }
                 flag_1 = 1;
             }

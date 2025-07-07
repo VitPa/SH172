@@ -219,7 +219,7 @@ void ramp(double A0, double A1, double start_command, double duration_command, d
             double val = A0 + frac * (A1 - A0);
             command[i][column] = val;
         } else {
-            command[i][column] = A0;  //Cambiato a A1 a A0
+            command[i][column] = A1;  //Cambiato a A1 a A0
         }
     }
 }
