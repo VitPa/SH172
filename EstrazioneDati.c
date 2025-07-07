@@ -173,24 +173,21 @@ void caricaTuttiIDati(double **engine, double **geometry_propeller, double **pro
 }
 
 void stampaTuttiIDati(double *engine, double *geometry_propeller, double *propeller_profile, double **data_propeller, double *body_axes, double *deflection_limits, double *fuel_mass, double **steady_state_coeff, double **aer_der_x, double **aer_der_y, double **aer_der_z, double **rolling_moment_der, double **pitch_moment_der, double **yawing_moment_der, double **control_force_der, double **control_moment_der, double **rotary_der) {
-    stampaVettore("engine", engine, dimVett[0]);
-    stampaVettore("geometry_propeller", geometry_propeller, dimVett[1]);
-    stampaVettore("propeller_profile", propeller_profile, dimVett[2]);
-    stampaVettore("body_axes", body_axes, dimVett[3]);
-    stampaVettore("deflection_limits", deflection_limits, dimVett[4]);
-    stampaVettore("fuel_mass", fuel_mass, dimVett[5]);
+    const char *name_vec[] = {"engine", "geometry_propeller", "propeller_profile", "body_axes", "deflection_limits", "fuel_mass"};
+    double *vec[] = {engine, geometry_propeller,propeller_profile, body_axes, deflection_limits, fuel_mass};
 
-    stampaMatrice("data_propeller", data_propeller, dimMat[0], 4);
-    stampaMatrice("steady_state_coeff", steady_state_coeff, dimMat[1], 7);
-    stampaMatrice("aer_der_x", aer_der_x, dimMat[2], 8);
-    stampaMatrice("aer_der_y", aer_der_y, dimMat[3], 7);
-    stampaMatrice("aer_der_z", aer_der_z, dimMat[4], 8);
-    stampaMatrice("rolling_moment_der", rolling_moment_der, dimMat[5], 7);
-    stampaMatrice("pitch_moment_der", pitch_moment_der, dimMat[6], 8);
-    stampaMatrice("yawing_moment_der", yawing_moment_der, dimMat[7], 7);
-    stampaMatrice("control_force_der", control_force_der, dimMat[8], 7);
-    stampaMatrice("control_moment_der", control_moment_der, dimMat[9], 7);
-    stampaMatrice("rotary_der", rotary_der, dimMat[10], 7);
+    printf("\n\n**********   STAMPA VETTORI   **********");
+    for(int i=0; i<sizeof(vec)/sizeof(vec[0]); ++i){
+        stampaVettore(name_vec[i], vec[i], dimVett[i]);
+    }
+
+    const char *name_mat[] = {"data_propeller", "steady_state_coeff", "aer_der_x", "aer_der_y", "aer_der_z", "rolling_moment_der", "pitch_moment_der", "yawing_moment_der", "control_force_der", "control_moment_der", "rotary_der"};
+    double **mat[] = {data_propeller, steady_state_coeff, aer_der_x, aer_der_y, aer_der_z, rolling_moment_der, pitch_moment_der, yawing_moment_der, control_force_der, control_moment_der, rotary_der};
+
+    printf("\n\n\n**********   STAMPA MATRICI   **********");
+    for(int i=0; i<sizeof(mat)/sizeof(mat[0]); ++i){
+        stampaMatrice(name_mat[i], mat[i], dimMat[i], (i==0) ? 4 : (i==2 || i==4 || i==6) ? 8 : 7);
+    }
 }
 
 // Funzione per liberare la memoria di tutti i dati caricati

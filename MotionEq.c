@@ -49,18 +49,12 @@ void equation(double *engine, double Pmax_h, double rho_h, double *CI, double **
         }
     }
     if (flag_1 == 0) {
-        printf("Nessun alpha di Trim trovato!\n");
-        //printf("Il valore più basso: %lf\t%lf\n", ver[0], ver[1]);
+        printf("[!] ERROR: Nessun alpha di Trim trovato!\n");
+        system("PAUSE");
+        exit(1);
     } else {
         printf("\n*********************Alpha di Trim trovato**************************************\n\n");
         printf("---------- ALPHA: %lf\t\t DE_TRIM: %lf\n\n", trim[0], trim[1]);
-        /*printf("CZ_tot: %lf\n", CZ_tot);
-        printf("cst * CZ_tot: %lf\n", cst * CZ_tot);
-        printf("m*g*cos(a): %lf\n", body_axes[0]*g*cos(alpha_1*(pi/180)));
-        printf("control: %lf\n", control);
-        printf("control2: %lf\n\n", control2);
-        printf("Valore interpolato di CZss: %lf\n", CZss);
-        printf("Valore interpolato di CZalpha: %lf\n", CZalpha);*/
     }
 
     double thetaTrim = (trim[0] + CI[2])*(pi/180);  
@@ -129,6 +123,11 @@ void equation(double *engine, double Pmax_h, double rho_h, double *CI, double **
         }
         // printf("RPM: %d\t dT: %lf\n", RPM, fabs(tTrim - prop[0]));
         RPM += 1;
+    }
+    if(RPM > RPM_max){
+        printf("[!] ERRORE: RPM di Trim non trovato\n");
+        system("PAUSE");
+        exit(1);
     }
 
     // Calcolo la stabilità dell'aeromobile

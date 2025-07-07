@@ -1,14 +1,14 @@
 gcc main.c atmosphere.c estrazionedati.c interpolazione.c motioneq.c interpolazione_new.c propeller.c routh.c -o main.exe && main.exe
 
 ## Da fare dopo
-- Inserire le logiche aggiuntive (stampa dei valori e eliminazione dell'ogiva) nel file EstrapolazioneDati_ottimizzato.c
+- [Ozionale] Inserire le logiche aggiuntive (stampa dei valori e eliminazione dell'ogiva) nel file EstrapolazioneDati_ottimizzato.c
 - Tradurre o tutto in Inglese o tutto in Italiano
+- Abbellire l'interfaccia
 
 ## Da fare ora
-- Controllare perchè la spinta si abbassa e si alza ma in un'intorno diverso da quello di trimmaggio
 - Va fatta la validazione del propel
 - Inserire tutti i warning e error nel codice
-- Se non trova qualcosa dei valori di trim, deve interrompere la simulazione
+- Abbellire il codice, eliminare le parti iniutili
 
 ## Domande
 - Con i quaternioni fare la parte di eulero
