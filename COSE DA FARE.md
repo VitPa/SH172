@@ -2,22 +2,17 @@
 - [Ozionale] Inserire le logiche aggiuntive (stampa dei valori e eliminazione dell'ogiva) nel file EstrapolazioneDati_ottimizzato.c
 - Tradurre o tutto in Inglese o tutto in Italiano
 - Abbellire l'interfaccia
-- Controllare che la validazione per l'interpolazione e il propel vadano bene
 
 ## Da fare ora
-- L'output della validazione va salvata in file separati
 - Inserire tutti i warning e error nel codice
 - Abbellire il codice, eliminare le parti iniutili
 
-- Calcolare le condizioni di Trim anche nell'integrazione
+- Calcolare le condizioni di Trim anche nell'integrazione (Filippo)
 - Separare i due eseguibili, uno per lettura e interpolazione, l'altro per propel
 
 ## Domande
-- In propel il come si calcola T e Q sono corretti? E Pal? Perchè la T oscilla troppo? Perchè il Pal va subito a saturazione?
-- Le equazioni sono corrette? C'è da fare una trasformazione di assi?
-- Il calcolo della manetta è corretto? L amanetta di trim è troppo grande 
 
-- Con i quaternioni fare la parte di eulero
+- (Primatesta) Controllare che le validazioni vadano bene
 
 ## AI FINI DELL'ESAME
 - Per la parte di inserimento dati fare una cosa del tipo che il terminale si modifichi dinamicamente. Quindi fare in modo che quando metto la velocità (ad esempio) il terminale mi stampi sopra come siamo messi a variabili (quindi un resoconto delle variabili riempite e di quelle ancora vuote). Ogni volta che inserisco un valore il terminale deve contenere solo la nuova domanda per inserire l'altra variabile e il resoconto sopra.

@@ -70,17 +70,9 @@ int main(){
     
     // Integration and simulation
     int i = 0;
-    FILE *fp = fopen("DATI_ANALISI.txt", "w");
-    if (fp == NULL) {
-        printf("Errore nell'apertura del file DATI_ANALISI.txt\n");
-        return 1;
-    }
-    FILE *cm = fopen("DATI_COMANDI.txt", "w");
-    if (cm == NULL) {
-        printf("Errore nell'apertura del file DATI_ANALISI.txt\n");
-        return 1;
-    }
-    FILE *f = fopen("DATI_AGGIUNTIVI.txt", "w");
+    FILE *fp = apriFile("DATI_ANALISI.txt", "w");
+    FILE *cm = apriFile("DATI_COMANDI.txt", "w");
+    FILE *f = apriFile("DATI_AGGIUNTIVI.txt", "w");
     if (f) fclose(f);
     for(double Ts = 0.00; Ts <=deltaT_fs; Ts += dt){
         AtmosphereCalc(state[i][9], engine, &Pmax_h, &press_h, &temp_h, &rho_h, &vsuono_h, flagatm);

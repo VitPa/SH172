@@ -146,7 +146,7 @@ void caricaTuttiIDati(double **engine, double **geometry_propeller, double **pro
     
     // VETTORI
     *engine = caricaVettoreDouble("dati/engine.txt", 1, &dimVett[0]); 
-    if (!*engine) {printf("[!]ERROR: Errore caricamento vettore engine\n"); system("PAUSE"); exit(0);}
+    if (!*engine) {printf("[!]ERROR: Errore caricamento vettore engine\n"); system("PAUSE"); exit(0);} //Error(101, "engine");
     RPMmin = (*engine)[2];
     RPMmax = (*engine)[3];
     *geometry_propeller = caricaVettoreDouble("dati/propeller.txt", 1, &dimVett[1]); 

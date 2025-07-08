@@ -3,17 +3,14 @@
 #include <math.h>
 #include "Interpolazione.h"
 #include "propeller.h"
+#include "EstrazioneDati.h"
 
 
 #define g 9.80665
 #define pi 3.14159265
 
 int eulerEquation(double dt, int i, double **state, double **command, double Pmax_h, double rho, double *engine, double *body_axes, double **steady_state_coefficients, double **aer_der_x, double **aer_der_y, double **aer_der_z, double **rolling_moment_der, double **pitch_moment_der, double **yawing_moment_der, double **control_force_der, double **control_moment_der, double *geometry_propeller, double *propeller_profile, double **data_propeller, double *fuel_mass){
-    FILE *agg = fopen("DATI_AGGIUNTIVI.txt", "a");
-    if (agg == NULL) {
-        printf("Errore nell'apertura del file DATI_ANALISI.txt\n");
-        exit(1);
-    };
+    FILE *agg = apriFile("DATI_AGGIUNTIVI.txt", "a");
     
     // Inizializzo le variabili
     double u,v,w,p,q,r,phi,theta,psi,h,x_ned,y_ned;
