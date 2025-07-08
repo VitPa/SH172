@@ -175,6 +175,6 @@ void main() {
         printf("%d\t|%.2lf \t|%.2lf\n", RPM, prop[0], prop[1]);
     }
 
-    printf("Validazione terminata con successo!\n");
+    printf("\n\nValidazione terminata con successo!\n");
     system("PAUSE");
 }

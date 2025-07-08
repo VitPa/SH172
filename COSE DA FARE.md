@@ -4,13 +4,19 @@
 - Abbellire l'interfaccia
 
 ## Da fare ora
-- Va fatta la validazione del propel
+- L'output della validazione va salvata in file separati
 - Inserire tutti i warning e error nel codice
 - Abbellire il codice, eliminare le parti iniutili
 
+- Calcolare le condizioni di Trim anche nell'integrazione
+- Separare i due eseguibili, uno per lettura e interpolazione, l'altro per propel
+
 ## Domande
+- In propel il come si calcola T e Q sono corretti? E Pal? Perchè la T oscilla troppo? Perchè il Pal va subito a saturazione?
+- Le equazioni sono corrette? C'è da fare una trasformazione di assi?
+- Il calcolo della manetta è corretto? L amanetta di trim è troppo grande 
+
 - Con i quaternioni fare la parte di eulero
-- Bisogna creare file separati per ogni validazione? Quindi tre diversi main ed eseguibili oppure solo uno con tutto (magari con un menù)?
 
 ## AI FINI DELL'ESAME
 - Per la parte di inserimento dati fare una cosa del tipo che il terminale si modifichi dinamicamente. Quindi fare in modo che quando metto la velocità (ad esempio) il terminale mi stampi sopra come siamo messi a variabili (quindi un resoconto delle variabili riempite e di quelle ancora vuote). Ogni volta che inserisco un valore il terminale deve contenere solo la nuova domanda per inserire l'altra variabile e il resoconto sopra.

@@ -31,18 +31,28 @@ void checkVelAlt(double *V, double *h, double *gamma) {
 }
 
 void physicalCheck(double V, double h, double Mdg, double vsuono_h) {
-    static int f1 = 0, f2 = 0, f3 = 0; // Prevents impulsive values from terminating the simulation
+    static int f1 = 0, f2 = 0, f3 = 0, f4 = 0; // Prevents impulsive values from terminating the simulation
     if (V/(sqrt(vsuono_h)) > Mdg){
-        if(++f1>2) { printf("[!]ERROR: La velocità è maggiore del match di drag rise.\nSIMULAZIONE TERMINATA!");system("PAUSE"); exit(0);}
+        ++f1;
+        if(++f1>3) { printf("[!]ERROR: La velocità è maggiore del match di drag rise.\n"); system("PAUSE"); exit(0);}
+    }
+    if (V < 30) {
+        ++f2;
+        if(++f2>3) {printf("[!]ERROR: La velocità è inferiore di quella di stallo.\n"); system("PAUSE"); exit(0);}
     }
     if(h<0){
-        if(++f2>2) {printf("[!]ERROR: Il velivolo ha raggiunto quota zero.\nSIMULAZIONE TERMINATA!"); system("PAUSE"); exit(0);}
+        ++f3;
+        if(++f3>3) {printf("[!]ERROR: Il velivolo ha raggiunto quota zero.\n"); system("PAUSE"); exit(0);}
     }
     else if(h==4116) printf("[~]WARNING: Il velivolo ha raggiunto la quota di tangenza.\n");
     else if(h>4116){
-        if(++f3>2) {printf("[!]ERROR: Il velivolo ha raggiunto la quota di tangenza.\nSIMULAZIONE TERMINATA!\n"); system("PAUSE"); exit(0);}
+        ++f4;
+        if(++f4>3) {printf("[!]ERROR: Il velivolo ha raggiunto la quota di tangenza.\n"); system("PAUSE"); exit(0);}
     }
-    f1 = 0, f2 = 0, f3 = 0;
+    if(f1>0) --f1;
+    if(f2>0) --f2;
+    if(f3>0) --f3;
+    if(f4>0) --f4;
 }
 
 void loadCI(double *CI) {

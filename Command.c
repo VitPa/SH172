@@ -3,13 +3,13 @@
 #include "command.h"
 #include "EstrazioneDati.h"
 
-static double RPMt;
+static double manettat;
 static double et;
 static int n;
 
 double** load_command(double dt, double Tfs, double RPMtrim, double eTrim){
     int choise;
-    RPMt = 100 * (RPMtrim - RPMmin) / (RPMmax - RPMmin);
+    manettat = 100 * (RPMtrim - RPMmin) / (RPMmax - RPMmin);
     et = eTrim;
     n = ((int)(Tfs/dt))+1;
     
@@ -54,7 +54,7 @@ void defaultManeuver(double dt, double Tfs, double **command){  //Manovre usate 
 void customManeuver(double dt, double Tfs, double **command){
     int maneuver;
     char *signal[4] = {"impulso", "impulso simmetrico", "gradino", "rampa"};
-    char *name[4] = {"alettoni", "equilibratore", "timone", "RPM"};
+    char *name[4] = {"alettoni", "equilibratore", "timone", "manetta"};
 
     for(int i = 0; i<4; ++i){
         system("cls");
@@ -86,18 +86,18 @@ void customManeuver(double dt, double Tfs, double **command){
             }while(1);
 
             if(maneuver!=0){
-                if(i==3) printf("Ampiezza %s [0, 100]: ", signal[maneuver-1]); 
+                if(i==3) printf("Ampiezza %s [%g, %g]: ", signal[maneuver-1], 0-manettat, 1-manettat); 
                 else if(i==1) printf("Ampiezza %s [%g, %g]: ", signal[maneuver-1], -20-et, 20-et);
                 else printf("Ampiezza %s [-20, 20]: ", signal[maneuver-1]);
                 scanf("%lf", &A);
 
                 if (i==3){
-                    if(A<0){
-                        A=0; 
+                    if(A+manettat<0){
+                        A=0-manettat; 
                         printf("[~]WARNING: Ampiezza minore del minimo consentito... Impostata ampiezza a 0%%\n");
                     }
-                    if(A>100){
-                        A=100; 
+                    if(A+manettat>1){
+                        A=1-manettat; 
                         printf("[~]WARNING: Ampiezza maggiore del massimo consentito... Impostata ampiezza a 100%%\n");
                     }
                 }else if (i==1){
@@ -151,8 +151,8 @@ void customManeuver(double dt, double Tfs, double **command){
                     else printf("Tempo durata comando [0, %g]: ", Tfs);
                     duration_command = ask_double(0, Tfs);
                     
-                    if(l>0) printf("Tempo inizio comando (precedente -> %s [%g, %g]) [0, %g]: \n",old_signal, old_start, old_start+old_dur, Tfs);
-                    else printf("Tempo inizio comando [0, %g]: ", Tfs);
+                    if(l>0) printf("Tempo inizio comando (precedente -> %s [%g, %g]) [0, %g]: \n",old_signal, old_start, old_start+old_dur, Tfs-duration_command);
+                    else printf("Tempo inizio comando [0, %g]: ", Tfs-duration_command);
                     start_command = ask_double(0, Tfs-duration_command);
 
                     step(apply_trim(A, i), start_command, duration_command, dt, Tfs, command, i, l);
@@ -163,8 +163,8 @@ void customManeuver(double dt, double Tfs, double **command){
                     else printf("Tempo durata comando [0, %g]: ", Tfs);
                     duration_command = ask_double(0, Tfs);
                     
-                    if(l>0) printf("Tempo inizio comando (precedente -> %s [%g, %g]) [0, %g]: \n",old_signal, old_start, old_start+old_dur, Tfs);
-                    else printf("Tempo inizio comando [0, %g]: ", Tfs);
+                    if(l>0) printf("Tempo inizio comando (precedente -> %s [%g, %g]) [0, %g]: \n",old_signal, old_start, old_start+old_dur, Tfs-duration_command);
+                    else printf("Tempo inizio comando [0, %g]: ", Tfs-duration_command);
                     start_command = ask_double(0, Tfs-duration_command);
 
                     ramp(apply_trim(0.0, i), apply_trim(A, i), start_command, duration_command, dt, Tfs, command, i, l);
@@ -251,7 +251,7 @@ void zero(double dt, double Tfs, double **command, int column){
 
 //Utility
 static inline double apply_trim(double val, int column) {
-    return (column == 1) ? (val + et) : (column == 3) ? (val == 0.0 ? RPMt : val) : val;
+    return (column == 1) ? (val + et) : (column == 3) ? (val + manettat) : val;
 }
 
 double ask_double(double min, double max) {
@@ -268,7 +268,7 @@ double ask_double(double min, double max) {
 }
 
 char check_choice(){
-    printf("Inserire altri impulsi per questo comando? [n/y] no/si: ");
+    printf("Inserire altri segnali per questo comando? [n/y] no/si: ");
     char choice;
     do{
         scanf(" %c", &choice);
