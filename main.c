@@ -37,7 +37,7 @@ int main(){
     double **rolling_moment_der = NULL, **pitch_moment_der = NULL, **yawing_moment_der = NULL;
     double **control_force_der = NULL, **control_moment_der = NULL, **rotary_der = NULL;
     double **state = NULL;
-    double trim[3];
+    double trim[4];
     double **command = NULL;
 
     // Load variables from file .txt
@@ -66,7 +66,7 @@ int main(){
     printf("Inserire il tempo di simulazione: ");
     scanf("%lf", &deltaT_fs);
 
-    command = load_command(dt, deltaT_fs, trim[2], trim[1]);
+    command = load_command(dt, deltaT_fs, trim[3], trim[1]);
     
     // Integration and simulation
     int i = 0;
@@ -87,7 +87,7 @@ int main(){
 
         state = reallocState(state, 12);
 
-        if (eulerEquation(dt, i, state, command, Pmax_h, rho_h, engine, body_axes, steady_state_coeff, aer_der_x, aer_der_y, aer_der_z, 
+        if (eulerEquation(dt, i, state, command, Pmax_h, rho_h, trim[2], engine, body_axes, steady_state_coeff, aer_der_x, aer_der_y, aer_der_z, 
             rolling_moment_der, pitch_moment_der, yawing_moment_der, control_force_der, control_moment_der, geometry_propeller, 
             propeller_profile, data_propeller, fuel_mass)){
                 break;

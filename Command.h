@@ -1,4 +1,4 @@
-double** load_command(double dt, double Tfs, double RPMtrim, double eTrim);
+double** load_command(double dt, double Tfs, double manettaTrim, double eTrim);
 void defaultManeuver(double dt, double Tfs, double **command);
 void customManeuver(double dt, double Tfs, double **command);
 

@@ -19,8 +19,8 @@ int routh(double Cm_q,double* body_axes, double rho, double alpha_trim, double V
     massa_adm = 2*body_axes[0]/(rho*body_axes[2]*body_axes[3]);
     inerziaY_adm = 8*body_axes[14]/(rho*body_axes[2]*pow(body_axes[3],3));
 
-    printf("massa_adm: %lf\n", massa_adm);
-    printf("inerziaY_adm: %lf\n", inerziaY_adm);
+    //printf("massa_adm: %lf\n", massa_adm);
+    //printf("inerziaY_adm: %lf\n", inerziaY_adm);
 
     //Variabili Aerodinamiche
     double CL_alpha,CLalpha_primo, CLe,CDe,CDalpha, Cwe,CTu;
@@ -35,7 +35,7 @@ int routh(double Cm_q,double* body_axes, double rho, double alpha_trim, double V
     Cwe = CLe;
     CTu = -3*CDe; //-0.0841
 
-    printf("CL_alpha: %lf\nCLalpha_primo: %lf\nCLe: %lf\nCDe: %lf\nCDalpha: %lf\nCwe: %lf\nCTu: %lf\n",CL_alpha,CLalpha_primo,CLe,CDe,CDalpha,Cwe,CTu);
+    //printf("CL_alpha: %lf\nCLalpha_primo: %lf\nCLe: %lf\nCDe: %lf\nCDalpha: %lf\nCwe: %lf\nCTu: %lf\n",CL_alpha,CLalpha_primo,CLe,CDe,CDalpha,Cwe,CTu);
 
     if(Cm_alpha>0){
         printf("\nERRORE: -11  - Il Cessna e' staticamente instabile.");
@@ -53,7 +53,7 @@ int routh(double Cm_q,double* body_axes, double rho, double alpha_trim, double V
     E = -2*Cm_alpha*Cwe*Cwe;
     Delta = B*C*D - A*D*D - B*B*E;
 
-    printf("\nA = %lf\nB = %lf\nC = %lf\nD = %lf\nE = %lf\nDelta = %lf\n",A,B,C,D,E,Delta);
+    //printf("\nA = %lf\nB = %lf\nC = %lf\nD = %lf\nE = %lf\nDelta = %lf\n",A,B,C,D,E,Delta);
 
 
     if(B<0||Delta<0||D<0||E<0){
@@ -68,16 +68,16 @@ int routh(double Cm_q,double* body_axes, double rho, double alpha_trim, double V
     double Reph = -zph*omegaNph;
     double Imph = omegaNph*sqrt(fabs(zph*zph - 1.0));
 
-    printf("\nReph = %lf\nImph = %lf\n",Reph,Imph);
-    printf("\nomegaNph = %lf\nomegaNph_adm = %lf\n",omegaNph,omegaNph_adm);
-    printf("\nzph = %lf\n",zph);
+    //printf("\nReph = %lf\nImph = %lf\n",Reph,Imph);
+    //printf("\nomegaNph = %lf\nomegaNph_adm = %lf\n",omegaNph,omegaNph_adm);
+    //printf("\nzph = %lf\n",zph);
 
     double Tph = 2*pi/Imph;
     double T12_ph = fabs(log(0.5)/Reph);
 
-    printf("\nTph = %lf\nT12_ph = %lf\n",Tph,T12_ph);
+    //printf("\nTph = %lf\nT12_ph = %lf\n",Tph,T12_ph);
 
-    printf("\n-----------------------------------\n");
+    //printf("\n-----------------------------------\n");
     
     //double omegaNsp_adm = sqrt(-Cm_alpha/inerziaY_adm);
     double omegaNsp_adm = sqrt(-(2*massa_adm*Cm_alpha+Cm_q*CL_alpha)/(2*massa_adm*inerziaY_adm));  //Modello completo non semplificato  
@@ -86,19 +86,19 @@ int routh(double Cm_q,double* body_axes, double rho, double alpha_trim, double V
     //printf("Cmq: %lf\nCLa_alpha: %lf", Cm_q, Cm_alpha);
     double omegaNsp = (omegaNsp_adm*2*V)/(body_axes[3]);
     double zsp = (inerziaY_adm*CL_alpha-2*massa_adm*(Cm_q+Cm_alphaprimo))/(2*sqrt(-2*massa_adm*inerziaY_adm*(2*massa_adm*Cm_alpha+Cm_q*CL_alpha)));
-   // double omegasp = omegaNsp*sqrt(fabs(zsp*zsp - 1));
+    //double omegasp = omegaNsp*sqrt(fabs(zsp*zsp - 1));
 
     double Resp = -zsp*omegaNsp;
     double Imsp = omegaNsp*sqrt(fabs(zsp*zsp - 1.0));
 
-    printf("\nResp = %lf\nImsp = %lf\n",Resp,Imsp);
-    printf("\nomegaNsp_adm = %lf\nomegaNsp = %lf\n",omegaNsp_adm, omegaNsp);
-    printf("\nzsp = %lf\n",zsp);
+    //printf("\nResp = %lf\nImsp = %lf\n",Resp,Imsp);
+    //printf("\nomegaNsp_adm = %lf\nomegaNsp = %lf\n",omegaNsp_adm, omegaNsp);
+    //printf("\nzsp = %lf\n",zsp);
 
     double Tsp = 2*pi/Imsp;
     double T12_sp = fabs(log(0.5)/Resp);
 
-    printf("\nTsp = %lf\nT12_sp = %lf\n",Tsp,T12_sp);
+    //printf("\nTsp = %lf\nT12_sp = %lf\n",Tsp,T12_sp);
 
 
 

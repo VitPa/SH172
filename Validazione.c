@@ -167,14 +167,14 @@ void main() {
     printf("Inizio controllo propel -> ");
     system("PAUSE");
 
-    printf("RPM\t Thrust\t\t Torque\n");
+    printf("RPM\t Thrust\t\t Torque \t Pal\n");
     for(int RPM = 1500; RPM <= 2700; RPM += 50) {
         double prop[3] = {0.0, 0.0, 0.0};
         double Pal;
         propel(RPM, 106.801832, 1.111648, 52, geometry_propeller, propeller_profile, data_propeller, prop, &Pal);
-        printf("%d\t|%.2lf \t|%.2lf\n", RPM, prop[0], prop[1]);
+        printf("%d\t|%.2lf \t|%.2lf  \t|%.2lf\n", RPM, prop[0], prop[1], Pal);
     }
 
-    printf("Validazione terminata con successo!\n");
+    printf("\n\nValidazione terminata con successo!\n");
     system("PAUSE");
 }

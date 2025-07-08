@@ -16,7 +16,7 @@ int main(){
         &pitch_moment_der, &yawing_moment_der, &control_force_der, &control_moment_der, &rotary_der);
 
     
-    double **command = load_command(0.01, 2, 2500, 0.1);
+    double **command = load_command(0.01, 2, 0.15, 0.1);
     int n = 2/0.01;
     for (int i = 0; i < n; ++i) {
         printf("%.2lf  -  ", i*0.01);

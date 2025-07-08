@@ -33,7 +33,7 @@ void checkVelAlt(double *V, double *h, double *gamma) {
 void physicalCheck(double V, double h, double Mdg, double vsuono_h) {
     static int f1 = 0, f2 = 0, f3 = 0; // Prevents impulsive values from terminating the simulation
     if (V/(sqrt(vsuono_h)) > Mdg){
-        if(++f1>2) { printf("[!]ERROR: La velocità è maggiore del match di drag rise.\nSIMULAZIONE TERMINATA!");system("PAUSE"); exit(0);}
+        if(++f1>2) { printf("[!]ERROR: La velocità è maggiore del match di drag rise.\nSIMULAZIONE TERMINATA!"); system("PAUSE"); exit(0);}
     }
     if(h<0){
         if(++f2>2) {printf("[!]ERROR: Il velivolo ha raggiunto quota zero.\nSIMULAZIONE TERMINATA!"); system("PAUSE"); exit(0);}

@@ -8,9 +8,7 @@
 #define g 9.80665
 #define pi 3.14159265
 
-static double MTOW = -1.0;
-
-int eulerEquation(double dt, int i, double **state, double **command, double Pmax_h, double rho, double *engine, double *body_axes, double **steady_state_coefficients, double **aer_der_x, double **aer_der_y, double **aer_der_z, double **rolling_moment_der, double **pitch_moment_der, double **yawing_moment_der, double **control_force_der, double **control_moment_der, double *geometry_propeller, double *propeller_profile, double **data_propeller, double *fuel_mass){
+int eulerEquation(double dt, int i, double **state, double **command, double Pmax_h, double rho, double RPMtrim, double *engine, double *body_axes, double **steady_state_coefficients, double **aer_der_x, double **aer_der_y, double **aer_der_z, double **rolling_moment_der, double **pitch_moment_der, double **yawing_moment_der, double **control_force_der, double **control_moment_der, double *geometry_propeller, double *propeller_profile, double **data_propeller, double *fuel_mass){
     FILE *agg = fopen("DATI_AGGIUNTIVI.txt", "a");
     if (agg == NULL) {
         printf("Errore nell'apertura del file DATI_ANALISI.txt\n");
@@ -25,7 +23,8 @@ int eulerEquation(double dt, int i, double **state, double **command, double Pma
     double q_ad, r_ad, p_ad;
     double T, prop[3] =  {0.0, 0.0, 0.0}, Pal = 0.0;
     double X, Y, Z, L, M, N;
-    double du, dv, dw, dp, dq, dphi, dtheta, dpsi, dh, dx_ned, dy_ned;
+    double du_, dv_, dw_, dp_, dq_, dphi_, dtheta_, dpsi_, dh_, dr_, dx_ned, dy_ned;
+
     // Richiamo componenti vettore di stato state:
     u     = state[i][0];
     v     = state[i][1];
@@ -44,7 +43,7 @@ int eulerEquation(double dt, int i, double **state, double **command, double Pma
     da    = command[i][0] *(pi/180);
     de    = command[i][1] *(pi/180);
     dr    = command[i][2] *(pi/180);
-    manetta = engine[2] + (engine[3] - engine[2]) * (command[i][3]) / (100);  //Mappatura manetta [0, 100] -> [RPMmin, RPMmax];
+    manetta = command[i][3];
 
     // Velostatetà totale iniziale (t = 0);
     V=sqrt(u*u + v*v + w*w);
@@ -52,17 +51,30 @@ int eulerEquation(double dt, int i, double **state, double **command, double Pma
         printf("[!] ERROR: Raggiunta velocità di stallo\n");
         return 1;
     }
+
+    // Calcolo Spinta
+    static int RPM = 0;
+    if(RPM == 0) RPM = RPMtrim;
+    do{
+        prop[0] = 0.0;
+        prop[1] = 0.0;
+        prop[2] = 0.0;
+        propel(RPM, Pmax_h, rho, V, geometry_propeller, propeller_profile, data_propeller, prop, &Pal);
+        if ((Pal/Pmax_h)-manetta > 0.01) --RPM;
+        if ((Pal/Pmax_h)-manetta < -0.01) ++RPM;
+        //printf("%lf\t%lf\t%d\n", Pal/Pmax_h, manetta, RPM);
+    }while(fabs((Pal/Pmax_h)-manetta) > 0.01);
+    T = prop[0];
+    //printf("Spinta: %lf\n", T);
+    //printf("Pmax_h: %lf\n", Pmax_h);
+    //printf("rho: %lf\n", rho);
+    //printf("V: %lf\n", V);
     fprintf(agg, "%lf\t%lf\n", i*dt, V);
     fclose(agg);
 
-    // Calcolo Spinta
-    propel(manetta, Pmax_h, rho, V, geometry_propeller, propeller_profile, data_propeller, prop, &Pal);
-    T = prop[0];
-    //printf("Spinta: %lf\n", T);
-    /*printf("Pal: %lf\n", Pal);*/
-
     // Calcolo consumo di carburante
-    if (MTOW <0) MTOW = body_axes[0];
+    static double MTOW = -1;
+    if (MTOW<0) MTOW = body_axes[0];
     if(fuel_mass[0] == 1){
         body_axes[0] = massConsumption(engine[5], Pal, prop[2], body_axes[0], dt);
         if(body_axes[0] < 0.5*MTOW){
@@ -135,16 +147,16 @@ int eulerEquation(double dt, int i, double **state, double **command, double Pma
     //printf("z-massa: %lf\n", Z+body_axes[0]*g);
 
     // Incrementi tempo t = 0[s].
-    du     = (r*v-q*w) - g*sin(theta) + X/m + T/m;
-    dv     = (p*w-r*u) + g*sin(phi)*cos(theta) + Y/m;
-    dw     = (q*u-p*v) + g*cos(phi)*cos(theta) + Z/m;
-    dp     = (-(Jz-Jy)*q*r)/Jx + L/Jx;
-    dq     = (-(Jx-Jz)*p*r)/Jy + M/Jy;
-    dr     = (-(Jy-Jx)*p*q)/Jz + N/Jz;
-    dphi   = p + q*sin(phi)*tan(theta) + r*cos(phi)*tan(theta);
-    dtheta = q*cos(phi) - r*sin(phi);
-    dpsi   = q*(sin(phi)/cos(theta)) + r*(cos(phi)/cos(theta));
-    dh     = -u*sin(theta) + v*cos(theta)*sin(phi) + w*cos(theta)*cos(phi);
+    du_     = (r*v-q*w) - g*sin(theta) + X/m + T/m;
+    dv_     = (p*w-r*u) + g*sin(phi)*cos(theta) + Y/m;
+    dw_     = (q*u-p*v) + g*cos(phi)*cos(theta) + Z/m;
+    dp_     = (-(Jz-Jy)*q*r)/Jx + L/Jx;
+    dq_     = (-(Jx-Jz)*p*r)/Jy + M/Jy;
+    dr_     = (-(Jy-Jx)*p*q)/Jz + N/Jz;
+    dphi_   = p + q*sin(phi)*tan(theta) + r*cos(phi)*tan(theta);
+    dtheta_ = q*cos(phi) - r*sin(phi);
+    dpsi_   = q*(sin(phi)/cos(theta)) + r*(cos(phi)/cos(theta));
+    dh_     = -u*sin(theta) + v*cos(theta)*sin(phi) + w*cos(theta)*cos(phi);
     dx_ned = u*cos(psi)*cos(theta) + v*(cos(psi)*sin(theta)*sin(phi) - sin(psi)*cos(phi)) + w*(cos(psi)*sin(theta)*cos(phi) + sin(psi)*sin(phi));
     dy_ned = u*sin(psi)*cos(theta) + v*(sin(psi)*sin(theta)*sin(phi) + cos(psi)*cos(phi)) + w*(sin(psi)*sin(theta)*cos(phi) - cos(psi)*sin(phi));
 
@@ -162,16 +174,16 @@ int eulerEquation(double dt, int i, double **state, double **command, double Pma
     printf("dy_ned: %lf\n", dy_ned);*/
     
     // Vettore di stato dopo condizione di trim.
-    state[i+1][0]  = u + dt*du;
-    state[i+1][1]  = v + dt*dv;
-    state[i+1][2]  = w + dt*dw;
-    state[i+1][3]  = p + dt*dp;
-    state[i+1][4]  = q + dt*dq;
+    state[i+1][0]  = u + dt*du_;
+    state[i+1][1]  = v + dt*dv_;
+    state[i+1][2]  = w + dt*dw_;
+    state[i+1][3]  = p + dt*dp_;
+    state[i+1][4]  = q + dt*dq_;
     state[i+1][5]  = r + dt*dr;
-    state[i+1][6]  = phi + dt*dphi;
-    state[i+1][7]  = theta + dt*dtheta;
-    state[i+1][8]  = psi + dt*dpsi;
-    state[i+1][9]  = h + dt*dh;
+    state[i+1][6]  = phi + dt*dphi_;
+    state[i+1][7]  = theta + dt*dtheta_;
+    state[i+1][8]  = psi + dt*dpsi_;
+    state[i+1][9]  = h + dt*dh_;
     state[i+1][10] = x_ned + dt*dx_ned;
     state[i+1][11] = y_ned + dt*dy_ned;
 

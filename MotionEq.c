@@ -119,6 +119,7 @@ void equation(double *engine, double Pmax_h, double rho_h, double *CI, double **
             printf("---------- RPM: %d\n\n", RPM);
             printf("Efficienza elica: %lf\n\n", prop[2]);
             trim[2] = RPM;
+            trim[3] = Pal/Pmax_h;
             break;
         }
         // printf("RPM: %d\t dT: %lf\n", RPM, fabs(tTrim - prop[0]));
