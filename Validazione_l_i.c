@@ -1,7 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
-#include <time.h>
 #include "EstrazioneDati.h"
 #include "Interpolazione.h"
 #include "propeller.h"
@@ -38,6 +36,8 @@ void main() {
         fuel_mass, steady_state_coeff, aer_der_x, aer_der_y, aer_der_z, rolling_moment_der, 
         pitch_moment_der, yawing_moment_der, control_force_der, control_moment_der, rotary_der);
     
+    printf("\n- Valori correttamente scritti nel file \"VALIDAZIONE_LETTURA_INTERPOLAZIONE.txt\"\n\n");
+
     printf("\nInizio interpolazione dati -> ");
     system("PAUSE");
 
@@ -96,16 +96,16 @@ void main() {
 
     printf("\nLegenda colonne per '%s':\n", nomi[sceltaMat]);
     for (int j = 0; j < 8; ++j) {
-        if(legende[sceltaMat][j] == NULL){
+        if(legende[sceltaMat][j] == NULL) {
             break;
         }
-        printf("(%d) %s\n", j, legende[sceltaMat][j]);
+        printf("(%d) %s %s\n", j, legende[sceltaMat][j], matrici[sceltaMat][0][j]==matrici[sceltaMat][10][j] ? matrici[sceltaMat][0][j]==0 ? "\t(costanti a zero)" : "\t(costanti)" : "");
     }
     int sceltaCol;
-    printf("Inserisci il codice della colonna da interpolare: ");
+    printf("\nInserisci il codice della colonna da interpolare: ");
     do{
         scanf("%d", &sceltaCol);
-        if(sceltaCol < 0 || sceltaCol > ((legende[sceltaMat][7] == NULL) ? 7 : 8)){
+        if(sceltaCol < 0 || sceltaCol > ((legende[sceltaMat][7] == NULL) ? 7 : 8)) {
             printf("Scelta non valida. Riprovare: ");
             continue;
         }
@@ -125,14 +125,17 @@ void main() {
 
     double InterpVet = interpolazioneTotale(matrici[sceltaMat], sceltaCol, alpha);
 
-    while(matrici[sceltaMat][++k][0] < alpha);
+    while(matrici[sceltaMat][++k][0] < alpha){};
     double x0 = matrici[sceltaMat][k-1][0];
     double x1 = matrici[sceltaMat][k][0];
 
-    printf("\nTest interpolazione su matrice '%s'\n", nomi[sceltaMat]);
-    printf("Alpha di riferimento: %g\n", alpha);
-    printf("Colonna di riferimento: %s\n", legende[sceltaMat][sceltaCol]);
-    printf("Valori di alpha di riferimento: %g, %g \n", x0, x1);
+    FILE *val1 = apriFile("Validazione_output/VALIDAZIONE_LETTURA_INTERPOLAZIONE.txt", "a");
+    fprintf(val1, "\n------------VALIDAZIONE_INTERPOLAZIONE------------\n");
+
+    fprintf(val1, "\nTest interpolazione su matrice '%s'\n", nomi[sceltaMat]);
+    fprintf(val1, "Alpha di riferimento: %g\n", alpha);
+    fprintf(val1, "Colonna di riferimento: %s\n", legende[sceltaMat][sceltaCol]);
+    fprintf(val1, "Valori di alpha di riferimento: %g, %g \n", x0, x1);
 
     x0 = matrici[sceltaMat][k-1][sceltaCol];
     x1 = matrici[sceltaMat][k][sceltaCol];
@@ -144,37 +147,28 @@ void main() {
     if (pos < 0) pos = 0;
     if (pos > bar_len) pos = bar_len;
 
-    printf("\nVisualizzazione grafica:\n");
-    printf("Estremo1: %g", x0);
-    for (int i = 0; i < bar_len + 2; ++i) printf(" ");
-    printf("Estremo2: %g\n", x1);
-
-    printf("[");
+    fprintf(val1, "\nVisualizzazione grafica:\n");
+    fprintf(val1, "Estremo1: %g", x0);
+    for (int i = 0; i < bar_len + 2; ++i) fprintf(val1, " ");
+    fprintf(val1, "Estremo2: %g\n", x1);
+    fprintf(val1, "[");
     for (int i = 0; i < bar_len; ++i) {
         if (i == pos)
-            printf("|");
+            fprintf(val1, "|");
         else
-            printf("-");
+            fprintf(val1, "-");
     }
-    printf("]\n");
-
+    fprintf(val1, "]\n");
     for (int i = 0; i < ((pos==0) ? bar_len/2 : pos + 1); ++i) {
-        printf(" ");
+        fprintf(val1, " ");
     }
-    printf("^\n");
-    printf("\t\tValore interpolato: %g\n", InterpVet);
+    fprintf(val1, "^\n");
+    fprintf(val1, "\t\tValore interpolato: %g\n", InterpVet);
 
-    printf("Inizio controllo propel -> ");
-    system("PAUSE");
+    fclose(val1);
 
-    printf("RPM\t Thrust\t\t Torque\n");
-    for(int RPM = 1500; RPM <= 2700; RPM += 50) {
-        double prop[3] = {0.0, 0.0, 0.0};
-        double Pal;
-        propel(RPM, 106.801832, 1.111648, 52, geometry_propeller, propeller_profile, data_propeller, prop, &Pal);
-        printf("%d\t|%.2lf \t|%.2lf\n", RPM, prop[0], prop[1]);
-    }
+    printf("\n- Valori correttamente scritti nel file \"VALIDAZIONE_LETTURA_INTERPOLAZIONE.txt\"\n\n");
 
-    printf("\n\nValidazione terminata con successo!\n");
+    printf("Validazione terminata con successo!\n");
     system("PAUSE");
 }

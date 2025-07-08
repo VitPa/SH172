@@ -2,6 +2,7 @@
 - [Ozionale] Inserire le logiche aggiuntive (stampa dei valori e eliminazione dell'ogiva) nel file EstrapolazioneDati_ottimizzato.c
 - Tradurre o tutto in Inglese o tutto in Italiano
 - Abbellire l'interfaccia
+- Controllare che la validazione per l'interpolazione e il propel vadano bene
 
 ## Da fare ora
 - L'output della validazione va salvata in file separati

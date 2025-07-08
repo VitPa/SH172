@@ -5,7 +5,7 @@ static int dimVett[6];
 int dimMat[13];
 double RPMmax, RPMmin;
 
-static FILE* apriFile(const char *path, const char *mode) {
+FILE* apriFile(const char *path, const char *mode) {
     FILE* f = fopen(path, mode);
     if (!f) fprintf(stderr, "Errore apertura file: %s\n", path);
     return f;
@@ -117,21 +117,25 @@ double** reallocCommand(double **command, int n_colonne) {
     return tmp;
 }
 
-void stampaVettore(const char* nome, double* v, int n) {
-    printf("\n\n--- %s (vettore, %d elementi) ---\n", nome, n);
+void stampaVettoreFile(const char* nome, double* v, int n) {
+    FILE *val1 = apriFile("Validazione_output/VALIDAZIONE_LETTURA_INTERPOLAZIONE.txt", "a");
+    fprintf(val1, "\n\n--- %s (vettore, %d elementi) ---\n", nome, n);
     for (int i = 0; i < n; ++i) {
-        printf("%g\t", v[i]);
+        fprintf(val1, "%.2lf\t", v[i]);
     }
+    fclose(val1);
 }
 
-void stampaMatrice(const char* nome, double** m, int righe, int colonne) {
-    printf("\n\n--- %s (matrice, %d x %d) ---\n", nome, righe, colonne);
+void stampaMatriceFile(const char* nome, double** m, int righe, int colonne) {
+    FILE *val1 = apriFile("Validazione_output/VALIDAZIONE_LETTURA_INTERPOLAZIONE.txt", "a");
+    fprintf(val1, "\n\n--- %s (matrice, %d x %d) ---\n", nome, righe, colonne);
     for (int i = 0; i < righe; ++i) {
         for (int j = 0; j < colonne; ++j) {
-            printf(" %g\t", m[i][j]);
+            fprintf(val1, "%s%s%.4lf\t", m[i][j]<0 ? "" : " ", m[i][j]<10 ? " " : "", m[i][j]);
         }
-        printf("\n");
+        fprintf(val1, "\n");
     }
+    fclose(val1);
 }
 
 // Funzione wrapper per caricare tutti i dati richiesti dal simulatore
@@ -176,17 +180,23 @@ void stampaTuttiIDati(double *engine, double *geometry_propeller, double *propel
     const char *name_vec[] = {"engine", "geometry_propeller", "propeller_profile", "body_axes", "deflection_limits", "fuel_mass"};
     double *vec[] = {engine, geometry_propeller,propeller_profile, body_axes, deflection_limits, fuel_mass};
 
-    printf("\n\n**********   STAMPA VETTORI   **********");
+    FILE *val1 = fopen("Validazione_output/VALIDAZIONE_LETTURA_INTERPOLAZIONE.txt", "w");
+    fclose(val1);
+    val1 = fopen("Validazione_output/VALIDAZIONE_LETTURA_INTERPOLAZIONE.txt", "a");
+    fprintf(val1, "\n\n**********   STAMPA VETTORI   **********");
+    fclose(val1);
     for(int i=0; i<sizeof(vec)/sizeof(vec[0]); ++i){
-        stampaVettore(name_vec[i], vec[i], dimVett[i]);
+        stampaVettoreFile(name_vec[i], vec[i], dimVett[i]);
     }
 
     const char *name_mat[] = {"data_propeller", "steady_state_coeff", "aer_der_x", "aer_der_y", "aer_der_z", "rolling_moment_der", "pitch_moment_der", "yawing_moment_der", "control_force_der", "control_moment_der", "rotary_der"};
     double **mat[] = {data_propeller, steady_state_coeff, aer_der_x, aer_der_y, aer_der_z, rolling_moment_der, pitch_moment_der, yawing_moment_der, control_force_der, control_moment_der, rotary_der};
 
-    printf("\n\n\n**********   STAMPA MATRICI   **********");
+    val1 = fopen("Validazione_output/VALIDAZIONE_LETTURA_INTERPOLAZIONE.txt", "a");
+    fprintf(val1, "\n\n\n**********   STAMPA MATRICI   **********");
+    fclose(val1);
     for(int i=0; i<sizeof(mat)/sizeof(mat[0]); ++i){
-        stampaMatrice(name_mat[i], mat[i], dimMat[i], (i==0) ? 4 : (i==2 || i==4 || i==6) ? 8 : 7);
+        stampaMatriceFile(name_mat[i], mat[i], dimMat[i], (i==0) ? 4 : (i==2 || i==4 || i==6) ? 8 : 7);
     }
 }
 
