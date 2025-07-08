@@ -4,6 +4,7 @@
 #include <time.h>
 #include "EstrazioneDati.h"
 #include "Interpolazione.h"
+#include "propeller.h"
 
 void main() {
     int trovato = 1, k = 0, mat;
@@ -104,7 +105,7 @@ void main() {
     printf("Inserisci il codice della colonna da interpolare: ");
     do{
         scanf("%d", &sceltaCol);
-        if(sceltaCol < 0 || sceltaCol >= (legende[sceltaMat][7] == NULL) ? 7 : 8){
+        if(sceltaCol < 0 || sceltaCol > ((legende[sceltaMat][7] == NULL) ? 7 : 8)){
             printf("Scelta non valida. Riprovare: ");
             continue;
         }
@@ -166,5 +167,14 @@ void main() {
     printf("Inizio controllo propel -> ");
     system("PAUSE");
 
-    
+    printf("RPM\t Thrust\t\t Torque\n");
+    for(int RPM = 1500; RPM <= 2700; RPM += 50) {
+        double prop[3] = {0.0, 0.0, 0.0};
+        double Pal;
+        propel(RPM, 106.801832, 1.111648, 52, geometry_propeller, propeller_profile, data_propeller, prop, &Pal);
+        printf("%d\t|%.2lf \t|%.2lf\n", RPM, prop[0], prop[1]);
+    }
+
+    printf("Validazione terminata con successo!\n");
+    system("PAUSE");
 }
