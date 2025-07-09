@@ -8,10 +8,11 @@ static double press0 = 101325;    // Pa
 static double temp0 = 15;         // C
 static double rho0 = 1.225;       // kg/m^3
 static double vsuono0 = 340;      // m/s
+static int flagatm;
 
 // il codice mostra i dati atmosferici di default a video e permette di modificarli.
 
-void AtmosphereChoice (double *press_h,double *temp_h,double *rho_h,double *vsuono_h, int *flagatm)
+void AtmosphereChoice (double *press_h,double *temp_h,double *rho_h,double *vsuono_h)
 {
     int input;
 
@@ -38,7 +39,7 @@ void AtmosphereChoice (double *press_h,double *temp_h,double *rho_h,double *vsuo
         switch(input)
         {
             case 1: // mantiene i valori iniziali di default
-                *flagatm = 1;
+                flagatm = 1;
                 break;
             case 2: //modifica i valori iniziali di default
                 printf("Inserire un valore di pressione (h=0) [Pa]:");    
@@ -69,7 +70,7 @@ void AtmosphereChoice (double *press_h,double *temp_h,double *rho_h,double *vsuo
                     printf("[~]WARNING immettere un numero positivo --> ");
                 } while (1);
 
-                *flagatm = 1;
+                flagatm = 1;
                 break;
             case 3: // immette i valori manualmente a una data quota senza richiederla poi
                 printf("Inserire un valore di pressione [Pa]:");
@@ -99,14 +100,14 @@ void AtmosphereChoice (double *press_h,double *temp_h,double *rho_h,double *vsuo
                     if(scanf("%lf", &vsuono_h) != 0 && vsuono_h>0) break;
                     printf("[!]WARNING immettere un numero positivo\n");
                 } while (1);
-                *flagatm = 2;
+                flagatm = 2;
                 break;
         }
     }
     while(input!=1 && input!=2 && input!=3);
 }
 
-void AtmosphereCalc (double h, double *datiengine, double *Pmax_h,  double *press_h, double *temp_h, double *rho_h, double *vsuono_h, int flagatm)
+void AtmosphereCalc (double h, double *datiengine, double *Pmax_h,  double *press_h, double *temp_h, double *rho_h, double *vsuono_h)
 {
     double R=287.05, gamma=1.3954;
     static int stampa = 0;

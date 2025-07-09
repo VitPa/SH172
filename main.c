@@ -15,9 +15,7 @@ int main(){
 
     /*
     Implementare all'inzio un parte di codice che fa decidere (oppure si passa come argomento) 
-    se far partire il simulatore in modalità utente o modalità test. Quindi verbosa o no. In più 
-    si può fare una terza modalità in cui si stampano (magari chiedendo funzione per funzione) 
-    tutti i calcoli intermedi per un debug ancora più avanzato
+    se far partire il simulatore in modalità utente o modalità test. Quindi verbosa o no.
     */
     /*
     Implementae una struct o una nuova funzione per la gestione degli errori. Ti deve permettere di
@@ -25,9 +23,6 @@ int main(){
     messaggio da stampare e distinguere tra warning silenzioso o warning non silenzioso (cioè se 
     l'utente deve intervenire oppure no).
     In ogni caso tutti i warning ed errori li deve stampare anche su un file di log
-    */
-    /*
-    Inserire la scritta "Premere invio per i messaggi di default" in tutti i messaggi per le condizioni
     */
 
     double *engine = NULL;
@@ -46,7 +41,6 @@ int main(){
         &pitch_moment_der, &yawing_moment_der, &control_force_der, &control_moment_der, &rotary_der);
 
     // Load initial conditions
-    int flagatm;
     double Pmax_h, press_h, temp_h, rho_h, vsuono_h;
     double CI[3];
 
@@ -54,8 +48,8 @@ int main(){
     checkVelAlt(&CI[0], &CI[1], &CI[2]);
 
     // Compute atmospheric variables
-    AtmosphereChoice(&press_h, &temp_h, &rho_h, &vsuono_h, &flagatm);
-    AtmosphereCalc(CI[1], engine, &Pmax_h, &press_h, &temp_h, &rho_h, &vsuono_h, flagatm);
+    AtmosphereChoice(&press_h, &temp_h, &rho_h, &vsuono_h);
+    AtmosphereCalc(CI[1], engine, &Pmax_h, &press_h, &temp_h, &rho_h, &vsuono_h);
 
     // Trim condition and Routh stability
     equation(engine, Pmax_h, rho_h, CI, &state, body_axes, aer_der_x, aer_der_z, steady_state_coeff, control_force_der, 
@@ -75,7 +69,7 @@ int main(){
     FILE *f = apriFile("DATI_AGGIUNTIVI.txt", "w");
     if (f) fclose(f);
     for(double Ts = 0.00; Ts <=deltaT_fs; Ts += dt){
-        AtmosphereCalc(state[i][9], engine, &Pmax_h, &press_h, &temp_h, &rho_h, &vsuono_h, flagatm);
+        AtmosphereCalc(state[i][9], engine, &Pmax_h, &press_h, &temp_h, &rho_h, &vsuono_h);
 
         state = reallocState(state, 12);
 

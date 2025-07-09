@@ -2,13 +2,15 @@
 - [Ozionale] Inserire le logiche aggiuntive (stampa dei valori e eliminazione dell'ogiva) nel file EstrapolazioneDati_ottimizzato.c
 - Tradurre o tutto in Inglese o tutto in Italiano
 - Abbellire l'interfaccia
+- Mettere tutte le variabili in un file header che vienechiamato da tutti invece che passare ogni volta tutte quelle variabili alle funzioni. Nelle chiamate alle funzioni ci devono essere solo o le variabili normali che devono essere cambiate, oppure le matrici/vettori che devono essere de/allocati
+- Inserire anche i percorsi dei file di lettura e scrittur ain quel file così da rendere più facile il cambio se ce ne dovesse essere bisogno
+- Inserire i commenti er chi legge il codice
 
 ## Da fare ora
-- Inserire tutti i warning e error nel codice
+- Inserire tutti i warning e error nel codice e gestirli con Handler
 - Abbellire il codice, eliminare le parti iniutili
 
 - Calcolare le condizioni di Trim anche nell'integrazione (Filippo)
-- Separare i due eseguibili, uno per lettura e interpolazione, l'altro per propel
 
 ## Domande
 
