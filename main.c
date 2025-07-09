@@ -62,6 +62,7 @@ int main(){
 
     command = load_command(dt, deltaT_fs, trim[2], trim[1]);
     
+    
     // Integration and simulation
     int i = 0;
     FILE *fp = apriFile("DATI_ANALISI.txt", "w");
@@ -82,7 +83,6 @@ int main(){
         physicalCheck(fabs(sqrt(pow(state[i][0], 2)+pow(state[i][1], 2)+pow(state[i][2], 2))), state[i][9], body_axes[0],body_axes[4], vsuono_h);
         
         //printf("%.2lf", Ts);
-
         /*for(int j = 0; j < 12; j++){
             printf("   -   %.4lf", state[i][j]);
         }*/
@@ -90,8 +90,11 @@ int main(){
 
         fprintf(fp, "%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t\n",Ts,state[i][0],state[i][1],state[i][2],state[i][3],state[i][4],state[i][5],state[i][6],state[i][7],state[i][8],state[i][9],state[i][10],state[i][11]);
         fprintf(cm, "%lf\t%lf\t%lf\t%lf\t%lf\t\n", Ts, command[i][0], command[i][1], command[i][2], command[i][3]);
+
+        progressBar(Ts, deltaT_fs);
         ++i;
     }
+    printf("\n");
     fclose(fp);
     fclose(cm);
 
@@ -100,6 +103,7 @@ int main(){
         fuel_mass, steady_state_coeff, aer_der_x, aer_der_y, aer_der_z, rolling_moment_der, pitch_moment_der, 
         yawing_moment_der, control_force_der, control_moment_der, rotary_der, state, command);
 
+    // DA ELIMINARE NEL CODICE FINALE
     system("copy /Y \"C:\\Users\\vitop\\OneDrive - Politecnico di Torino\\Computer\\Universita\\PoliTo\\2 anno\\Mod-Sim\\Simulazione\\Progetti\\Simulatore\\FILE_PROGETTO\\GIT\\DATI_AGGIUNTIVI.txt\" \"C:\\Users\\vitop\\Downloads\\CODICE_GRUPPO\\CODICE_GRUPPO\\DATI_AGGIUNTIVI.txt\"");
     system("copy /Y \"C:\\Users\\vitop\\OneDrive - Politecnico di Torino\\Computer\\Universita\\PoliTo\\2 anno\\Mod-Sim\\Simulazione\\Progetti\\Simulatore\\FILE_PROGETTO\\GIT\\DATI_ANALISI.txt\" \"C:\\Users\\vitop\\Downloads\\CODICE_GRUPPO\\CODICE_GRUPPO\\DATI_ANALISI.txt\"");
     system("copy /Y \"C:\\Users\\vitop\\OneDrive - Politecnico di Torino\\Computer\\Universita\\PoliTo\\2 anno\\Mod-Sim\\Simulazione\\Progetti\\Simulatore\\FILE_PROGETTO\\GIT\\DATI_COMANDI.txt\" \"C:\\Users\\vitop\\Downloads\\CODICE_GRUPPO\\CODICE_GRUPPO\\DATI_COMANDI.txt\"");
