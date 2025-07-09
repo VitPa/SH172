@@ -88,7 +88,7 @@ void main() {
     do{
         scanf("%d", &sceltaMat);
         if(sceltaMat < 0 || sceltaMat >= numMatrici){
-            printf("Scelta non valida. Riprovare: ");
+            printf("[~] WARNING: Scelta non valida. Riprovare: ");
             continue;
         }
         break;
@@ -99,14 +99,15 @@ void main() {
         if(legende[sceltaMat][j] == NULL) {
             break;
         }
-        printf("(%d) %s %s\n", j, legende[sceltaMat][j], matrici[sceltaMat][0][j]==matrici[sceltaMat][10][j] ? matrici[sceltaMat][0][j]==0 ? "\t(costanti a zero)" : "\t(costanti)" : "");
+        printf("(%d) %s %s\n", j, legende[sceltaMat][j], matrici[sceltaMat][0][j]==matrici[sceltaMat][10][j] ? 
+            matrici[sceltaMat][0][j]==0 ? "\t(costanti a zero)" : "\t(costanti)" : "");
     }
     int sceltaCol;
     printf("\nInserisci il codice della colonna da interpolare: ");
     do{
         scanf("%d", &sceltaCol);
         if(sceltaCol < 0 || sceltaCol > ((legende[sceltaMat][7] == NULL) ? 7 : 8)) {
-            printf("Scelta non valida. Riprovare: ");
+            printf("[~] WARNING: Scelta non valida. Riprovare: ");
             continue;
         }
         break;
@@ -117,7 +118,7 @@ void main() {
     do{
         scanf("%lf", &alpha);
         if(alpha < -5 || alpha > 20){
-            printf("Scelta non valida. Riprovare: ");
+            printf("[~] WARNING: Scelta non valida. Riprovare: ");
             continue;
         }
         break;

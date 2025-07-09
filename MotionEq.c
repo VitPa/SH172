@@ -15,12 +15,10 @@ void equation(double *engine, double Pmax_h, double rho_h, double *CI, double **
 
     double cst = 0.5 * rho_h * CI[0] * CI[0] * body_axes[2];
     int flag_1 = 0;
-    double alpha_1 = -5.0;
     double score_min = 1000;
     double CZtrim, CMtrim;
     
-    for (int i = 0; i <= 2500; ++i) {  // cambia la i con alpha_1, tanto la i non viene usata mai
-        alpha_1 += 0.01;
+    for (double alpha_1 = -5.0; alpha_1 <= 20.0; alpha_1 += 0.01) {  // cambia la i con alpha_1, tanto la i non viene usata mai
         double CZss = interpolazioneTotale(steady_state_coeff, 3, alpha_1);
         double CMss = interpolazioneTotale(steady_state_coeff, 5, alpha_1);
         double CMalpha = interpolazioneTotale(pitch_moment_der, 1, alpha_1);
