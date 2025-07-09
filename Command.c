@@ -2,13 +2,14 @@
 #include <stdlib.h>
 #include "command.h"
 #include "EstrazioneDati.h"
+#include "ErrorWarning.h"
 
 static double manettat;
 static double et;
 static int n;
 
 double** load_command(double dt, double Tfs, double RPMtrim, double eTrim){
-    int choise;
+    int choice;
     manettat = 100 * (RPMtrim - RPMmin) / (RPMmax - RPMmin);
     et = eTrim;
     n = ((int)(Tfs/dt))+1;
@@ -19,16 +20,21 @@ double** load_command(double dt, double Tfs, double RPMtrim, double eTrim){
     }
 
     printf("(1) per le manovre standard già implementate, (2) per le manovre personalizzate: \n");
-    scanf("%d", &choise);  //AGGIUNGERE CONTROLLO SULL'INPUT
-    switch (choise){
-    case 1:
-        defaultManeuver(dt, Tfs, command);
+    do{
+        scanf("%d", &choice);
+        if(choice != 1 && choice != 2){
+            printf("[~]WARNING: Valore non valido... Inserire 1 o 2: ");
+            continue;
+        }
         break;
-    case 2:
-        customManeuver(dt, Tfs, command);
-        break;
-    default:
-        break;
+    }while(1);
+    switch (choice){
+        case 1:
+            defaultManeuver(dt, Tfs, command);
+            break;
+        case 2:
+            customManeuver(dt, Tfs, command);
+            break;
     }
 
     return command;
@@ -36,13 +42,24 @@ double** load_command(double dt, double Tfs, double RPMtrim, double eTrim){
 
 void defaultManeuver(double dt, double Tfs, double **command){  //Manovre usate per i report
     int maneuver;
+    int nDefaultManeuver = 1;
+    const char *maneuverName[] = {"Volo livellato"};
 
     printf("Scegliere la manovra desiderata:\n");
-    printf("(1) Volo livellato\n(2) rampa 0-3deg alettoni per 7s\n");
-    scanf("%d", &maneuver);
+    for(int i = 0; i<nDefaultManeuver; ++i){
+        printf("(%d) %s\n", i+1, maneuverName[i]);
+    }
+    do{
+        scanf("%d", &maneuver);
+        if(maneuver<0 || maneuver>nDefaultManeuver){
+            printf("[~]WARNING: Inserire un numero compreso tra 1 e %d\n", nDefaultManeuver);
+            continue;
+        }
+        break;
+    }while(1);
 
     switch(maneuver){
-        case 1:  //ESEMPIO UNA MANOVRA
+        case 1:  // Volo livellato
             zero(dt, Tfs, command, 0);
             zero(dt, Tfs, command, 1);
             zero(dt, Tfs, command, 2);
@@ -170,10 +187,7 @@ void customManeuver(double dt, double Tfs, double **command){
                     ramp(apply_trim(0.0, i), apply_trim(A, i), start_command, duration_command, dt, Tfs, command, i, l);
                     break;
                 default:
-                    printf("[!] ERROR: Nessun comando valido selezionato\n");
-                    system("PAUSE");
-                    exit(0);
-                    break;
+                    Error(500, NULL);
             }
 
             if(++l<=1){
