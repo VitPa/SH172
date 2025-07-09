@@ -5,12 +5,18 @@
 - Mettere tutte le variabili in un file header che vienechiamato da tutti invece che passare ogni volta tutte quelle variabili alle funzioni. Nelle chiamate alle funzioni ci devono essere solo o le variabili normali che devono essere cambiate, oppure le matrici/vettori che devono essere de/allocati
 - Inserire anche i percorsi dei file di lettura e scrittur ain quel file così da rendere più facile il cambio se ce ne dovesse essere bisogno
 - Inserire i commenti er chi legge il codice
+- Eliminare alla fine il codice per copiare i file nelle cartelle
 
 ## Da fare ora
 - Inserire tutti i warning e error nel codice e gestirli con Handler
 - Abbellire il codice, eliminare le parti iniutili
 - Controllo massa carburante da verificare
 - Implementare il controllo della velocità massima/minima (usando state[] che sta già) e la variazione della massa all'esterno di Integrazion (usando body_axes[])
+- Inserire le stampe per la stabilità, quindi fugoide e corto periodo
+- Inserire la progress bar alla nel ciclo di Integrazione
+- Controllare le stampe di tutte le funzioni ed inserire quando serve system("cls")
+- Cambiare il ciclo di Trimmaggio di alpha, usa alpha_1 al posto di i
+- Scrivere gli errori/warning in un file di log, in cui però metti informazioni aggiuntive come la funzione da cui viene l'errore (ad esempio)
 
 - Calcolare le condizioni di Trim anche nell'integrazione (Filippo)
 
