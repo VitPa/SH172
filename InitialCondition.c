@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
+#include "ErrorWarning.h"
 
 void checkVelAlt(double *V, double *h, double *gamma) {
     if (*V < 30){
@@ -28,19 +30,19 @@ void checkVelAlt(double *V, double *h, double *gamma) {
     }
 }
 
-void physicalCheck(double V, double h, double m,double Mdg, double vsuono_h) {
-    enum {COND_VMIN, COND_MACH, COND_VMAX, COND_HMIN, COND_HMAX, N_COND};
+void physicalCheck(double V, double h, double m, double Mdg, double vsuono_h) {
+    enum {COND_VMIN, COND_MACH, COND_VMAX, COND_HMIN, COND_HMAX, COND_MASS, N_COND};
     static int counters[N_COND] = {0};
     const int threshold = 3;
-    double MTOW; //Eliminare quando si mette il controllo della massa nel main
+    double mFuelMin; //Eliminare quando si mette il controllo della massa nel main
 
     int triggered[N_COND] = {
         V < 30,
-        V/(sqrt(vsuono_h)) > Mdg,
+        V/vsuono_h > Mdg,
         V > 75,
         h < 0,
         h > 4116,
-        m < 0.5*MTOW
+        m < mFuelMin
     };
 
     int error_codes[N_COND] = {200, 201, 202, 203, 204};
