@@ -9,6 +9,8 @@
 ## Da fare ora
 - Inserire tutti i warning e error nel codice e gestirli con Handler
 - Abbellire il codice, eliminare le parti iniutili
+- Controllo massa carburante da verificare
+- Implementare il controllo della velocità massima/minima (usando state[] che sta già) e la variazione della massa all'esterno di Integrazion (usando body_axes[])
 
 - Calcolare le condizioni di Trim anche nell'integrazione (Filippo)
 

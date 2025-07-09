@@ -29,7 +29,7 @@ double* caricaVettoreDouble(const char *path, int checkSection, int *outSize) {
         if (sscanf(riga, "%lf", &val) == 1) {
             if (section == checkSection){
                 arr = realloc(arr, (n+1)*sizeof(double));
-                if(!arr) Error(902, path!="input_files/engine.txt"?
+                if(!arr) Error(901, path!="input_files/engine.txt"?
                     path!="input_files/propeller.txt"?name_d[checkSection-1]:name_p[checkSection-1]:"engine");
                 arr[n++] = val;
             }
@@ -73,7 +73,7 @@ double** caricaMatriceDouble(const char *path, int colonne, int checkSection, in
                 }
                 if (letti == colonne) {
                     mat = realloc(mat, (n+1)*sizeof(double*));
-                    if(!mat) Error(902, path!="input_files/propeller.txt"?name[checkSection-4]:"data_propeller");
+                    if(!mat) Error(901, path!="input_files/propeller.txt"?name[checkSection-4]:"data_propeller");
                     mat[n++] = temp;
                 } else {
                     free(temp);
@@ -93,7 +93,7 @@ double** reallocState(double **state, int n_colonne) {
     int new_rows = dimMat[11] + 1;
 
     double **tmp = realloc(state, new_rows * sizeof(double*));
-    if (!tmp) Error(902, "state");
+    if (!tmp) Error(901, "state");
 
     tmp[new_rows - 1] = calloc(n_colonne, sizeof(double));
     if (!tmp[new_rows - 1]) Error(900, "state");
@@ -107,7 +107,7 @@ double** reallocCommand(double **command, int n_colonne) {
     int new_rows = dimMat[12] + 1; // Usa un indice libero per command
     
     double **tmp = realloc(command, new_rows * sizeof(double*));
-    if (!tmp) Error(902, "command");
+    if (!tmp) Error(901, "command");
     
     tmp[new_rows - 1] = calloc(n_colonne, sizeof(double));
     if (!tmp[new_rows - 1]) Error(900, "command");
