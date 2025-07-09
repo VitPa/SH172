@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include "ErrorWarning.h"
 #include "Interpolazione.h"
 #include "propeller.h"
 #include "routh.h"
@@ -18,7 +19,7 @@ void equation(double *engine, double Pmax_h, double rho_h, double *CI, double **
     double score_min = 1000;
     double CZtrim, CMtrim;
     
-    for (int i = 0; i <= 2500; ++i) {
+    for (int i = 0; i <= 2500; ++i) {  // cambia la i con alpha_1, tanto la i non viene usata mai
         alpha_1 += 0.01;
         double CZss = interpolazioneTotale(steady_state_coeff, 3, alpha_1);
         double CMss = interpolazioneTotale(steady_state_coeff, 5, alpha_1);
@@ -41,21 +42,15 @@ void equation(double *engine, double Pmax_h, double rho_h, double *CI, double **
                     trim[0] = alpha_1;
                     CZtrim = CZalpha;
                     CMtrim = CMalpha;
-                    //double de_ref = - (CMss + CMalpha * alpha_1 * (pi/180)) / CMde;
-                    //printf("Valore di de stimato: %lf\n", de_ref*(180/pi));
                 }
                 flag_1 = 1;
             }
         }
     }
-    if (flag_1 == 0) {
-        printf("[!] ERROR: Nessun alpha di Trim trovato!\n");
-        system("PAUSE");
-        exit(1);
-    } else {
+    if (flag_1 != 0) {
         printf("\n*********************Alpha di Trim trovato**************************************\n\n");
         printf("---------- ALPHA: %lf\t\t DE_TRIM: %lf\n\n", trim[0], trim[1]);
-    }
+    } else Error(400, NULL);
 
     double thetaTrim = (trim[0] + CI[2])*(pi/180);  
 
@@ -64,19 +59,13 @@ void equation(double *engine, double Pmax_h, double rho_h, double *CI, double **
     double wTrim = CI[0] * sin(trim[0]*(pi/180));
     double hTrim = CI[1];
 
-    // VETTORE DEGLI STATI (DINAMICA LONGITUDINALE)- Condizione di Trim
     // Creo la prima righa della matrice vett_stato (dinamica)
     *vett_stato = malloc(sizeof(double*));
-    if (*vett_stato == NULL) {
-        fprintf(stderr, "Errore allocazione vett_stato\n");
-        exit(1);
-    }
+    if (*vett_stato == NULL) Error(902, "state");
+
     (*vett_stato)[0] = calloc(12, sizeof(double));
-    if ((*vett_stato)[0] == NULL) {
-        fprintf(stderr, "Errore allocazione riga vett_stato\n");
-        free(*vett_stato);
-        exit(1);
-    }
+    if ((*vett_stato)[0] == NULL) Error(901, "state");
+
     // Riempio la prima riga con i valori di Trim
     for (int i = 0; i < 12; ++i){
         switch (i) {
@@ -105,7 +94,6 @@ void equation(double *engine, double Pmax_h, double rho_h, double *CI, double **
     // ******* TROVARE RPM di Trim *******
     double CX_tot = CXss + CXalpha * trim[0] * (pi/180) + CXde * trim[1] * (pi/180);
     double tTrim = body_axes[0]*g*sin(thetaTrim) - 0.5*CX_tot*rho_h*CI[0]*CI[0]*body_axes[2];
-    printf("\n\ntTrim: %lf\n", tTrim);
 
     int RPM = (int) engine[2];
     int RPM_max = (int) engine[3];
@@ -124,11 +112,7 @@ void equation(double *engine, double Pmax_h, double rho_h, double *CI, double **
         // printf("RPM: %d\t dT: %lf\n", RPM, fabs(tTrim - prop[0]));
         RPM += 1;
     }
-    if(RPM > RPM_max){
-        printf("[!] ERRORE: RPM di Trim non trovato\n");
-        system("PAUSE");
-        exit(1);
-    }
+    if(RPM > RPM_max) Error(401, NULL);
 
     // Calcolo la stabilità dell'aeromobile
     int a = routh(pitch_moment_der[0][4], body_axes, rho_h, trim[0], CI[0], CXalpha, CZtrim, CMtrim, pitch_moment_der[0][2]);
