@@ -79,7 +79,7 @@ int main(){
                 break;
             }
 
-        physicalCheck(fabs(sqrt(pow(state[i][0], 2)+pow(state[i][1], 2)+pow(state[i][2], 2))), state[i][9], body_axes[4], vsuono_h);
+        physicalCheck(fabs(sqrt(pow(state[i][0], 2)+pow(state[i][1], 2)+pow(state[i][2], 2))), state[i][9], body_axes[0],body_axes[4], vsuono_h);
         
         //printf("%.2lf", Ts);
 

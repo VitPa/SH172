@@ -1,7 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
-#include "Atmosphere.h"
 
 void checkVelAlt(double *V, double *h, double *gamma) {
     if (*V < 30){
@@ -30,29 +28,30 @@ void checkVelAlt(double *V, double *h, double *gamma) {
     }
 }
 
-void physicalCheck(double V, double h, double Mdg, double vsuono_h) {
-    static int f1 = 0, f2 = 0, f3 = 0, f4 = 0; // Prevents impulsive values from terminating the simulation
-    if (V/(sqrt(vsuono_h)) > Mdg){
-        ++f1;
-        if(++f1>3) { printf("[!]ERROR: La velocità è maggiore del match di drag rise.\n"); system("PAUSE"); exit(0);}
+void physicalCheck(double V, double h, double m,double Mdg, double vsuono_h) {
+    enum {COND_VMIN, COND_MACH, COND_VMAX, COND_HMIN, COND_HMAX, N_COND};
+    static int counters[N_COND] = {0};
+    const int threshold = 3;
+    double MTOW; //Eliminare quando si mette il controllo della massa nel main
+
+    int triggered[N_COND] = {
+        V < 30,
+        V/(sqrt(vsuono_h)) > Mdg,
+        V > 75,
+        h < 0,
+        h > 4116,
+        m < 0.5*MTOW
+    };
+
+    int error_codes[N_COND] = {200, 201, 202, 203, 204};
+
+    for (int i = 0; i < N_COND; ++i) {
+        if (triggered[i]) {
+            if (++counters[i] > threshold) Error(error_codes[i], NULL);
+        } else if (counters[i] > 0) {
+            --counters[i];
+        }
     }
-    if (V < 30) {
-        ++f2;
-        if(++f2>3) {printf("[!]ERROR: La velocità è inferiore di quella di stallo.\n"); system("PAUSE"); exit(0);}
-    }
-    if(h<0){
-        ++f3;
-        if(++f3>3) {printf("[!]ERROR: Il velivolo ha raggiunto quota zero.\n"); system("PAUSE"); exit(0);}
-    }
-    else if(h==4116) printf("[~]WARNING: Il velivolo ha raggiunto la quota di tangenza.\n");
-    else if(h>4116){
-        ++f4;
-        if(++f4>3) {printf("[!]ERROR: Il velivolo ha raggiunto la quota di tangenza.\n"); system("PAUSE"); exit(0);}
-    }
-    if(f1>0) --f1;
-    if(f2>0) --f2;
-    if(f3>0) --f3;
-    if(f4>0) --f4;
 }
 
 void loadCI(double *CI) {

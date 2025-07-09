@@ -13,9 +13,16 @@ static const Error_t error_table[] = {
     {100, "Apertura del file '%s' non riuscita.\n\n"},
     {101, "Caricamento vettore '%s' non riuscito.\n\n"},
     {102, "Caricamento matrice '%s' non riuscita.\n\n"},
+    //2xx -> Superamento condizioni di funzionamento
+    {200, "La velocità è inferiore della velocità di stallo.\n\n"},
+    {201, "La velocità è maggiore del match di drag rise.\n\n"},
+    {202, "La velocità è maggiore della velocità massima.\n\n"},
+    {203, "La quota è minore di zero.\n\n"},
+    {204, "La quota è maggiore della quota di tangenza.\n\n"},
+    {205, "La massa di carburante è scesa sotto la soglia minima consentita.\n\n"},
     //9xx -> Errori per memoria dinamica
     {900, "Inizializzazione memoria dinamica per '%s' non riuscita.\n\n"},
-    {902, "Riallocazione memoria dinamica per '%s' non riuscita.\n\n"},
+    {901, "Riallocazione memoria dinamica per '%s' non riuscita.\n\n"},
 };
 
 void Error(int code, const char* other_msg){
