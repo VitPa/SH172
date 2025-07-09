@@ -77,7 +77,7 @@ void AtmosphereChoice (double *press_h,double *temp_h,double *rho_h,double *vsuo
                 do {
                     scanf("%*[^\n]");
                     if(scanf("%lf", &press_h) != 0 && press_h>0) break;
-                    printf("[!]WARNING immettere un numero positivo\n");
+                    printf("[~]WARNING immettere un numero positivo\n");
                 } while (1);
 
                 printf("Inserire un valore di temperatura [C]:");
@@ -91,14 +91,14 @@ void AtmosphereChoice (double *press_h,double *temp_h,double *rho_h,double *vsuo
                 do {
                     scanf("%*[^\n]");
                     if(scanf("%lf", &rho_h) != 0 && rho_h>0) break;
-                    printf("[!]WARNING immettere un numero positivo\n");
+                    printf("[~]WARNING immettere un numero positivo\n");
                 } while (1);
 
                 printf("Inserire un valore di velocita' del suono [m/s]:");
                 do {
                     scanf("%*[^\n]");
                     if(scanf("%lf", &vsuono_h) != 0 && vsuono_h>0) break;
-                    printf("[!]WARNING immettere un numero positivo\n");
+                    printf("[~]WARNING immettere un numero positivo\n");
                 } while (1);
                 flagatm = 2;
                 break;
