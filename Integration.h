@@ -3,4 +3,6 @@
 
 int eulerEquation(double dt, int i, double **state, double **command, double Pmax_h, double rho,double *engine, double *body_axes, double **steady_state_coefficients, double **aer_der_x, double **aer_der_y, double **aer_der_z, double **rolling_moment_der, double **pitch_moment_der, double **yawing_moment_der, double **control_force_der, double **control_moment_der, double *geometry_propeller, double *propeller_profile, double **data_propeller, double *fuel_mass);
 
+void progressBar(double Ts, double deltaT_fs);
+
 #endif

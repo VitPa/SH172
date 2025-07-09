@@ -11,76 +11,55 @@
 
 int eulerEquation(double dt, int i, double **state, double **command, double Pmax_h, double rho, double *engine, double *body_axes, double **steady_state_coefficients, double **aer_der_x, double **aer_der_y, double **aer_der_z, double **rolling_moment_der, double **pitch_moment_der, double **yawing_moment_der, double **control_force_der, double **control_moment_der, double *geometry_propeller, double *propeller_profile, double **data_propeller, double *fuel_mass){
     FILE *agg = apriFile("DATI_AGGIUNTIVI.txt", "a");
-    
-    // Inizializzo le variabili
-    double u,v,w,p,q,r,phi,theta,psi,h,x_ned,y_ned;
-    double da, de, dr, manetta;
-    double S, V, costante;
-    double alpha, beta;
-    double q_ad, r_ad, p_ad;
-    double T, prop[3] =  {0.0, 0.0, 0.0}, Pal = 0.0;
-    double X, Y, Z, L, M, N;
-    double du_, dv_, dw_, dp_, dq_, dphi_, dtheta_, dpsi_, dh_, dr_, dx_ned, dy_ned;
-    // Richiamo componenti vettore di stato state:
-    u     = state[i][0];
-    v     = state[i][1];
-    w     = state[i][2];
-    p     = state[i][3];
-    q     = state[i][4];
-    r     = state[i][5];
-    phi   = state[i][6];
-    theta = state[i][7];
-    psi   = state[i][8];
-    h     = state[i][9];
-    x_ned = state[i][10];
-    y_ned = state[i][11];
+ 
+    // Richiamo componenti vettore di stato state
+    double u     = state[i][0];
+    double v     = state[i][1];
+    double w     = state[i][2];
+    double p     = state[i][3];
+    double q     = state[i][4];
+    double r     = state[i][5];
+    double phi   = state[i][6];
+    double theta = state[i][7];
+    double psi   = state[i][8];
+    double h     = state[i][9];
+    double x_ned = state[i][10];
+    double y_ned = state[i][11];
 
-    //Richiamo componenti dei comandi
-    da    = command[i][0] *(pi/180);
-    de    = command[i][1] *(pi/180);
-    dr    = command[i][2] *(pi/180);
-    manetta = engine[2] + (engine[3] - engine[2]) * (command[i][3]) / (100);  //Mappatura manetta [0, 100] -> [RPMmin, RPMmax];
+    // Richiamo componenti dei comandi
+    double da    = command[i][0] *(pi/180);
+    double de    = command[i][1] *(pi/180);
+    double dr    = command[i][2] *(pi/180);
+    double manetta = engine[2] + (engine[3] - engine[2]) * (command[i][3]) / (100);  // Mappatura manetta [0, 100] -> [RPMmin, RPMmax];
 
     // Velostatetà totale iniziale (t = 0);
-    V=sqrt(u*u + v*v + w*w);
-    if(V<32){
-        printf("[!] ERROR: Raggiunta velocità di stallo\n");
-        return 1;
-    }
-
+    double V = sqrt(u*u + v*v + w*w);
 
     // Calcolo Spinta
+    double prop[3] =  {0.0, 0.0, 0.0}, Pal = 0.0;
+
     propel(manetta, Pmax_h, rho, V, geometry_propeller, propeller_profile, data_propeller, prop, &Pal);
-    T = prop[0];
-    //printf("Spinta: %lf\n", T);
-    /*printf("Pal: %lf\n", Pal);*/
+    double T = prop[0];
+
     fprintf(agg, "%lf\t%lf\n", i*dt, T);
     fclose(agg);
 
-    // Calcolo consumo di carburante
+    // Calcolo consumo di carburante   ---> Da cambiare dopo che ho il file Variables.c
     static double MTOW = -1.0;
     if (MTOW <0) MTOW = body_axes[0];
-    if(fuel_mass[0] == 1){
-        body_axes[0] = massConsumption(engine[5], Pal, prop[2], body_axes[0], dt);
-        if(body_axes[0] < 0.5*MTOW){
-            printf("[!] ERROR: Carburante esaurito\n");
-            return 1;
-        }
-    }
+    if(fuel_mass[0] == 1) body_axes[0] = massConsumption(engine[5], Pal, prop[2], body_axes[0], dt);
 
-    S = body_axes[2];
-    costante=0.5*rho*V*V*S;
+    double S = body_axes[2];
+    double costante=0.5*rho*V*V*S;
 
     // Definizione alpha e beta iniziali (t = 0):
-    alpha = atan2(w,u);
-    beta = asin(v/V);
+    double alpha = atan2(w,u);
+    double beta = asin(v/V);
 
-    //printf("alpha: %lf\n", alpha*(180/pi));
-
-    //Calcolo velocità angolari adimensionali
-    q_ad = q*body_axes[3]/(2*V);
-    p_ad = p*body_axes[1]/(2*V);
-    r_ad = r*body_axes[1]/(2*V);
+    // Calcolo velocità angolari adimensionali
+    double q_ad = q*body_axes[3]/(2*V);
+    double p_ad = p*body_axes[1]/(2*V);
+    double r_ad = r*body_axes[1]/(2*V);
     double alpha_int = alpha*(180/pi);
 
     // Calcolo coefficienti aerodinamici
@@ -115,48 +94,26 @@ int eulerEquation(double dt, int i, double **state, double **command, double Pma
     double Jx = body_axes[13], Jy = body_axes[14], Jz = body_axes[15], m = body_axes[0];
 
     // Calcolo Forze e Momenti (t = 0);
-    X = costante*(Cxss+Cxa*alpha+Cxde*de);
-    Y = costante*(Cyb*beta+Cyp*p_ad+Cyr*r_ad+Cydr*dr);
-    Z = costante*(Czss+Cza*alpha+Czq*q_ad+Czde*de);
-    L = costante*body_axes[1]*(Clb*beta+Clp*p_ad+Clr*r_ad+Clda*da+Cldr*dr);
-    M = costante*body_axes[3]*(Cmss+Cma*alpha+Cmq*q_ad+Cmde*de);
-    N = costante*body_axes[1]*(Cnss+Cnb*beta+Cnp*p_ad+Cnr*r_ad+Cnda*da+Cndr*dr);
+    double X = costante*(Cxss+Cxa*alpha+Cxde*de);
+    double Y = costante*(Cyb*beta+Cyp*p_ad+Cyr*r_ad+Cydr*dr);
+    double Z = costante*(Czss+Cza*alpha+Czq*q_ad+Czde*de);
+    double L = costante*body_axes[1]*(Clb*beta+Clp*p_ad+Clr*r_ad+Clda*da+Cldr*dr);
+    double M = costante*body_axes[3]*(Cmss+Cma*alpha+Cmq*q_ad+Cmde*de);
+    double N = costante*body_axes[1]*(Cnss+Cnb*beta+Cnp*p_ad+Cnr*r_ad+Cnda*da+Cndr*dr);
 
-    /*printf("x: %lf\n", X);
-    printf("y: %lf\n", Y);*/
-    //printf("z: %lf\n", Z);
-    /*printf("L: %lf\n", L);
-    printf("M: %lf\n", M);
-    printf("N: %lf\n", N);*/
-
-    //printf("z-massa: %lf\n", Z+body_axes[0]*g);
-
-    // Incrementi tempo t = 0[s].
-     du_     = (r*v-q*w) - g*sin(theta) + X/m + T/m;
-    dv_     = (p*w-r*u) + g*sin(phi)*cos(theta) + Y/m;
-    dw_     = (q*u-p*v) + g*cos(phi)*cos(theta) + Z/m;
-    dp_     = (-(Jz-Jy)*q*r)/Jx + L/Jx;
-    dq_     = (-(Jx-Jz)*p*r)/Jy + M/Jy;
-    dr_     = (-(Jy-Jx)*p*q)/Jz + N/Jz;
-    dphi_   = p + q*sin(phi)*tan(theta) + r*cos(phi)*tan(theta);
-    dtheta_ = q*cos(phi) - r*sin(phi);
-    dpsi_   = q*(sin(phi)/cos(theta)) + r*(cos(phi)/cos(theta));
-    dh_     = -u*sin(theta) + v*cos(theta)*sin(phi) + w*cos(theta)*cos(phi);
-    dx_ned = u*cos(psi)*cos(theta) + v*(cos(psi)*sin(theta)*sin(phi) - sin(psi)*cos(phi)) + w*(cos(psi)*sin(theta)*cos(phi) + sin(psi)*sin(phi));
-    dy_ned = u*sin(psi)*cos(theta) + v*(sin(psi)*sin(theta)*sin(phi) + cos(psi)*cos(phi)) + w*(sin(psi)*sin(theta)*cos(phi) - cos(psi)*sin(phi));
-
-    /*printf("du: %lf\n", du);
-    printf("dv: %lf\n", dv);
-    printf("dw: %lf\n", dw);
-    printf("dp: %lf\n", dp);
-    printf("dq: %lf\n", dq);
-    printf("dr: %lf\n", dr);
-    printf("dphi: %lf\n", dphi);
-    printf("dtheta: %lf\n", dtheta);
-    printf("dpsi: %lf\n", dpsi);
-    printf("dh: %lf\n", dh);
-    printf("dx_ned: %lf\n", dx_ned);
-    printf("dy_ned: %lf\n", dy_ned);*/
+    // Incrementi tempo t = 0[s]
+    double du_     = (r*v-q*w) - g*sin(theta) + X/m + T/m;
+    double dv_     = (p*w-r*u) + g*sin(phi)*cos(theta) + Y/m;
+    double dw_     = (q*u-p*v) + g*cos(phi)*cos(theta) + Z/m;
+    double dp_     = (-(Jz-Jy)*q*r)/Jx + L/Jx;
+    double dq_     = (-(Jx-Jz)*p*r)/Jy + M/Jy;
+    double dr_     = (-(Jy-Jx)*p*q)/Jz + N/Jz;
+    double dphi_   = p + q*sin(phi)*tan(theta) + r*cos(phi)*tan(theta);
+    double dtheta_ = q*cos(phi) - r*sin(phi);
+    double dpsi_   = q*(sin(phi)/cos(theta)) + r*(cos(phi)/cos(theta));
+    double dh_     = -u*sin(theta) + v*cos(theta)*sin(phi) + w*cos(theta)*cos(phi);
+    double dx_ned = u*cos(psi)*cos(theta) + v*(cos(psi)*sin(theta)*sin(phi) - sin(psi)*cos(phi)) + w*(cos(psi)*sin(theta)*cos(phi) + sin(psi)*sin(phi));
+    double dy_ned = u*sin(psi)*cos(theta) + v*(sin(psi)*sin(theta)*sin(phi) + cos(psi)*cos(phi)) + w*(sin(psi)*sin(theta)*cos(phi) - cos(psi)*sin(phi));
     
     // Vettore di stato dopo condizione di trim.
     state[i+1][0]  = u + dt*du_;
@@ -172,13 +129,22 @@ int eulerEquation(double dt, int i, double **state, double **command, double Pma
     state[i+1][10] = x_ned + dt*dx_ned;
     state[i+1][11] = y_ned + dt*dy_ned;
 
-    /*printf("Posizione x: %f\n", state[i][10]);
-    printf("Posizione y: %f\n", state[i][11]);
-    printf("Velocità u: %f\n", state[i][0]);
-    printf("Velocità w: %f\n", state[i][2]);
-    printf("Altezza: %f\n", state[i][9]);
-    printf("---------\n");*/
-
     return 0;
     
+}
+
+void progressBar(double Ts, double deltaT_fs){
+    if(fmod(Ts, (deltaT_fs/40.0)) < 0.01){
+            int progress = (int)(Ts / (deltaT_fs / 40.0));
+            if (Ts > deltaT_fs) progress = 40;
+            printf("\r[");
+            for(int k = 0; k<40; ++k){
+                if(k <= progress){
+                    printf("*");
+                } else {
+                    printf("-");
+                }
+            }
+            printf("] Simulating");
+        }
 }
