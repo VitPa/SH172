@@ -17,6 +17,8 @@ const double Vmin = 30;
 const double Hmin = 0;
 const double Hmax = 4116;
 double mFuelMin;  //Da inserire in Estrazione dati con = 0.95 * body_axes[0]*/
+extern int RPMmin;
+extern int RPMmax;
 extern int liv_trim;
 
 // variabili file

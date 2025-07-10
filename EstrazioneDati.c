@@ -6,7 +6,6 @@
 
 static int dimVett[6];
 int dimMat[13];
-double RPMmax, RPMmin;
 
 FILE* apriFile(const char *path, const char *mode) {
     FILE* f = fopen(path, mode);
@@ -145,8 +144,6 @@ void caricaTuttiIDati() {
     
     // VETTORI
     engine = caricaVettoreDouble("input_files/engine.txt", 1, &dimVett[0]); 
-    RPMmin = (engine)[2];  //Se si fa il file unico con le matrici/valori, non serve più
-    RPMmax = (engine)[3];  //Se si fa il file unico con le matrici/valori, non serve più
     geometry_propeller = caricaVettoreDouble("input_files/propeller.txt", 1, &dimVett[1]);
     propeller_profile = caricaVettoreDouble("input_files/propeller.txt", 2, &dimVett[2]); 
     body_axes = caricaVettoreDouble("input_files/dba.txt", 1, &dimVett[3]); 

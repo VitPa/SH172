@@ -47,15 +47,14 @@ void eulerEquation(double dt, int i){
         dr    = command[i][2] *(pi/180);
         manetta = engine[2] + (engine[3] - engine[2]) * (command[i][3]) / (100);  // Mappatura manetta [0, 100] -> [RPMmin, RPMmax];
     }
+    fprintf(agg, "%lf\t%lf\t%lf\t%lf\t%lf\n", i*dt, da, de, dr, manetta);
+    fclose(agg);
 
     // Calcolo Spinta
     double prop[3] =  {0.0, 0.0, 0.0}, Pal = 0.0;
 
     propel(manetta, V, prop, &Pal);
     double T = prop[0];
-
-    fprintf(agg, "%lf\t%lf\n", i*dt, T);
-    fclose(agg);
 
     // Calcolo consumo di carburante   ---> Da cambiare dopo che ho il file Variables.c
     if(fuel_mass[0] == 1) body_axes[0] = massConsumption(engine[5], Pal, prop[2], body_axes[0], dt);
@@ -143,16 +142,16 @@ void eulerEquation(double dt, int i){
 
 void progressBar(double Ts, double deltaT_fs){
     if(fmod(Ts, (deltaT_fs/40.0)) < 0.01){
-            int progress = (int)(Ts / (deltaT_fs / 40.0));
-            if (Ts > deltaT_fs) progress = 40;
-            printf("\r[");
-            for(int k = 0; k<40; ++k){
-                if(k <= progress){
-                    printf("*");
-                } else {
-                    printf("-");
-                }
+        int progress = (int)(Ts / (deltaT_fs / 40.0));
+        if (Ts > deltaT_fs) progress = 40;
+        printf("\r[");
+        for(int k = 0; k<40; ++k){
+            if(k <= progress){
+                printf("*");
+            } else {
+                printf("-");
             }
-            printf("] Simulating");
         }
+        printf("] Simulating");
+    }
 }

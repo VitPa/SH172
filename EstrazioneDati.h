@@ -1,8 +1,6 @@
 #ifndef ESTRAZIONE_DATI_H
 #define ESTRAZIONE_DATI_H
 
-extern double RPMmax, RPMmin;
-
 FILE* apriFile(const char *path, const char *mode);
 
 double* caricaVettoreDouble(const char *path, int checkSection, int *outSize);

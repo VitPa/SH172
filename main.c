@@ -28,7 +28,9 @@ int main(){
 
     // Load variables from file .txt
     caricaTuttiIDati();
-    stampaTuttiIDati();
+
+    RPMmin = (int)engine[2];
+    RPMmax = (int)engine[3];
 
     // Load initial conditions
     double CI[3];

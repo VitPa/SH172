@@ -61,10 +61,10 @@ void defaultManeuver(double dt, double Tfs, double **command){  //Manovre usate 
 
     switch(maneuver){
         case 1:  // Volo livellato
-            /*zero(dt, Tfs, command, 0);
+            zero(dt, Tfs, command, 0);
             zero(dt, Tfs, command, 1);
             zero(dt, Tfs, command, 2);
-            zero(dt, Tfs, command, 3);*/
+            zero(dt, Tfs, command, 3);
             liv_trim = 1;
             break;
     }

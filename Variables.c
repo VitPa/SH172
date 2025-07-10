@@ -2,6 +2,8 @@
 
 FILE *ew_log = NULL;
 
+int RPMmin = -1;
+int RPMmax = -1;
 int liv_trim = 0;
 
 double *engine = NULL;
