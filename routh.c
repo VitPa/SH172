@@ -73,16 +73,13 @@ int routh(double Cm_q,double* body_axes, double rho, double alpha_trim, double V
     double Tsp = 2*pi/Imsp;
     double T12_sp = fabs(log(0.5)/Resp);
 
-    if(stampa){
-        /*printf("\n Caratteristiche modi:");
-        printf("\n                  ****************************************************************************************** \n");
-        printf("                  * - MODO FUGOIDE:                           * - MODO CORTO PERIODO:                      *\n" );
-        printf("                  * - omega[rad/s]= %lf                  * - omega[rad/s]= %lf                  *\n",omega[0],omega[1]);
-        printf("                  * - smorzamento[-]= %lf                * - smorzamento[-]= %lf                 *\n",zeta[0],zeta[1]);
-        printf("                  * - periodo[s]= %lf                    * - periodo[s]= %lf                     *\n",periodo[0],periodo[1]);
-        printf("                  * - tempo di dimezzamento[s]= %lf     * - tempo di dimezzamento[s]= %lf       *\n",t_mezzi[0],t_mezzi[1]);
-        printf("                  ****************************************************************************************** \n ");*/
-        stampa = 0;
-    }
+    printf("\n\n Caratteristiche modi:\n");
+    printf("                  ****************************************************************************************** \n");
+    printf("                  * - MODO FUGOIDE:                           * - MODO CORTO PERIODO:                   *\n" );
+    printf("                  * - omega[rad/s] = %.3f                    * - omega[rad/s]= %.3lf                   *\n",omegaNph,omegaNsp);
+    printf("                  * - smorzamento[-] = %.3lf                  * - smorzamento[-]= %.3lf                 *\n",zph,zsp);
+    printf("                  * - periodo[s] = %.3lf                     * - periodo[s]= %.3lf                     *\n",Tph,Tsp);
+    printf("                  * - tempo di dimezzamento[s] = %.3lf       * - tempo di dimezzamento[s]= %.3lf       *\n",T12_ph,T12_sp);
+    printf("                  ****************************************************************************************** \n\n ");
     
 }

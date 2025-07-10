@@ -109,7 +109,6 @@ void equation(double *engine, double Pmax_h, double rho_h, double *CI, double **
                 printf("\n*********************RPM di Trim trovato**************************************\n\n");
                 printf("---------- RPM: %d\n\n", RPM);
                 printf("Efficienza elica: %lf\n\n", prop[2]);
-                stampa = 0;
             }
             trim[2] = RPM;
             break;
@@ -119,5 +118,8 @@ void equation(double *engine, double Pmax_h, double rho_h, double *CI, double **
     if(RPM > RPM_max) ERROR(401);
 
     // Calcolo la stabilità dell'aeromobile
-    int a = routh(pitch_moment_der[0][4], body_axes, rho_h, trim[0], CI[0], CXalpha, CZtrim, CMtrim, pitch_moment_der[0][2]);
+    if(stampa){
+        int a = routh(pitch_moment_der[0][4], body_axes, rho_h, trim[0], CI[0], CXalpha, CZtrim, CMtrim, pitch_moment_der[0][2]);
+        stampa = 0;
+    }
 }

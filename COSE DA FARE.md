@@ -14,17 +14,20 @@
 - Controllo massa carburante da verificare
 - Implementare il controllo della velocità massima/minima (usando state[] che sta già) e la variazione della massa all'esterno di Integrazion (usando body_axes[])
 - Inserire le stampe per la stabilità, quindi fugoide e corto periodo
-- Inserire la progress bar alla nel ciclo di Integrazione
 - Controllare le stampe di tutte le funzioni ed inserire quando serve system("cls")
 - Cambiare il ciclo di Trimmaggio di alpha, usa alpha_1 al posto di i
 - Scrivere gli errori/warning in un file di log, in cui però metti informazioni aggiuntive come la funzione da cui viene l'errore (ad esempio)
 - Inserire l'apertura dei file nel file in una funzione dedicata (magari in InitialCondition) e poi dichiara i puntatori in maniera globale in Variables.h
+- Fare i print sulla stabilità (routh.c)
 
 - Calcolare le condizioni di Trim anche nell'integrazione (Filippo)
 
 ## Domande
 
-- (Primatesta) Controllare che le validazioni vadano bene
+- Controllare che le validazioni vadano bene
+- Controllare la condizione di consumo carburante
+- Chiedere se va bene la logica di rifare il trimmaggio SOLO in volo livellato e non anche nelle parti del volo comandato senza comandi
+- Chiedere se la logica della manetta va bene con RPM
 
 ## AI FINI DELL'ESAME
 - Per la parte di inserimento dati fare una cosa del tipo che il terminale si modifichi dinamicamente. Quindi fare in modo che quando metto la velocità (ad esempio) il terminale mi stampi sopra come siamo messi a variabili (quindi un resoconto delle variabili riempite e di quelle ancora vuote). Ogni volta che inserisco un valore il terminale deve contenere solo la nuova domanda per inserire l'altra variabile e il resoconto sopra.

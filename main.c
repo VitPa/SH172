@@ -29,6 +29,11 @@ int main(){
     double trim[3];
     double **command = NULL;
 
+    printf("\n\nSimulatore di volo per il Cessna 172\n Inserire i dati iniziali\n");
+    printf("--------------------------------------------\n");
+    printf("Per i valori di default premere Invio . . .\n");
+    printf("--------------------------------------------\n\n");
+
     // Load variables from file .txt
     caricaTuttiIDati(&engine, &geometry_propeller, &propeller_profile, &data_propeller, &body_axes, &deflection_limits,
         &fuel_mass, &steady_state_coeff, &aer_der_x, &aer_der_y, &aer_der_z, &rolling_moment_der, 
@@ -51,7 +56,7 @@ int main(){
 
     // Load commands matrix
     double dt = 0.01, deltaT_fs;
-    printf("Inserire il tempo di simulazione: ");
+    printf("Inserire il tempo di simulazione [s]: ");
     do{
         scanf("%lf", &deltaT_fs);
         if(deltaT_fs <= 0){

@@ -58,10 +58,6 @@ void physicalCheck(double V, double h, double m, double Mdg, double vsuono_h) {
 
 void loadCI(double *CI) {
     char input[100];
-    printf("\n\nSimulatore di volo per il Cessna 172\n Inserire i dati iniziali\n");
-    printf("--------------------------------------------\n");
-    printf("Per i valori di default premere Invio . . .\n");
-    printf("--------------------------------------------\n\n");
     
     printf("Inserire la velocità inziale [m/s] (default: 52): ");
     do{

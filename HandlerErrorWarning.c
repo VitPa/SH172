@@ -22,7 +22,7 @@ static const Err_War_t error_table[] = {
 
     //2xx -> Superamento condizioni di funzionamento
     {200, "La velocità è inferiore della velocità di stallo.\n"},
-    {201, "La velocità è maggiore del match di drag rise.\n"},
+    {201, "La velocità è maggiore del Mach di drag rise.\n"},
     {202, "La velocità è maggiore della velocità massima.\n"},
     {203, "La quota è minore di zero.\n"},
     {204, "La quota è maggiore della quota di tangenza.\n"},
