@@ -3,6 +3,7 @@
 #include "EstrazioneDati.h"
 #include "Interpolazione.h"
 #include "propeller.h"
+#include "ErrorWarning.h"
 
 void main() {
     int trovato = 1, k = 0, mat;
