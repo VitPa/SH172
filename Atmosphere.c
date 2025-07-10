@@ -4,6 +4,7 @@
 #include <math.h>
 #include <ctype.h>
 #include "ErrorWarning.h"
+#include "Variables.h"
 
 static double press0 = 101325;    // Pa
 static double temp0 = 15;         // C
@@ -11,7 +12,7 @@ static double rho0 = 1.225;       // kg/m^3
 static double vsuono0 = 340;      // m/s
 static int flagatm;
 
-void AtmosphereChoice (double *press_h, double *temp_h, double *rho_h, double *vsuono_h)
+void AtmosphereChoice ()
 {
     int input;
 
@@ -75,28 +76,28 @@ void AtmosphereChoice (double *press_h, double *temp_h, double *rho_h, double *v
                 printf("Inserire un valore di pressione [Pa]:");
                 do {
                     scanf("%*[^\n]");
-                    if(scanf("%lf", &press_h) != 0 && *press_h>0) break;
+                    if(scanf("%lf", &press_h) != 0 && press_h>0) break;
                     WARNING(501);
                 } while (1);
 
                 printf("Inserire un valore di temperatura [C]:");
                 do {
                     scanf("%*[^\n]");
-                    if(scanf("%lf", &temp_h) != 0 && *temp_h>-273.15) break;
+                    if(scanf("%lf", &temp_h) != 0 && temp_h>-273.15) break;
                     WARNING(502, -273.15);
                 } while (1);
 
                 printf("Inserire un valore di densita' [kg/m^3]:");
                 do {
                     scanf("%*[^\n]");
-                    if(scanf("%lf", &rho_h) != 0 && *rho_h>0) break;
+                    if(scanf("%lf", &rho_h) != 0 && rho_h>0) break;
                     WARNING(501);
                 } while (1);
 
                 printf("Inserire un valore di velocita' del suono [m/s]:");
                 do {
                     scanf("%*[^\n]");
-                    if(scanf("%lf", &vsuono_h) != 0 && *vsuono_h>0) break;
+                    if(scanf("%lf", &vsuono_h) != 0 && vsuono_h>0) break;
                     WARNING(501);
                 } while (1);
                 flagatm = 2;
@@ -106,7 +107,7 @@ void AtmosphereChoice (double *press_h, double *temp_h, double *rho_h, double *v
     while(input!=1 && input!=2 && input!=3);
 }
 
-void AtmosphereCalc (double h, double *datiengine, double *Pmax_h,  double *press_h, double *temp_h, double *rho_h, double *vsuono_h)
+void AtmosphereCalc (double h)
 {
     double R=287.05, gamma=1.3954;
     static int stampa = 0;
@@ -114,30 +115,30 @@ void AtmosphereCalc (double h, double *datiengine, double *Pmax_h,  double *pres
     {
         case 1: // calcola le condizioni atmosferiche e di pot per i valori a SL di default o inseriti dall'utente
             double temp = temp0 + 273.15;
-            *temp_h = temp - 0.0065*h;
-            *press_h = press0*(pow((*temp_h/(temp)),5.2561));
-            *rho_h = *press_h/(R*(*temp_h));
-            *Pmax_h = datiengine[0] * pow(*rho_h/(rho0),datiengine[1]);
-            *vsuono_h = sqrt(gamma*R*(*temp_h));
+            temp_h = temp - 0.0065*h;
+            press_h = press0*(pow((temp_h/(temp)),5.2561));
+            rho_h = press_h/(R*temp_h);
+            Pmax_h = engine[0] * pow(rho_h/(rho0),engine[1]);
+            vsuono_h = sqrt(gamma*R*(temp_h));
             if (stampa == 0){
                 printf("\nI dati atmosferici e di potenza per la quota di %d m sono:\n\n", (int) h);
-                printf("Temperatura: \t\t%f [K]\n",*temp_h);
-                printf("Pressione: \t\t%f [Pa]\n",*press_h);
-                printf("Desita': \t\t%f [kg/m^3]\n",*rho_h);
-                printf("Potenza: \t\t%f [kW]\n",*Pmax_h);
+                printf("Temperatura: \t\t%f [K]\n",temp_h);
+                printf("Pressione: \t\t%f [Pa]\n",press_h);
+                printf("Desita': \t\t%f [kg/m^3]\n",rho_h);
+                printf("Potenza: \t\t%f [kW]\n",Pmax_h);
                 stampa = 1;
             }
             break;
         case 2:// usa i valori scelti dall'utente
-            *temp_h=*temp_h+273.15;
-            *Pmax_h= datiengine[0] * pow(*rho_h/(rho0),datiengine[1]);
+            temp_h=temp_h+273.15;
+            Pmax_h= engine[0] * pow(rho_h/(rho0),engine[1]);
 
             if (stampa == 0){
                 printf("\nI dati atmosferici e di potenza per la quota di %f m sono:\n\n",h);
-                printf("Temperatura: \t\t%f [K]\n",*temp_h);
-                printf("Pressione: \t\t%f [Pa]\n",*press_h);
-                printf("Densita': \t\t%f [kg/m^3]\n",*rho_h);
-                printf("Potenza: \t\t%f [kW]\n",*Pmax_h);
+                printf("Temperatura: \t\t%g [K]\n",temp_h);
+                printf("Pressione: \t\t%g [Pa]\n",press_h);
+                printf("Densita': \t\t%g [kg/m^3]\n",rho_h);
+                printf("Potenza: \t\t%g [kW]\n",Pmax_h);
                 stampa = 1;
             }
             break;

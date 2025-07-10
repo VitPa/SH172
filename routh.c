@@ -4,10 +4,11 @@
 #include <complex.h>
 #include <math.h>
 #include "ErrorWarning.h"
+#include "Variables.h"
 
 #define pi 3.14159265
 
-int routh(double Cm_q,double* body_axes, double rho, double alpha_trim, double V, double Cx_alpha, double Cz_alpha, double Cm_alpha, double Cm_alphaprimo){
+int routh(double Cm_q, double alpha_trim, double V, double Cx_alpha, double Cz_alpha, double Cm_alpha, double Cm_alphaprimo){
 
     static int stampa = 1;
 
@@ -19,8 +20,8 @@ int routh(double Cm_q,double* body_axes, double rho, double alpha_trim, double V
     alpha_trim = alpha_trim*(pi/180);
 
     //Massa e Momento di inerzia adimensionali
-    massa_adm = 2*body_axes[0]/(rho*body_axes[2]*body_axes[3]);
-    inerziaY_adm = 8*body_axes[14]/(rho*body_axes[2]*pow(body_axes[3],3));
+    massa_adm = 2*body_axes[0]/(rho_h*body_axes[2]*body_axes[3]);
+    inerziaY_adm = 8*body_axes[14]/(rho_h*body_axes[2]*pow(body_axes[3],3));
 
     //Variabili Aerodinamiche
     double CL_alpha,CLalpha_primo, CLe,CDe,CDalpha, Cwe,CTu;
@@ -29,7 +30,7 @@ int routh(double Cm_q,double* body_axes, double rho, double alpha_trim, double V
     //Impostiamo il Clalpha nel nuovo (SdR)
     CL_alpha = Cx_alpha*sin(alpha_trim) - Cz_alpha*cos(alpha_trim); // da modificare
     CLalpha_primo = 1.56; // (rad^-1)
-    CLe = body_axes[0]*9.81*2/(rho*body_axes[2]*V*V);
+    CLe = body_axes[0]*9.81*2/(rho_h*body_axes[2]*V*V);
     CDe = Cd0 + k*CLe*CLe;  //k = 0.047 CD0 = 0.0235
     CDalpha = 2*k*CL_alpha*CLe; //
     Cwe = CLe;
@@ -73,13 +74,13 @@ int routh(double Cm_q,double* body_axes, double rho, double alpha_trim, double V
     double Tsp = 2*pi/Imsp;
     double T12_sp = fabs(log(0.5)/Resp);
 
-    printf("\n\n Caratteristiche modi:\n");
+    printf("\n\nCaratteristiche modi:\n");
     printf("                  ****************************************************************************************** \n");
     printf("                  * - MODO FUGOIDE:                           * - MODO CORTO PERIODO:                   *\n" );
     printf("                  * - omega[rad/s] = %.3f                    * - omega[rad/s]= %.3lf                   *\n",omegaNph,omegaNsp);
     printf("                  * - smorzamento[-] = %.3lf                  * - smorzamento[-]= %.3lf                 *\n",zph,zsp);
     printf("                  * - periodo[s] = %.3lf                     * - periodo[s]= %.3lf                     *\n",Tph,Tsp);
     printf("                  * - tempo di dimezzamento[s] = %.3lf       * - tempo di dimezzamento[s]= %.3lf       *\n",T12_ph,T12_sp);
-    printf("                  ****************************************************************************************** \n\n ");
+    printf("                  ****************************************************************************************** \n\n");
     
 }

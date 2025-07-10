@@ -4,12 +4,14 @@
 #include "Interpolazione.h"
 #include "propeller.h"
 #include "EstrazioneDati.h"
+#include "Variables.h"
+#include "MotionEq.h"
 
 
 #define g 9.80665
 #define pi 3.14159265
 
-int eulerEquation(double dt, int i, double **state, double **command, double Pmax_h, double rho, double *engine, double *body_axes, double **steady_state_coefficients, double **aer_der_x, double **aer_der_y, double **aer_der_z, double **rolling_moment_der, double **pitch_moment_der, double **yawing_moment_der, double **control_force_der, double **control_moment_der, double *geometry_propeller, double *propeller_profile, double **data_propeller, double *fuel_mass){
+void eulerEquation(double dt, int i){
     FILE *agg = apriFile("DATI_AGGIUNTIVI.txt", "a");
  
     // Richiamo componenti vettore di stato state
@@ -26,31 +28,40 @@ int eulerEquation(double dt, int i, double **state, double **command, double Pma
     double x_ned = state[i][10];
     double y_ned = state[i][11];
 
-    // Richiamo componenti dei comandi
-    double da    = command[i][0] *(pi/180);
-    double de    = command[i][1] *(pi/180);
-    double dr    = command[i][2] *(pi/180);
-    double manetta = engine[2] + (engine[3] - engine[2]) * (command[i][3]) / (100);  // Mappatura manetta [0, 100] -> [RPMmin, RPMmax];
-
     // Velostatetà totale iniziale (t = 0);
     double V = sqrt(u*u + v*v + w*w);
+
+    // Richiamo componenti dei comandi
+    double da, de, dr, manetta;
+    if(liv_trim){
+        double trim[3] = {0.0, 0.0, 0.0};
+        double Ci[] = {V, h};
+        equation(Ci, trim);
+        da    = 0.0;
+        de    = trim[1] *(pi/180);
+        dr    = 0.0;
+        manetta = trim[2];
+    }else{
+        da    = command[i][0] *(pi/180);
+        de    = command[i][1] *(pi/180);
+        dr    = command[i][2] *(pi/180);
+        manetta = engine[2] + (engine[3] - engine[2]) * (command[i][3]) / (100);  // Mappatura manetta [0, 100] -> [RPMmin, RPMmax];
+    }
 
     // Calcolo Spinta
     double prop[3] =  {0.0, 0.0, 0.0}, Pal = 0.0;
 
-    propel(manetta, Pmax_h, rho, V, geometry_propeller, propeller_profile, data_propeller, prop, &Pal);
+    propel(manetta, V, prop, &Pal);
     double T = prop[0];
 
     fprintf(agg, "%lf\t%lf\n", i*dt, T);
     fclose(agg);
 
     // Calcolo consumo di carburante   ---> Da cambiare dopo che ho il file Variables.c
-    static double MTOW = -1.0;
-    if (MTOW <0) MTOW = body_axes[0];
     if(fuel_mass[0] == 1) body_axes[0] = massConsumption(engine[5], Pal, prop[2], body_axes[0], dt);
 
     double S = body_axes[2];
-    double costante=0.5*rho*V*V*S;
+    double costante=0.5*rho_h*V*V*S;
 
     // Definizione alpha e beta iniziali (t = 0):
     double alpha = atan2(w,u);
@@ -63,14 +74,14 @@ int eulerEquation(double dt, int i, double **state, double **command, double Pma
     double alpha_int = alpha*(180/pi);
 
     // Calcolo coefficienti aerodinamici
-    double Cxss = interpolazioneTotale(steady_state_coefficients, 1, alpha_int);
+    double Cxss = interpolazioneTotale(steady_state_coeff, 1, alpha_int);
     double Cxa = interpolazioneTotale(aer_der_x, 1, alpha_int);
     double Cxde = interpolazioneTotale(control_force_der, 1, alpha_int);
     double Cyb = interpolazioneTotale(aer_der_y, 1, alpha_int);
     double Cyp = interpolazioneTotale(aer_der_y, 3, alpha_int);
     double Cyr = interpolazioneTotale(aer_der_y, 4, alpha_int);
     double Cydr = interpolazioneTotale(control_force_der, 6, alpha_int);
-    double Czss = interpolazioneTotale(steady_state_coefficients, 3, alpha_int);
+    double Czss = interpolazioneTotale(steady_state_coeff, 3, alpha_int);
     double Cza = interpolazioneTotale(aer_der_z, 1, alpha_int);
     double Czq = interpolazioneTotale(aer_der_z, 4, alpha_int);
     double Czde = interpolazioneTotale(control_force_der, 3, alpha_int);
@@ -79,11 +90,11 @@ int eulerEquation(double dt, int i, double **state, double **command, double Pma
     double Clr = interpolazioneTotale(rolling_moment_der, 4, alpha_int);
     double Clda = interpolazioneTotale(control_moment_der, 1, alpha_int);
     double Cldr = interpolazioneTotale(control_moment_der, 2, alpha_int); 
-    double Cmss = interpolazioneTotale(steady_state_coefficients, 5, alpha_int);
+    double Cmss = interpolazioneTotale(steady_state_coeff, 5, alpha_int);
     double Cma = interpolazioneTotale(pitch_moment_der, 1, alpha_int);
     double Cmq = interpolazioneTotale(pitch_moment_der, 4, alpha_int);
     double Cmde = interpolazioneTotale(control_moment_der, 3, alpha_int);
-    double Cnss = interpolazioneTotale(steady_state_coefficients, 6, alpha_int);
+    double Cnss = interpolazioneTotale(steady_state_coeff, 6, alpha_int);
     double Cnb = interpolazioneTotale(yawing_moment_der, 1, alpha_int);
     double Cnp = interpolazioneTotale(yawing_moment_der, 3, alpha_int);
     double Cnr = interpolazioneTotale(yawing_moment_der, 4, alpha_int);
@@ -128,9 +139,6 @@ int eulerEquation(double dt, int i, double **state, double **command, double Pma
     state[i+1][9]  = h + dt*dh_;
     state[i+1][10] = x_ned + dt*dx_ned;
     state[i+1][11] = y_ned + dt*dy_ned;
-
-    return 0;
-    
 }
 
 void progressBar(double Ts, double deltaT_fs){

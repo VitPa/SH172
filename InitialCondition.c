@@ -34,7 +34,7 @@ void physicalCheck(double V, double h, double m, double Mdg, double vsuono_h) {
     enum {COND_VMIN, COND_MACH, COND_VMAX, COND_HMIN, COND_HMAX, COND_MASS, N_COND};
     static int counters[N_COND] = {0};
     const int threshold = 3;
-    double mFuelMin; //0.95*body_axes[0]   //Eliminare quando si mette il controllo della massa nel main
+    double mFuelMin = 0.95 * 1046; //0.95*body_axes[0]   //Eliminare quando si mette il controllo della massa nel main
 
     int triggered[N_COND] = {
         V < 30,

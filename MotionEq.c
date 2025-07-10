@@ -5,11 +5,12 @@
 #include "Interpolazione.h"
 #include "propeller.h"
 #include "routh.h"
+#include "Variables.h"
 
 #define g 9.80665
 #define pi 3.14159265
 
-void equation(double *engine, double Pmax_h, double rho_h, double *CI, double ***vett_stato, double *body_axes, double **aer_der_x, double **aer_der_z, double **steady_state_coeff, double **control_force_der, double **control_moment_der, double **pitch_moment_der, double *geometry_propeller, double *propeller_profile, double **data_propeller, double *trim) {
+void equation(double *CI, double *trim) {
     
     static int stampa = 1;
 
@@ -62,29 +63,29 @@ void equation(double *engine, double Pmax_h, double rho_h, double *CI, double **
     double hTrim = CI[1];
 
     // Creo la prima righa della matrice vett_stato (dinamica)
-    *vett_stato = malloc(sizeof(double*));
-    if (*vett_stato == NULL) ERROR(902, "state");
+    state = malloc(sizeof(double*));
+    if (state == NULL) ERROR(902, "state");
 
-    (*vett_stato)[0] = calloc(12, sizeof(double));
-    if ((*vett_stato)[0] == NULL) ERROR(901, "state");
+    state[0] = calloc(12, sizeof(double));
+    if (state[0] == NULL) ERROR(901, "state");
 
     // Riempio la prima riga con i valori di Trim
     for (int i = 0; i < 12; ++i){
         switch (i) {
             case 0:
-                (*vett_stato)[0][i] = uTrim;
+                state[0][i] = uTrim;
                 break;
             case 2:
-                (*vett_stato)[0][i] = wTrim;
+                state[0][i] = wTrim;
                 break;
             case 7:
-                (*vett_stato)[0][i] = thetaTrim;
+                state[0][i] = thetaTrim;
                 break;
             case 9:
-                (*vett_stato)[0][i] = hTrim;
+                state[0][i] = hTrim;
                 break;
             default:
-                (*vett_stato)[0][i] = 0;
+                state[0][i] = 0;
                 break;
         }
     }
@@ -102,7 +103,7 @@ void equation(double *engine, double Pmax_h, double rho_h, double *CI, double **
     while (RPM <= RPM_max){
         double Pal;
         double prop[3] = {0, 0, 0};
-        propel(RPM, Pmax_h, rho_h, CI[0], geometry_propeller, propeller_profile, data_propeller, prop, &Pal);
+        propel(RPM, CI[0], prop, &Pal);
 
         if (fabs(tTrim - prop[0]) < 1.0){
             if(stampa){
@@ -119,7 +120,7 @@ void equation(double *engine, double Pmax_h, double rho_h, double *CI, double **
 
     // Calcolo la stabilità dell'aeromobile
     if(stampa){
-        int a = routh(pitch_moment_der[0][4], body_axes, rho_h, trim[0], CI[0], CXalpha, CZtrim, CMtrim, pitch_moment_der[0][2]);
+        int a = routh(pitch_moment_der[0][4], trim[0], CI[0], CXalpha, CZtrim, CMtrim, pitch_moment_der[0][2]);
         stampa = 0;
     }
 }

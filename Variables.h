@@ -16,15 +16,19 @@ const double Vmax = 75;
 const double Vmin = 30;
 const double Hmin = 0;
 const double Hmax = 4116;
-double mFuelMin;  //Da inserire in Estrazione dati con = 0.95 * body_axes[0]
+double mFuelMin;  //Da inserire in Estrazione dati con = 0.95 * body_axes[0]*/
+extern int liv_trim;
 
 // variabili file
-double *engine;
-double *geometry_propeller, *propeller_profile, **data_propeller;
-double *body_axes, *deflection_limits, *fuel_mass;
-double **steady_state_coeff, **aer_der_x, **aer_der_y,**aer_der_z;
-double **rolling_moment_der, **pitch_moment_der, **yawing_moment_der;
-double **control_force_der, **control_moment_der, **rotary_der;
+extern double *engine;
+extern double *geometry_propeller, *propeller_profile, **data_propeller;
+extern double *body_axes, *deflection_limits, *fuel_mass;
+extern double **steady_state_coeff, **aer_der_x, **aer_der_y,**aer_der_z;
+extern double **rolling_moment_der, **pitch_moment_der, **yawing_moment_der;
+extern double **control_force_der, **control_moment_der, **rotary_der;
 
-double **state;
-double **command;*/
+extern double **state;
+extern double **command;
+
+// variabili atmosferiche
+extern double Pmax_h, press_h, temp_h, rho_h, vsuono_h;

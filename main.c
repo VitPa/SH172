@@ -18,16 +18,8 @@ int main(){
     In ogni caso tutti i warning ed errori li deve stampare anche su un file di log
     */
     ew_log = apriFile("log.txt", "w");
-
-    double *engine = NULL;
-    double *geometry_propeller = NULL, *propeller_profile = NULL, **data_propeller = NULL;
-    double *body_axes = NULL, *deflection_limits = NULL, *fuel_mass = NULL;
-    double **steady_state_coeff = NULL, **aer_der_x = NULL, **aer_der_y = NULL,**aer_der_z = NULL;
-    double **rolling_moment_der = NULL, **pitch_moment_der = NULL, **yawing_moment_der = NULL;
-    double **control_force_der = NULL, **control_moment_der = NULL, **rotary_der = NULL;
-    double **state = NULL;
+    
     double trim[3];
-    double **command = NULL;
 
     printf("\n\nSimulatore di volo per il Cessna 172\n Inserire i dati iniziali\n");
     printf("--------------------------------------------\n");
@@ -35,24 +27,21 @@ int main(){
     printf("--------------------------------------------\n\n");
 
     // Load variables from file .txt
-    caricaTuttiIDati(&engine, &geometry_propeller, &propeller_profile, &data_propeller, &body_axes, &deflection_limits,
-        &fuel_mass, &steady_state_coeff, &aer_der_x, &aer_der_y, &aer_der_z, &rolling_moment_der, 
-        &pitch_moment_der, &yawing_moment_der, &control_force_der, &control_moment_der, &rotary_der);
+    caricaTuttiIDati();
+    stampaTuttiIDati();
 
     // Load initial conditions
-    double Pmax_h, press_h, temp_h, rho_h, vsuono_h;
     double CI[3];
 
     loadCI(CI);
     checkVelAlt(&CI[0], &CI[1], &CI[2]);
 
     // Compute atmospheric variables
-    AtmosphereChoice(&press_h, &temp_h, &rho_h, &vsuono_h);
-    AtmosphereCalc(CI[1], engine, &Pmax_h, &press_h, &temp_h, &rho_h, &vsuono_h);
+    AtmosphereChoice();
+    AtmosphereCalc(CI[1]);
 
     // Trim condition and Routh stability
-    equation(engine, Pmax_h, rho_h, CI, &state, body_axes, aer_der_x, aer_der_z, steady_state_coeff, control_force_der, 
-        control_moment_der, pitch_moment_der, geometry_propeller, propeller_profile, data_propeller, trim);
+    equation(CI, trim);
 
     // Load commands matrix
     double dt = 0.01, deltaT_fs;
@@ -66,7 +55,6 @@ int main(){
 
     command = load_command(dt, deltaT_fs, trim[2], trim[1]);
     
-    
     // Integration and simulation
     int i = 0;
     FILE *fp = apriFile("DATI_ANALISI.txt", "w");
@@ -75,20 +63,11 @@ int main(){
     if (f) fclose(f);
     for(double Ts = 0.00; Ts <=deltaT_fs; Ts += dt){
 
-        /*if(i % 50 == 0 && i != 0){
-            equation(engine, Pmax_h, rho_h, CI, &state, body_axes, aer_der_x, aer_der_z, steady_state_coeff, control_force_der, 
-        control_moment_der, pitch_moment_der, geometry_propeller, propeller_profile, data_propeller, trim)
-        }*/
-
-        AtmosphereCalc(state[i][9], engine, &Pmax_h, &press_h, &temp_h, &rho_h, &vsuono_h);
+        AtmosphereCalc(state[i][9]);
 
         state = reallocState(state, 12);
 
-        if (eulerEquation(dt, i, state, command, Pmax_h, rho_h, engine, body_axes, steady_state_coeff, aer_der_x, aer_der_y, aer_der_z, 
-            rolling_moment_der, pitch_moment_der, yawing_moment_der, control_force_der, control_moment_der, geometry_propeller, 
-            propeller_profile, data_propeller, fuel_mass)){
-                break;
-            }
+        eulerEquation(dt, i);
 
         physicalCheck(fabs(sqrt(pow(state[i][0], 2)+pow(state[i][1], 2)+pow(state[i][2], 2))), state[i][9], body_axes[0],body_axes[4], vsuono_h);
         

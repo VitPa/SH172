@@ -4,7 +4,8 @@
 #include "ErrorWarning.h"
 
 double interpolazioneTotale(double** mat_1, int colonna, double alpha){
-    if (alpha < mat_1[125][0]+1e-6 && alpha > mat_1[125][0]) alpha = 20.0;
+
+    //if (alpha < mat_1[125][0]+1e-6 && alpha > mat_1[125][0]) alpha = 20.0;
     if (alpha < mat_1[0][0]-1e-6) ERROR(600, alpha);
     else if (alpha > mat_1[125][0]+1e-6) ERROR(601, alpha);
 

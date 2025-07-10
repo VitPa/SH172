@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "ErrorWarning.h"
 #include "EstrazioneDati.h"
+#include "Variables.h"
 
 static int dimVett[6];
 int dimMat[13];
@@ -138,35 +139,35 @@ void stampaMatriceFile(const char* nome, double** m, int righe, int colonne) {
 }
 
 // Funzione wrapper per caricare tutti i dati richiesti dal simulatore
-void caricaTuttiIDati(double **engine, double **geometry_propeller, double **propeller_profile, double ***data_propeller, double **body_axes, double **deflection_limits, double **fuel_mass, double ***steady_state_coeff, double ***aer_der_x, double ***aer_der_y, double ***aer_der_z, double ***rolling_moment_der, double ***pitch_moment_der, double ***yawing_moment_der, double ***control_force_der, double ***control_moment_der, double ***rotary_der) {
+void caricaTuttiIDati() {
     dimMat[11]=1;
     dimMat[12]=0;
     
     // VETTORI
-    *engine = caricaVettoreDouble("input_files/engine.txt", 1, &dimVett[0]); 
-    RPMmin = (*engine)[2];  //Se si fa il file unico con le matrici/valori, non serve più
-    RPMmax = (*engine)[3];  //Se si fa il file unico con le matrici/valori, non serve più
-    *geometry_propeller = caricaVettoreDouble("input_files/propeller.txt", 1, &dimVett[1]);
-    *propeller_profile = caricaVettoreDouble("input_files/propeller.txt", 2, &dimVett[2]); 
-    *body_axes = caricaVettoreDouble("input_files/dba.txt", 1, &dimVett[3]); 
-    *deflection_limits = caricaVettoreDouble("input_files/dba.txt", 2, &dimVett[4]); 
-    *fuel_mass = caricaVettoreDouble("input_files/dba.txt", 3, &dimVett[5]); 
+    engine = caricaVettoreDouble("input_files/engine.txt", 1, &dimVett[0]); 
+    RPMmin = (engine)[2];  //Se si fa il file unico con le matrici/valori, non serve più
+    RPMmax = (engine)[3];  //Se si fa il file unico con le matrici/valori, non serve più
+    geometry_propeller = caricaVettoreDouble("input_files/propeller.txt", 1, &dimVett[1]);
+    propeller_profile = caricaVettoreDouble("input_files/propeller.txt", 2, &dimVett[2]); 
+    body_axes = caricaVettoreDouble("input_files/dba.txt", 1, &dimVett[3]); 
+    deflection_limits = caricaVettoreDouble("input_files/dba.txt", 2, &dimVett[4]); 
+    fuel_mass = caricaVettoreDouble("input_files/dba.txt", 3, &dimVett[5]); 
     
     // MATRICI
-    *data_propeller = caricaMatriceDouble("input_files/propeller.txt", 4, 3, &dimMat[0]);
-    *steady_state_coeff = caricaMatriceDouble("input_files/dba.txt", 7, 4, &dimMat[1]);
-    *aer_der_x = caricaMatriceDouble("input_files/dba.txt", 8, 5, &dimMat[2]);
-    *aer_der_y = caricaMatriceDouble("input_files/dba.txt", 7, 6, &dimMat[3]);
-    *aer_der_z = caricaMatriceDouble("input_files/dba.txt", 8, 7, &dimMat[4]);
-    *rolling_moment_der = caricaMatriceDouble("input_files/dba.txt", 7, 8, &dimMat[5]);
-    *pitch_moment_der = caricaMatriceDouble("input_files/dba.txt", 8, 9, &dimMat[6]);
-    *yawing_moment_der = caricaMatriceDouble("input_files/dba.txt", 7, 10, &dimMat[7]);
-    *control_force_der = caricaMatriceDouble("input_files/dba.txt", 7, 11, &dimMat[8]);
-    *control_moment_der = caricaMatriceDouble("input_files/dba.txt", 7, 12, &dimMat[9]);
-    *rotary_der = caricaMatriceDouble("input_files/dba.txt", 7, 13, &dimMat[10]);
+    data_propeller = caricaMatriceDouble("input_files/propeller.txt", 4, 3, &dimMat[0]);
+    steady_state_coeff = caricaMatriceDouble("input_files/dba.txt", 7, 4, &dimMat[1]);
+    aer_der_x = caricaMatriceDouble("input_files/dba.txt", 8, 5, &dimMat[2]);
+    aer_der_y = caricaMatriceDouble("input_files/dba.txt", 7, 6, &dimMat[3]);
+    aer_der_z = caricaMatriceDouble("input_files/dba.txt", 8, 7, &dimMat[4]);
+    rolling_moment_der = caricaMatriceDouble("input_files/dba.txt", 7, 8, &dimMat[5]);
+    pitch_moment_der = caricaMatriceDouble("input_files/dba.txt", 8, 9, &dimMat[6]);
+    yawing_moment_der = caricaMatriceDouble("input_files/dba.txt", 7, 10, &dimMat[7]);
+    control_force_der = caricaMatriceDouble("input_files/dba.txt", 7, 11, &dimMat[8]);
+    control_moment_der = caricaMatriceDouble("input_files/dba.txt", 7, 12, &dimMat[9]);
+    rotary_der = caricaMatriceDouble("input_files/dba.txt", 7, 13, &dimMat[10]);
 }
 
-void stampaTuttiIDati(double *engine, double *geometry_propeller, double *propeller_profile, double **data_propeller, double *body_axes, double *deflection_limits, double *fuel_mass, double **steady_state_coeff, double **aer_der_x, double **aer_der_y, double **aer_der_z, double **rolling_moment_der, double **pitch_moment_der, double **yawing_moment_der, double **control_force_der, double **control_moment_der, double **rotary_der) {
+void stampaTuttiIDati() {
     const char *name_vec[] = {"engine", "geometry_propeller", "propeller_profile", "body_axes", "deflection_limits", "fuel_mass"};
     double *vec[] = {engine, geometry_propeller,propeller_profile, body_axes, deflection_limits, fuel_mass};
 
