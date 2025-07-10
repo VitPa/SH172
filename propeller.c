@@ -99,7 +99,12 @@ double propel(double RPM_ref, double Vel, double* prop, double *Pal)
     if (t<0){
         prop[2] = 0.0; //efficienza elica
     }else{
-        prop[2] = t/q*(J*diam)/(2.0*pi); //efficienza elica
+        //prop[2] = t/q*(J*diam)/(2.0*pi); //efficienza elica
+        prop[2] = (J * t) / (2.0 * pi * q); //CONTROLLARE
+        if (prop[2] > 1.0) {
+            printf("Efficienza > 1: eff=%.3f, t=%.3e, q=%.3e, J=%.3f, diam=%.3f, Vel=%.3f, n=%.3f, prop[0]=%.3f, prop[1]=%.3f\n",
+                prop[2], t, q, J, diam, Vel, n, prop[0], prop[1]);
+        }
     }
 
     *Pal = (prop[1]*omega)/1000;

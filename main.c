@@ -12,6 +12,7 @@
 #include "Command.h"
 #include "ErrorWarning.h"
 #include "Variables.h"
+#include "rk4.h"
 
 int main(){
     /*
@@ -65,13 +66,14 @@ int main(){
     if (f) fclose(f);
     for(double Ts = 0.00; Ts <=deltaT_fs; Ts += dt){
 
-        AtmosphereCalc(state[i][9]);
+        //AtmosphereCalc(state[9]);
 
-        state = reallocState(state, 12);
+        //state = reallocState(state, 12);
 
         eulerEquation(dt, i);
+        //rk4_step(state, 12, dt, Ts, i, compute_derivatives);
 
-        physicalCheck(fabs(sqrt(pow(state[i][0], 2)+pow(state[i][1], 2)+pow(state[i][2], 2))), state[i][9], body_axes[0],body_axes[4], vsuono_h);
+        physicalCheck(sqrt(pow(state[0], 2) + pow(state[1], 2) + pow(state[2], 2)), state[9], body_axes[0],body_axes[4], vsuono_h);
         
         //printf("%.2lf", Ts);
         /*for(int j = 0; j < 12; j++){
@@ -79,7 +81,7 @@ int main(){
         }*/
         //printf("\n");
 
-        fprintf(fp, "%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t\n",Ts,state[i][0],state[i][1],state[i][2],state[i][3],state[i][4],state[i][5],state[i][6],state[i][7],state[i][8],state[i][9],state[i][10],state[i][11]);
+        fprintf(fp, "%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t\n",Ts,state[0],state[1],state[2],state[3],state[4],state[5],state[6],state[7],state[8],state[9],state[10],state[11]);
         fprintf(cm, "%lf\t%lf\t%lf\t%lf\t%lf\t\n", Ts, command[i][0], command[i][1], command[i][2], command[i][3]);
 
         progressBar(Ts, deltaT_fs);
@@ -90,9 +92,7 @@ int main(){
     fclose(cm);
 
     // Free dynamic memory
-    liberaTuttiIDati(engine, geometry_propeller, propeller_profile, data_propeller, body_axes, deflection_limits, 
-        fuel_mass, steady_state_coeff, aer_der_x, aer_der_y, aer_der_z, rolling_moment_der, pitch_moment_der, 
-        yawing_moment_der, control_force_der, control_moment_der, rotary_der, state, command);
+    liberaTuttiIDati();
 
     // DA ELIMINARE NEL CODICE FINALE
     system("copy /Y \"C:\\Users\\vitop\\OneDrive - Politecnico di Torino\\Computer\\Universita\\PoliTo\\2 anno\\Mod-Sim\\Simulazione\\Progetti\\Simulatore\\FILE_PROGETTO\\GIT\\DATI_AGGIUNTIVI.txt\" \"C:\\Users\\vitop\\Downloads\\CODICE_GRUPPO\\CODICE_GRUPPO\\DATI_AGGIUNTIVI.txt\"");

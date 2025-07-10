@@ -192,12 +192,12 @@ void stampaTuttiIDati() {
 }
 
 // Funzione per liberare la memoria di tutti i dati caricati
-void liberaTuttiIDati(double *engine, double *geometry_propeller, double *propeller_profile, double **data_propeller, double *body_axes, double *deflection_limits, double *fuel_mass, double **steady_state_coeff, double **aer_der_x, double **aer_der_y, double **aer_der_z, double **rolling_moment_der, double **pitch_moment_der, double **yawing_moment_der, double **control_force_der, double **control_moment_der, double **rotary_der, double **state, double **command) {
-    free(engine); free(geometry_propeller); free(propeller_profile); free(body_axes); free(deflection_limits); free(fuel_mass);
+void liberaTuttiIDati() {
+    free(engine); free(geometry_propeller); free(propeller_profile); free(body_axes); free(deflection_limits); free(fuel_mass); free(state);
     double** matrici[] = {
         data_propeller, steady_state_coeff, aer_der_x, aer_der_y, aer_der_z,
         rolling_moment_der, pitch_moment_der, yawing_moment_der,
-        control_force_der, control_moment_der, rotary_der, state, command
+        control_force_der, control_moment_der, rotary_der, command
     };
     int numMatrici = sizeof(matrici)/sizeof(matrici[0]);
     for (int m = 0; m < numMatrici; ++m) {

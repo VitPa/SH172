@@ -9,14 +9,8 @@
 - Inserire tutti i condizionali ngli header (#ifndef)
 
 ## Da fare ora
-- Inserire tutti i warning e error nel codice e gestirli con Handler
 - Abbellire il codice, eliminare le parti iniutili
-- Controllo massa carburante da verificare
-- Implementare il controllo della velocità massima/minima (usando state[] che sta già) e la variazione della massa all'esterno di Integrazion (usando body_axes[])
-- Inserire le stampe per la stabilità, quindi fugoide e corto periodo
 - Controllare le stampe di tutte le funzioni ed inserire quando serve system("cls")
-- Cambiare il ciclo di Trimmaggio di alpha, usa alpha_1 al posto di i
-- Scrivere gli errori/warning in un file di log, in cui però metti informazioni aggiuntive come la funzione da cui viene l'errore (ad esempio)
 - Inserire l'apertura dei file nel file in una funzione dedicata (magari in InitialCondition) e poi dichiara i puntatori in maniera globale in Variables.h
 - Fare i print sulla stabilità (routh.c)
 

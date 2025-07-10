@@ -11,7 +11,7 @@ static int n;
 
 double** load_command(double dt, double Tfs, double RPMtrim, double eTrim){
     int choice;
-    manettat = 100 * (RPMtrim - RPMmin) / (RPMmax - RPMmin);
+    manettat = (RPMtrim - RPMmin) / (RPMmax - RPMmin);
     et = eTrim;
     n = ((int)(Tfs/dt))+1;
     
@@ -146,7 +146,7 @@ void customManeuver(double dt, double Tfs, double **command){
                     l = 1;
                     break;
                 case 1:  // IMPLUSE
-                    if(l>0) printf("Tempo inizio comando (precedente -> %s [%g, %g]) [0, %g]: \n", old_signal, old_start, old_start+old_dur, Tfs-5*dt);
+                    if(l>0) printf("Tempo inizio comando (precedente -> %s [%g, %g]) [0, %g]: ", old_signal, old_start, old_start+old_dur, Tfs-5*dt);
                     else printf("Tempo inizio comando [0, %g]: ", Tfs-5*dt);
                     start_command = ask_double(0, Tfs-5*dt);
 
@@ -156,7 +156,7 @@ void customManeuver(double dt, double Tfs, double **command){
                     break;
 
                 case 2: // SYMMITRIC IMPULSE
-                    if(l>0) printf("Tempo inizio comando (precedente -> %s [%g, %g]) [0, %g]: \n",old_signal, old_start, old_start+old_dur, Tfs-10*dt);
+                    if(l>0) printf("Tempo inizio comando (precedente -> %s [%g, %g]) [0, %g]: ",old_signal, old_start, old_start+old_dur, Tfs-10*dt);
                     else printf("Tempo inizio comando [0, %g]: ", Tfs-10*dt);
                     start_command = ask_double(0, Tfs-10*dt);
 
@@ -166,11 +166,11 @@ void customManeuver(double dt, double Tfs, double **command){
                     break;
 
                 case 3: // STEP
-                    if(l>0) printf("Tempo durata comando (precedente -> %s [%g]) [0, %g]: \n",old_signal, old_dur, Tfs);
+                    if(l>0) printf("Tempo durata comando (precedente -> %s [%g]) [0, %g]: ",old_signal, old_dur, Tfs);
                     else printf("Tempo durata comando [0, %g]: ", Tfs);
                     duration_command = ask_double(0, Tfs);
                     
-                    if(l>0) printf("Tempo inizio comando (precedente -> %s [%g, %g]) [0, %g]: \n",old_signal, old_start, old_start+old_dur, Tfs-duration_command);
+                    if(l>0) printf("Tempo inizio comando (precedente -> %s [%g, %g]) [0, %g]: ",old_signal, old_start, old_start+old_dur, Tfs-duration_command);
                     else printf("Tempo inizio comando [0, %g]: ", Tfs-duration_command);
                     start_command = ask_double(0, Tfs-duration_command);
 
@@ -178,11 +178,11 @@ void customManeuver(double dt, double Tfs, double **command){
                     break;
                     
                 case 4: // RAMP
-                    if(l>0) printf("Tempo durata comando (precedente -> %s [%g]) [0, %g]: \n",old_signal, old_dur, Tfs);
+                    if(l>0) printf("Tempo durata comando (precedente -> %s [%g]) [0, %g]: ",old_signal, old_dur, Tfs);
                     else printf("Tempo durata comando [0, %g]: ", Tfs);
                     duration_command = ask_double(0, Tfs);
                     
-                    if(l>0) printf("Tempo inizio comando (precedente -> %s [%g, %g]) [0, %g]: \n",old_signal, old_start, old_start+old_dur, Tfs-duration_command);
+                    if(l>0) printf("Tempo inizio comando (precedente -> %s [%g, %g]) [0, %g]: ",old_signal, old_start, old_start+old_dur, Tfs-duration_command);
                     else printf("Tempo inizio comando [0, %g]: ", Tfs-duration_command);
                     start_command = ask_double(0, Tfs-duration_command);
 
@@ -286,9 +286,9 @@ double ask_double(double min, double max) {
 
 char check_choice(){
     printf("Inserire altri segnali per questo comando? (0=No, 1=Si): ");
-    char choice;
+    int choice;
     do{
-        scanf(" %c", &choice);
+        scanf("%d", &choice);
         if(choice !=0 && choice !=1){
             WARNING(500, 0, 1.0);
             continue;

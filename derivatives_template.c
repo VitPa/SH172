@@ -1,20 +1,16 @@
+#include "Variables.h"
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
-#include "Interpolazione.h"
 #include "propeller.h"
-#include "EstrazioneDati.h"
-#include "Variables.h"
+#include "Interpolazione.h"
 #include "MotionEq.h"
 
 
-#define g 9.80665
-#define pi 3.14159265
-
-void eulerEquation(double dt, int i){
-    FILE *agg = apriFile("DATI_AGGIUNTIVI.txt", "a");
- 
-    // Richiamo componenti vettore di stato state
+// Esempio di funzione per calcolare le derivate dello stato
+// Adatta questa funzione copiando la logica di eulerEquation, ma scrivi le derivate in dstatedt
+void compute_derivatives(const double *state, double *dstatedt, double t, int i) {
+    // Variabili di stato
     double u     = state[0];
     double v     = state[1];
     double w     = state[2];
@@ -28,14 +24,12 @@ void eulerEquation(double dt, int i){
     double x_ned = state[10];
     double y_ned = state[11];
 
-    // Velostatetà totale iniziale (t = 0);
-    double V = sqrt(pow(u, 2) + pow(v, 2) + pow(w, 2));
+    // Comandi
 
-    // Richiamo componenti dei comandi
     double da, de, dr, manetta;
     if(liv_trim == 2){
         double trim[3] = {0.0, 0.0, 0.0};
-        double Ci[] = {V, h};
+        double Ci[] = {sqrt(u*u + v*v + w*w), h};
         equation(Ci, trim);
         da    = 0.0;
         de    = trim[1] *(pi/180);
@@ -45,28 +39,20 @@ void eulerEquation(double dt, int i){
         da    = command[i][0] *(pi/180);
         de    = command[i][1] *(pi/180);
         dr    = command[i][2] *(pi/180);
-        manetta = engine[2] + (engine[3] - engine[2]) * (command[i][3]) / (1);  // Mappatura manetta [0, 1] -> [RPMmin, RPMmax];
+        manetta = engine[2] + (engine[3] - engine[2]) * (command[i][3]) / (100);
     }
-    //fprintf(agg, "%lf\t%lf\t%lf\t%lf\t%lf\n", i*dt, da, de, dr, manetta);
-    //fclose(agg);
 
-    // Calcolo Spinta
+    // Calcolo spinta
     double prop[3] =  {0.0, 0.0, 0.0}, Pal = 0.0;
-
-    propel(manetta, V, prop, &Pal);
+    propel(manetta, sqrt(u*u + v*v + w*w), prop, &Pal);
     double T = prop[0];
-    fprintf(agg, "%lf\t%lf\n", i*dt, T);
-    fclose(agg);
 
-    // Calcolo consumo di carburante
-    if(fuel_mass[0] == 1) body_axes[0] = massConsumption(engine[5], Pal, prop[2], body_axes[0], dt);
-
-    double S = body_axes[2];
-    double costante=0.5*rho_h*V*V*S;
+    // Calcolo della velocità totale
+    double V = sqrt(u*u + v*v + w*w);
 
     // Definizione alpha e beta iniziali (t = 0):
-    double alpha = atan2(w,u);
-    double beta = asin(v/V);
+    double alpha = atan2(w, u);
+    double beta = asin(v / (V + 1e-8));
 
     // Calcolo velocità angolari adimensionali
     double q_ad = q*body_axes[3]/(2*V);
@@ -106,6 +92,8 @@ void eulerEquation(double dt, int i){
     double Jx = body_axes[13], Jy = body_axes[14], Jz = body_axes[15], m = body_axes[0];
 
     // Calcolo Forze e Momenti (t = 0);
+    double S = body_axes[2];
+    double costante=0.5*rho_h*V*V*S;
     double X = costante*(Cxss+Cxa*alpha+Cxde*de);
     double Y = costante*(Cyb*beta+Cyp*p_ad+Cyr*r_ad+Cydr*dr);
     double Z = costante*(Czss+Cza*alpha+Czq*q_ad+Czde*de);
@@ -113,47 +101,26 @@ void eulerEquation(double dt, int i){
     double M = costante*body_axes[3]*(Cmss+Cma*alpha+Cmq*q_ad+Cmde*de);
     double N = costante*body_axes[1]*(Cnss+Cnb*beta+Cnp*p_ad+Cnr*r_ad+Cnda*da+Cndr*dr);
 
-    // Incrementi tempo t = 0[s]
-    double du_     = (r*v-q*w) - g*sin(theta) + X/m + T/m;
-    double dv_     = (p*w-r*u) + g*sin(phi)*cos(theta) + Y/m;
-    double dw_     = (q*u-p*v) + g*cos(phi)*cos(theta) + Z/m;
-    double dp_     = (-(Jz-Jy)*q*r)/Jx + L/Jx;
-    double dq_     = (-(Jx-Jz)*p*r)/Jy + M/Jy;
-    double dr_     = (-(Jy-Jx)*p*q)/Jz + N/Jz;
-    double dphi_   = p + q*sin(phi)*tan(theta) + r*cos(phi)*tan(theta);
-    double dtheta_ = q*cos(phi) - r*sin(phi);
-    double dpsi_   = q*(sin(phi)/cos(theta)) + r*(cos(phi)/cos(theta));
-    double dh_     = -u*sin(theta) + v*cos(theta)*sin(phi) + w*cos(theta)*cos(phi);
-    double dx_ned = u*cos(psi)*cos(theta) + v*(cos(psi)*sin(theta)*sin(phi) - sin(psi)*cos(phi)) + w*(cos(psi)*sin(theta)*cos(phi) + sin(psi)*sin(phi));
-    double dy_ned = u*sin(psi)*cos(theta) + v*(sin(psi)*sin(theta)*sin(phi) + cos(psi)*cos(phi)) + w*(sin(psi)*sin(theta)*cos(phi) - cos(psi)*sin(phi));
-    
-    // Vettore di stato dopo condizione di trim.
-    state[0]  = u + dt*du_;
-    state[1]  = v + dt*dv_;
-    state[2]  = w + dt*dw_;
-    state[3]  = p + dt*dp_;
-    state[4]  = q + dt*dq_;
-    state[5]  = r + dt*dr_;
-    state[6]  = phi + dt*dphi_;
-    state[7]  = theta + dt*dtheta_;
-    state[8]  = psi + dt*dpsi_;
-    state[9]  = h + dt*dh_;
-    state[10] = x_ned + dt*dx_ned;
-    state[11] = y_ned + dt*dy_ned;
-}
+    // Equazioni del moto traslazionali
+    dstatedt[0] = (r*v-q*w) - g*sin(theta) + X/m + T/m;
+    dstatedt[1] = (p*w-r*u) + g*sin(phi)*cos(theta) + Y/m;
+    dstatedt[2] = (q*u-p*v) + g*cos(phi)*cos(theta) + Z/m;
 
-void progressBar(double Ts, double deltaT_fs){
-    if(fmod(Ts, (deltaT_fs/40.0)) < 0.01){
-        int progress = (int)(Ts / (deltaT_fs / 40.0));
-        if (Ts > deltaT_fs) progress = 40;
-        printf("\r[");
-        for(int k = 0; k<40; ++k){
-            if(k <= progress){
-                printf("*");
-            } else {
-                printf("-");
-            }
-        }
-        printf("] Simulating");
-    }
+    // Equazioni del moto rotazionali
+    dstatedt[3] = (-(Jz-Jy)*q*r)/Jx + L/Jx;
+    dstatedt[4] = (-(Jx-Jz)*p*r)/Jy + M/Jy;
+    dstatedt[5] = (-(Jy-Jx)*p*q)/Jz + N/Jz;
+
+    // Cinematica (angoli di Eulero)
+    dstatedt[6] = p + q*sin(phi)*tan(theta) + r*cos(phi)*tan(theta);
+    dstatedt[7] = q*cos(phi) - r*sin(phi);
+    dstatedt[8] = q*(sin(phi)/cos(theta)) + r*(cos(phi)/cos(theta));
+
+    // Quota e posizione
+    dstatedt[9]  = -u*sin(theta) + v*cos(theta)*sin(phi) + w*cos(theta)*cos(phi);
+    dstatedt[10] = u*cos(psi)*cos(theta) + v*(cos(psi)*sin(theta)*sin(phi) - sin(psi)*cos(phi)) + w*(cos(psi)*sin(theta)*cos(phi) + sin(psi)*sin(phi));
+    dstatedt[11] = u*sin(psi)*cos(theta) + v*(sin(psi)*sin(theta)*sin(phi) + cos(psi)*cos(phi)) + w*(sin(psi)*sin(theta)*cos(phi) - cos(psi)*sin(phi));
+
+    // Calcolo consumo carburante (se serve)
+    // (Non modificare variabili globali qui, aggiorna la massa fuori da questa funzione!)
 }

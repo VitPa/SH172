@@ -22,7 +22,7 @@ void equation(double *CI, double *trim) {
     double score_min = 1000;
     double CZtrim, CMtrim;
     
-    for (double alpha_1 = -5.0; alpha_1 <= 20.0; alpha_1 += 0.01) {
+    for (double alpha_1 = -5.0; alpha_1 <= 20.0; alpha_1 += 0.001) {
         double CZss = interpolazioneTotale(steady_state_coeff, 3, alpha_1);
         double CMss = interpolazioneTotale(steady_state_coeff, 5, alpha_1);
         double CMalpha = interpolazioneTotale(pitch_moment_der, 1, alpha_1);
@@ -30,12 +30,12 @@ void equation(double *CI, double *trim) {
         double CZalpha = interpolazioneTotale(aer_der_z, 1, alpha_1);
         double CZde = control_force_der[0][3];
         
-        for (double de_1 = -20.0; de_1 <= 20.0; de_1 += 0.01){
+        for (double de_1 = -20.0; de_1 <= 20.0; de_1 += 0.001){
             double CZ_tot = CZss + CZalpha * alpha_1 * (pi/180) + CZde * de_1 * (pi/180);
             double control = fabs(body_axes[0]*g*cos(alpha_1*(pi/180) + CI[2]*(pi/180)) + cst * CZ_tot);
             double control2 = fabs(CMss + CMalpha * alpha_1*(pi/180) + CMde * de_1 * (pi/180));
 
-            if (control < 1.0 && cst*control2 < 0.004){
+            if (control < 1.0 && control2 < 0.0001){
 
                 double score = sqrt(pow(control/10,2) + pow(control2/0.004,2));
                 if (score < score_min) {
@@ -44,7 +44,6 @@ void equation(double *CI, double *trim) {
                     trim[0] = alpha_1;
                     CZtrim = CZalpha;
                     CMtrim = CMalpha;
-                    printf("Cmss: %lf\tCmalpha: %lf\tCmde: %lf\n", CMss, CMalpha, CMde);
                 }
                 flag_1 = 1;
             }
@@ -65,7 +64,7 @@ void equation(double *CI, double *trim) {
         double wTrim = CI[0] * sin(trim[0]*(pi/180));
         double hTrim = CI[1];
 
-        // Creo la prima righa della matrice vett_stato (dinamica)
+        /*// Creo la prima righa della matrice vett_stato (dinamica)
         state = malloc(sizeof(double*));
         if (state == NULL) ERROR(902, "state");
 
@@ -91,7 +90,13 @@ void equation(double *CI, double *trim) {
                     state[0][i] = 0;
                     break;
             }
-        }
+        }*/
+       state = calloc(12, sizeof(double));
+       if (state == NULL) ERROR(901, "state");
+       state[0] = uTrim;
+       state[2] = wTrim;
+       state[7] = thetaTrim;
+       state[9] = hTrim;
     }
     
 
