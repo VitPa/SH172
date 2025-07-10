@@ -9,6 +9,8 @@
 
 int routh(double Cm_q,double* body_axes, double rho, double alpha_trim, double V, double Cx_alpha, double Cz_alpha, double Cm_alpha, double Cm_alphaprimo){
 
+    static int stampa = 1;
+
     //Variabili geometriche
     double massa_adm;
     double inerziaY_adm;
@@ -33,7 +35,7 @@ int routh(double Cm_q,double* body_axes, double rho, double alpha_trim, double V
     Cwe = CLe;
     CTu = -3*CDe; //-0.0841
 
-    if(Cm_alpha>0) Error(402, NULL);
+    if(Cm_alpha>0) ERROR(402);
 
 
     //Coefficienti quartica
@@ -46,7 +48,7 @@ int routh(double Cm_q,double* body_axes, double rho, double alpha_trim, double V
     E = -2*Cm_alpha*Cwe*Cwe;
     Delta = B*C*D - A*D*D - B*B*E;
 
-    if(B<0||Delta<0||D<0||E<0) Error(403, NULL);
+    if(B<0||Delta<0||D<0||E<0) ERROR(403);
 
     double omegaNph = (Cwe/(sqrt(2)*massa_adm))*2*V/(body_axes[3]);
     double zph = 3*CDe/(2*sqrt(2)*Cwe);
@@ -61,11 +63,9 @@ int routh(double Cm_q,double* body_axes, double rho, double alpha_trim, double V
     //double omegaNsp_adm = sqrt(-Cm_alpha/inerziaY_adm);
     double omegaNsp_adm = sqrt(-(2*massa_adm*Cm_alpha+Cm_q*CL_alpha)/(2*massa_adm*inerziaY_adm));  //Modello completo non semplificato  
     //double omegaNsp_adm = sqrt(-Cm_alpha/inerziaY_adm-(Cm_q*CL_alpha)/(2*massa_adm*inerziaY_adm));
-    //printf("A: %lf\nB: %lf", Cm_alpha/inerziaY_adm, (Cm_q*CL_alpha)/(2*massa_adm*inerziaY_adm));
-    //printf("Cmq: %lf\nCLa_alpha: %lf", Cm_q, Cm_alpha);
     double omegaNsp = (omegaNsp_adm*2*V)/(body_axes[3]);
     double zsp = (inerziaY_adm*CL_alpha-2*massa_adm*(Cm_q+Cm_alphaprimo))/(2*sqrt(-2*massa_adm*inerziaY_adm*(2*massa_adm*Cm_alpha+Cm_q*CL_alpha)));
-   // double omegasp = omegaNsp*sqrt(fabs(zsp*zsp - 1));
+    //double omegasp = omegaNsp*sqrt(fabs(zsp*zsp - 1));
 
     double Resp = -zsp*omegaNsp;
     double Imsp = omegaNsp*sqrt(fabs(zsp*zsp - 1.0));
@@ -73,12 +73,16 @@ int routh(double Cm_q,double* body_axes, double rho, double alpha_trim, double V
     double Tsp = 2*pi/Imsp;
     double T12_sp = fabs(log(0.5)/Resp);
 
-    /*printf("\n Caratteristiche modi:");
-    printf("\n                  ****************************************************************************************** \n");
-    printf("                  * - MODO FUGOIDE:                           * - MODO CORTO PERIODO:                      *\n" );
-    printf("                  * - omega[rad/s]= %lf                  * - omega[rad/s]= %lf                  *\n",omega[0],omega[1]);
-    printf("                  * - smorzamento[-]= %lf                * - smorzamento[-]= %lf                 *\n",zeta[0],zeta[1]);
-    printf("                  * - periodo[s]= %lf                    * - periodo[s]= %lf                     *\n",periodo[0],periodo[1]);
-    printf("                  * - tempo di dimezzamento[s]= %lf     * - tempo di dimezzamento[s]= %lf       *\n",t_mezzi[0],t_mezzi[1]);
-    printf("                  ****************************************************************************************** \n ");*/
+    if(stampa){
+        /*printf("\n Caratteristiche modi:");
+        printf("\n                  ****************************************************************************************** \n");
+        printf("                  * - MODO FUGOIDE:                           * - MODO CORTO PERIODO:                      *\n" );
+        printf("                  * - omega[rad/s]= %lf                  * - omega[rad/s]= %lf                  *\n",omega[0],omega[1]);
+        printf("                  * - smorzamento[-]= %lf                * - smorzamento[-]= %lf                 *\n",zeta[0],zeta[1]);
+        printf("                  * - periodo[s]= %lf                    * - periodo[s]= %lf                     *\n",periodo[0],periodo[1]);
+        printf("                  * - tempo di dimezzamento[s]= %lf     * - tempo di dimezzamento[s]= %lf       *\n",t_mezzi[0],t_mezzi[1]);
+        printf("                  ****************************************************************************************** \n ");*/
+        stampa = 0;
+    }
+    
 }

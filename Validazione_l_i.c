@@ -88,7 +88,7 @@ void main() {
     do{
         scanf("%d", &sceltaMat);
         if(sceltaMat < 0 || sceltaMat >= numMatrici){
-            printf("[~] WARNING: Scelta non valida. Riprovare: ");
+            WARNING(500, 0, (double)numMatrici);
             continue;
         }
         break;
@@ -107,7 +107,7 @@ void main() {
     do{
         scanf("%d", &sceltaCol);
         if(sceltaCol < 0 || sceltaCol > ((legende[sceltaMat][7] == NULL) ? 7 : 8)) {
-            printf("[~] WARNING: Scelta non valida. Riprovare: ");
+            WARNING(500, 0, ((legende[sceltaMat][7] == NULL) ? 7.0 : 8.0));
             continue;
         }
         break;
@@ -118,7 +118,7 @@ void main() {
     do{
         scanf("%lf", &alpha);
         if(alpha < -5 || alpha > 20){
-            printf("[~] WARNING: Scelta non valida. Riprovare: ");
+            WARNING(500, -5.0, 20.0);
             continue;
         }
         break;

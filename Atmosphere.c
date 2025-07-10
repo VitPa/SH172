@@ -3,6 +3,7 @@
 #include <string.h>
 #include <math.h>
 #include <ctype.h>
+#include "ErrorWarning.h"
 
 static double press0 = 101325;    // Pa
 static double temp0 = 15;         // C
@@ -10,9 +11,7 @@ static double rho0 = 1.225;       // kg/m^3
 static double vsuono0 = 340;      // m/s
 static int flagatm;
 
-// il codice mostra i dati atmosferici di default a video e permette di modificarli.
-
-void AtmosphereChoice (double *press_h,double *temp_h,double *rho_h,double *vsuono_h)
+void AtmosphereChoice (double *press_h, double *temp_h, double *rho_h, double *vsuono_h)
 {
     int input;
 
@@ -34,7 +33,7 @@ void AtmosphereChoice (double *press_h,double *temp_h,double *rho_h,double *vsuo
         if(input!=1 && input!=2 && input!=3)
         {
             scanf("%*[^\n]"); //svuota il buffer di scanf se immetto un carattere invece che un numero
-            printf("[~]WARNING: immettere un numero da 1 a 3\n");
+            WARNING(500, 1.0, 3.0);
         }
         switch(input)
         {
@@ -46,28 +45,28 @@ void AtmosphereChoice (double *press_h,double *temp_h,double *rho_h,double *vsuo
                 do {
                     scanf("%*[^\n]");
                     if(scanf("%lf", &press0) != 0 && press0>0) break;
-                    printf("[~]WARNING immettere un numero positivo --> ");
+                    WARNING(501);
                 } while (1);
 
                 printf("Inserire un valore di temperatura (h=0) [C]:");
                 do {
                     scanf("%*[^\n]");
-                    if(scanf("%lf", &temp0) != 0) break;
-                    printf("[~]WARNING immettere un numero positivo --> ");
+                    if(scanf("%lf", &temp0) != 0 && temp0>-273.15) break;
+                    WARNING(502, -273.15);
                 } while (1);
 
                 printf("Inserire un valore di densita' (h=0) [kg/m^3]:");
                 do {
                     scanf("%*[^\n]");
                     if(scanf("%lf", &rho0) != 0 && rho0>0) break;
-                    printf("[~]WARNING immettere un numero positivo --> ");
+                    WARNING(501);
                 } while(1);
 
                 printf("Inserire un valore di velocita' (h=0) del suono in m/s:");
                 do {
                     scanf("%*[^\n]");
                     if(scanf("%lf", &vsuono0) != 0 && vsuono0>0) break;
-                    printf("[~]WARNING immettere un numero positivo --> ");
+                    WARNING(501);
                 } while (1);
 
                 flagatm = 1;
@@ -76,29 +75,29 @@ void AtmosphereChoice (double *press_h,double *temp_h,double *rho_h,double *vsuo
                 printf("Inserire un valore di pressione [Pa]:");
                 do {
                     scanf("%*[^\n]");
-                    if(scanf("%lf", &press_h) != 0 && press_h>0) break;
-                    printf("[~]WARNING immettere un numero positivo\n");
+                    if(scanf("%lf", &press_h) != 0 && *press_h>0) break;
+                    WARNING(501);
                 } while (1);
 
                 printf("Inserire un valore di temperatura [C]:");
                 do {
                     scanf("%*[^\n]");
-                    if(scanf("%lf", &temp_h) != 0) break;
-                    printf("[~]WARNING immettere un numero positivo --> ");
+                    if(scanf("%lf", &temp_h) != 0 && *temp_h>-273.15) break;
+                    WARNING(502, -273.15);
                 } while (1);
 
                 printf("Inserire un valore di densita' [kg/m^3]:");
                 do {
                     scanf("%*[^\n]");
-                    if(scanf("%lf", &rho_h) != 0 && rho_h>0) break;
-                    printf("[~]WARNING immettere un numero positivo\n");
+                    if(scanf("%lf", &rho_h) != 0 && *rho_h>0) break;
+                    WARNING(501);
                 } while (1);
 
                 printf("Inserire un valore di velocita' del suono [m/s]:");
                 do {
                     scanf("%*[^\n]");
-                    if(scanf("%lf", &vsuono_h) != 0 && vsuono_h>0) break;
-                    printf("[~]WARNING immettere un numero positivo\n");
+                    if(scanf("%lf", &vsuono_h) != 0 && *vsuono_h>0) break;
+                    WARNING(501);
                 } while (1);
                 flagatm = 2;
                 break;

@@ -23,7 +23,7 @@ double** load_command(double dt, double Tfs, double RPMtrim, double eTrim){
     do{
         scanf("%d", &choice);
         if(choice != 1 && choice != 2){
-            printf("[~]WARNING: Valore non valido... Inserire 1 o 2: ");
+            WARNING(500, 1.0, 2.0);
             continue;
         }
         break;
@@ -52,7 +52,7 @@ void defaultManeuver(double dt, double Tfs, double **command){  //Manovre usate 
     do{
         scanf("%d", &maneuver);
         if(maneuver<0 || maneuver>nDefaultManeuver){
-            printf("[~]WARNING: Inserire un numero compreso tra 1 e %d\n", nDefaultManeuver);
+            WARNING(500, 1.0, (double)nDefaultManeuver);
             continue;
         }
         break;
@@ -96,7 +96,7 @@ void customManeuver(double dt, double Tfs, double **command){
             do{
                 scanf("%d", &maneuver);
                 if(maneuver<0 || maneuver>4){
-                    printf("[~] WARNING: Inserire un numero compreso tra 1 e 4\n");
+                    WARNING(500, 1, 4);
                     continue;
                 }
                 break;
@@ -111,29 +111,29 @@ void customManeuver(double dt, double Tfs, double **command){
                 if (i==3){
                     if(A+manettat<0){
                         A=0-manettat; 
-                        printf("[~]WARNING: Ampiezza minore del minimo consentito... Impostata ampiezza a 0%%\n");
+                        WARNING(100, 0-manettat);
                     }
                     if(A+manettat>1){
                         A=1-manettat; 
-                        printf("[~]WARNING: Ampiezza maggiore del massimo consentito... Impostata ampiezza a 100%%\n");
+                        WARNING(101, 1-manettat);
                     }
                 }else if (i==1){
                     if(A+et<-20){
                         A=-20-et; 
-                        printf("[~]WARNING: Ampiezza minore del minimo consentito... Impostata ampiezza a %gdeg\n", -20-et);
+                        WARNING(100, -20-et);
                     }
                     if(A+et>20){
                         A=20-et; 
-                        printf("[~]WARNING: Ampiezza maggiore del massimo consentito... Impostata ampiezza a %gdeg\n", 20-et);
+                        WARNING(101, 20-et);
                     }
                 }else{
                     if(A<-20){
                         A=-20; 
-                        printf("[~]WARNING: Ampiezza minore del minimo consentito... Impostata ampiezza a -20deg\n");
+                        WARNING(100, (double)-20);
                     }
                     if(A>20){
                         A=20; 
-                        printf("[~]WARNING: Ampiezza maggiore del massimo consentito... Impostata ampiezza a 20deg\n");
+                        WARNING(100, (double)20);
                     }
                 }
             }
@@ -153,7 +153,7 @@ void customManeuver(double dt, double Tfs, double **command){
                     duration_command = 5*dt;
                     break;
 
-                case 2: //IMPULSO SIMMETRICO
+                case 2: // SYMMITRIC IMPULSE
                     if(l>0) printf("Tempo inizio comando (precedente -> %s [%g, %g]) [0, %g]: \n",old_signal, old_start, old_start+old_dur, Tfs-10*dt);
                     else printf("Tempo inizio comando [0, %g]: ", Tfs-10*dt);
                     start_command = ask_double(0, Tfs-10*dt);
@@ -163,7 +163,7 @@ void customManeuver(double dt, double Tfs, double **command){
                     duration_command = 10*dt;
                     break;
 
-                case 3: //GRADINO
+                case 3: // STEP
                     if(l>0) printf("Tempo durata comando (precedente -> %s [%g]) [0, %g]: \n",old_signal, old_dur, Tfs);
                     else printf("Tempo durata comando [0, %g]: ", Tfs);
                     duration_command = ask_double(0, Tfs);
@@ -175,7 +175,7 @@ void customManeuver(double dt, double Tfs, double **command){
                     step(apply_trim(A, i), start_command, duration_command, dt, Tfs, command, i, l);
                     break;
                     
-                case 4: //RAMPA
+                case 4: // RAMP
                     if(l>0) printf("Tempo durata comando (precedente -> %s [%g]) [0, %g]: \n",old_signal, old_dur, Tfs);
                     else printf("Tempo durata comando [0, %g]: ", Tfs);
                     duration_command = ask_double(0, Tfs);
@@ -186,13 +186,14 @@ void customManeuver(double dt, double Tfs, double **command){
 
                     ramp(apply_trim(0.0, i), apply_trim(A, i), start_command, duration_command, dt, Tfs, command, i, l);
                     break;
+                
                 default:
-                    Error(500, NULL);
+                    ERROR(500);
             }
 
             if(++l<=1){
                 char choice = check_choice();
-                if(choice == 'y' || choice == 'Y') continue;
+                if(choice == 1) continue;
                 break;
             };
         }while(l<=1);
@@ -273,7 +274,7 @@ double ask_double(double min, double max) {
     do {
         scanf("%lf", &val);
         if(val < min || val > max) {
-            printf("[~]WARNING: Inserire un valore compreso tra %.2f e %.2f\n", min, max);
+            WARNING(500, min, max);
             continue;
         }
         break;
@@ -282,12 +283,12 @@ double ask_double(double min, double max) {
 }
 
 char check_choice(){
-    printf("Inserire altri segnali per questo comando? [n/y] no/si: ");
+    printf("Inserire altri segnali per questo comando? (0=No, 1=Si): ");
     char choice;
     do{
         scanf(" %c", &choice);
-        if(choice !='n' && choice !='N' && choice !='y' && choice !='Y'){
-            printf("Valore non valido... Inserire [n/y] no/si: ");
+        if(choice !=0 && choice !=1){
+            WARNING(500, 0, 1.0);
             continue;
         }
         break;

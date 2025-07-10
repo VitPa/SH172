@@ -1,18 +1,30 @@
 #include <stdio.h>
+#include "EstrazioneDati.h"
 
 #define g 9.80665
 #define pi 3.14159265
 
-// variabili globali
+// Percorsi file I/O
+//char *path_dba = "input_files/DBA.txt";
 
+// Puntatori ai file
+extern FILE *ew_log;
+
+
+/*// variabili globali
+const double Vmax = 75;
+const double Vmin = 30;
+const double Hmin = 0;
+const double Hmax = 4116;
+double mFuelMin;  //Da inserire in Estrazione dati con = 0.95 * body_axes[0]
 
 // variabili file
-double *engine = NULL;
-double *geometry_propeller = NULL, *propeller_profile = NULL, **data_propeller = NULL;
-double *body_axes = NULL, *deflection_limits = NULL, *fuel_mass = NULL;
-double **steady_state_coeff = NULL, **aer_der_x = NULL, **aer_der_y = NULL,**aer_der_z = NULL;
-double **rolling_moment_der = NULL, **pitch_moment_der = NULL, **yawing_moment_der = NULL;
-double **control_force_der = NULL, **control_moment_der = NULL, **rotary_der = NULL;
+double *engine;
+double *geometry_propeller, *propeller_profile, **data_propeller;
+double *body_axes, *deflection_limits, *fuel_mass;
+double **steady_state_coeff, **aer_der_x, **aer_der_y,**aer_der_z;
+double **rolling_moment_der, **pitch_moment_der, **yawing_moment_der;
+double **control_force_der, **control_moment_der, **rotary_der;
 
-double **state = NULL;
-double **command = NULL;
+double **state;
+double **command;*/

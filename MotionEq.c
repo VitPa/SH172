@@ -10,6 +10,8 @@
 #define pi 3.14159265
 
 void equation(double *engine, double Pmax_h, double rho_h, double *CI, double ***vett_stato, double *body_axes, double **aer_der_x, double **aer_der_z, double **steady_state_coeff, double **control_force_der, double **control_moment_der, double **pitch_moment_der, double *geometry_propeller, double *propeller_profile, double **data_propeller, double *trim) {
+    
+    static int stampa = 1;
 
     // ****** TROVARE ALPHA DI TRIM *******
 
@@ -46,9 +48,11 @@ void equation(double *engine, double Pmax_h, double rho_h, double *CI, double **
         }
     }
     if (flag_1 != 0) {
-        printf("\n*********************Alpha di Trim trovato**************************************\n\n");
-        printf("---------- ALPHA: %lf\t\t DE_TRIM: %lf\n\n", trim[0], trim[1]);
-    } else Error(400, NULL);
+        if(stampa){
+            printf("\n*********************Alpha di Trim trovato**************************************\n\n");
+            printf("---------- ALPHA: %lf\t\t DE_TRIM: %lf\n\n", trim[0], trim[1]);
+        }
+    } else ERROR(400);
 
     double thetaTrim = (trim[0] + CI[2])*(pi/180);  
 
@@ -59,10 +63,10 @@ void equation(double *engine, double Pmax_h, double rho_h, double *CI, double **
 
     // Creo la prima righa della matrice vett_stato (dinamica)
     *vett_stato = malloc(sizeof(double*));
-    if (*vett_stato == NULL) Error(902, "state");
+    if (*vett_stato == NULL) ERROR(902, "state");
 
     (*vett_stato)[0] = calloc(12, sizeof(double));
-    if ((*vett_stato)[0] == NULL) Error(901, "state");
+    if ((*vett_stato)[0] == NULL) ERROR(901, "state");
 
     // Riempio la prima riga con i valori di Trim
     for (int i = 0; i < 12; ++i){
@@ -101,16 +105,18 @@ void equation(double *engine, double Pmax_h, double rho_h, double *CI, double **
         propel(RPM, Pmax_h, rho_h, CI[0], geometry_propeller, propeller_profile, data_propeller, prop, &Pal);
 
         if (fabs(tTrim - prop[0]) < 1.0){
-            printf("\n*********************RPM di Trim trovato**************************************\n\n");
-            printf("---------- RPM: %d\n\n", RPM);
-            printf("Efficienza elica: %lf\n\n", prop[2]);
+            if(stampa){
+                printf("\n*********************RPM di Trim trovato**************************************\n\n");
+                printf("---------- RPM: %d\n\n", RPM);
+                printf("Efficienza elica: %lf\n\n", prop[2]);
+                stampa = 0;
+            }
             trim[2] = RPM;
             break;
         }
-        // printf("RPM: %d\t dT: %lf\n", RPM, fabs(tTrim - prop[0]));
         RPM += 1;
     }
-    if(RPM > RPM_max) Error(401, NULL);
+    if(RPM > RPM_max) ERROR(401);
 
     // Calcolo la stabilità dell'aeromobile
     int a = routh(pitch_moment_der[0][4], body_axes, rho_h, trim[0], CI[0], CXalpha, CZtrim, CMtrim, pitch_moment_der[0][2]);

@@ -5,27 +5,27 @@
 
 void checkVelAlt(double *V, double *h, double *gamma) {
     if (*V < 30){
-        printf("[~]WARNING: La velocità inserita è inferiore di quella di stallo.\tInserita velocità minima: 30 m/s\n");
+        WARNING(200, 30.0);
         *V = 30;
     }
     else if (*V > 75){
-        printf("[~]WARNING: La velocità inserita è maggiore di quella massima.\tInserita velocità massima: 75 m/s\n");
+        WARNING(202, 75.0);
         *V = 75;
     }
     if (*h<0){
-        printf("[~]WARNING: I valori inseriti corrispondono ad una quota minore di zero.\nInserita quota minima: 0 m\n");
+        WARNING(203, 0);
         *h = 0;
     }
     else if(*h>4116){
-        printf("[~]WARNING: I valori inseriti corrispondono ad una quota maggiore di quella di tangenza.\nInserita quota massima: 4116 m\n");
+        WARNING(204, 4116.0);
         *h = 4116;
     }
     if (*gamma<-5){
-        printf("[~]WARNING: L'angolo di rampa è inferiore di quello minimo consentito.\tInserito angolo di rampa minimo: -5 deg\n");
+        WARNING(205, -5.0);
         *gamma = -5;
     }
     if (*gamma>10){
-        printf("[~]WARNING: L'angolo di rampa è maggiore di quello massimo consentito.\tInserito angolo di rampa massimo: 10 deg\n");
+        WARNING(206, 10.0);
         *gamma = 10;
     }
 }
@@ -34,7 +34,7 @@ void physicalCheck(double V, double h, double m, double Mdg, double vsuono_h) {
     enum {COND_VMIN, COND_MACH, COND_VMAX, COND_HMIN, COND_HMAX, COND_MASS, N_COND};
     static int counters[N_COND] = {0};
     const int threshold = 3;
-    double mFuelMin; //Eliminare quando si mette il controllo della massa nel main
+    double mFuelMin; //0.95*body_axes[0]   //Eliminare quando si mette il controllo della massa nel main
 
     int triggered[N_COND] = {
         V < 30,
@@ -45,11 +45,11 @@ void physicalCheck(double V, double h, double m, double Mdg, double vsuono_h) {
         m < mFuelMin
     };
 
-    int error_codes[N_COND] = {200, 201, 202, 203, 204};
+    int error_codes[N_COND] = {200, 201, 202, 203, 204, 205};
 
     for (int i = 0; i < N_COND; ++i) {
         if (triggered[i]) {
-            if (++counters[i] > threshold) Error(error_codes[i], NULL);
+            if (++counters[i] > threshold) ERROR(error_codes[i]);
         } else if (counters[i] > 0) {
             --counters[i];
         }
@@ -68,33 +68,33 @@ void loadCI(double *CI) {
         fgets(input, 100, stdin);
         if(input[0]=='\n') {
             CI[0] = 52; 
-            printf("[-]DEFAULT: Valore di default inserito: 52 m/s\n"); 
+            WARNING(0, 52.0); 
             break;
         }
         if(sscanf(input,"%lf",&CI[0])!=0) break;
-        printf("[~]WARNING: Immettere un valore numerico --> ");
+        WARNING(504);
     }while(1);
     printf("\nInserire l'altitudine inziale [m] (default: 1000): ");
     do{
         fgets(input, 100, stdin);
         if(input[0]=='\n') {
             CI[1] = 1000; 
-            printf("[-]DEFAULT: Valore di default inserito: 1000 m\n"); 
+            WARNING(0, 1000.0); 
             break;
         }
         if(sscanf(input,"%lf",&CI[1])!=0) break;
-        printf("[~]WARNING: Immettere un valore numerico --> ");
+        WARNING(504);
     }while(1);
     printf("\nInserire l'angolo di attacco inziale [deg] (default: 0): ");
     do{
         fgets(input, 100, stdin);
         if(input[0]=='\n') {
             CI[2] = 0; 
-            printf("[-]DEFAULT: Valore di default inserito: 0 deg\n"); 
+            WARNING(0, 0); 
             break;
         }
         if(sscanf(input,"%lf",&CI[2])!=0) break;
-        printf("[~]WARNING: Immettere un valore numerico --> ");
+        WARNING(504);
     }while(1);
     printf("\n");
 }

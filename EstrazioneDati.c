@@ -9,7 +9,7 @@ double RPMmax, RPMmin;
 
 FILE* apriFile(const char *path, const char *mode) {
     FILE* f = fopen(path, mode);
-    if (!f) Error(100, path); //fprintf(stderr, "Errore apertura file: %s\n", path);
+    if (!f) ERROR(100, path); //fprintf(stderr, "Errore apertura file: %s\n", path);
     return f;
 }
 
@@ -29,7 +29,7 @@ double* caricaVettoreDouble(const char *path, int checkSection, int *outSize) {
         if (sscanf(riga, "%lf", &val) == 1) {
             if (section == checkSection){
                 arr = realloc(arr, (n+1)*sizeof(double));
-                if(!arr) Error(901, path!="input_files/engine.txt"?
+                if(!arr) ERROR(901, path!="input_files/engine.txt"?
                     path!="input_files/propeller.txt"?name_d[checkSection-1]:name_p[checkSection-1]:"engine");
                 arr[n++] = val;
             }
@@ -38,7 +38,7 @@ double* caricaVettoreDouble(const char *path, int checkSection, int *outSize) {
     }
     fclose(f);
     if (outSize) *outSize = n;
-    if(!arr) Error(101, path!="input_files/engine.txt"?
+    if(!arr) ERROR(101, path!="input_files/engine.txt"?
                     path!="input_files/propeller.txt"?name_d[checkSection-1]:name_p[checkSection-1]:"engine");
     return arr;
 }
@@ -73,7 +73,7 @@ double** caricaMatriceDouble(const char *path, int colonne, int checkSection, in
                 }
                 if (letti == colonne) {
                     mat = realloc(mat, (n+1)*sizeof(double*));
-                    if(!mat) Error(901, path!="input_files/propeller.txt"?name[checkSection-4]:"data_propeller");
+                    if(!mat) ERROR(901, path!="input_files/propeller.txt"?name[checkSection-4]:"data_propeller");
                     mat[n++] = temp;
                 } else {
                     free(temp);
@@ -84,7 +84,7 @@ double** caricaMatriceDouble(const char *path, int colonne, int checkSection, in
     }
     fclose(f);
     if (outRighe) *outRighe = n;
-    if(!mat) Error(102, path!="input_files/propeller.txt"?name[checkSection-4]:"data_propeller");
+    if(!mat) ERROR(102, path!="input_files/propeller.txt"?name[checkSection-4]:"data_propeller");
     return mat;
 }
 
@@ -93,10 +93,10 @@ double** reallocState(double **state, int n_colonne) {
     int new_rows = dimMat[11] + 1;
 
     double **tmp = realloc(state, new_rows * sizeof(double*));
-    if (!tmp) Error(901, "state");
+    if (!tmp) ERROR(901, "state");
 
     tmp[new_rows - 1] = calloc(n_colonne, sizeof(double));
-    if (!tmp[new_rows - 1]) Error(900, "state");
+    if (!tmp[new_rows - 1]) ERROR(900, "state");
     
     dimMat[11] = new_rows;
     return tmp;
@@ -107,10 +107,10 @@ double** reallocCommand(double **command, int n_colonne) {
     int new_rows = dimMat[12] + 1; // Usa un indice libero per command
     
     double **tmp = realloc(command, new_rows * sizeof(double*));
-    if (!tmp) Error(901, "command");
+    if (!tmp) ERROR(901, "command");
     
     tmp[new_rows - 1] = calloc(n_colonne, sizeof(double));
-    if (!tmp[new_rows - 1]) Error(900, "command");
+    if (!tmp[new_rows - 1]) ERROR(900, "command");
     
     dimMat[12] = new_rows;
     return tmp;

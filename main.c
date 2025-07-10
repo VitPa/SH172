@@ -10,20 +10,14 @@
 #include "Integration.h"
 #include "InitialCondition.h"
 #include "Command.h"
+#include "ErrorWarning.h"
+#include "Variables.h"
 
 int main(){
-
     /*
-    Implementare all'inzio un parte di codice che fa decidere (oppure si passa come argomento) 
-    se far partire il simulatore in modalità utente o modalità test. Quindi verbosa o no.
-    */
-    /*
-    Implementae una struct o una nuova funzione per la gestione degli errori. Ti deve permettere di
-    fare (system("PAUSE"); exit(0);) se è un'errore oppure gestire il warning, magari passando il 
-    messaggio da stampare e distinguere tra warning silenzioso o warning non silenzioso (cioè se 
-    l'utente deve intervenire oppure no).
     In ogni caso tutti i warning ed errori li deve stampare anche su un file di log
     */
+    ew_log = apriFile("log.txt", "w");
 
     double *engine = NULL;
     double *geometry_propeller = NULL, *propeller_profile = NULL, **data_propeller = NULL;
@@ -58,7 +52,12 @@ int main(){
     // Load commands matrix
     double dt = 0.01, deltaT_fs;
     printf("Inserire il tempo di simulazione: ");
-    scanf("%lf", &deltaT_fs);
+    do{
+        scanf("%lf", &deltaT_fs);
+        if(deltaT_fs <= 0){
+            WARNING(501);
+        }
+    }while(deltaT_fs <= 0);
 
     command = load_command(dt, deltaT_fs, trim[2], trim[1]);
     
@@ -70,6 +69,12 @@ int main(){
     FILE *f = apriFile("DATI_AGGIUNTIVI.txt", "w");
     if (f) fclose(f);
     for(double Ts = 0.00; Ts <=deltaT_fs; Ts += dt){
+
+        /*if(i % 50 == 0 && i != 0){
+            equation(engine, Pmax_h, rho_h, CI, &state, body_axes, aer_der_x, aer_der_z, steady_state_coeff, control_force_der, 
+        control_moment_der, pitch_moment_der, geometry_propeller, propeller_profile, data_propeller, trim)
+        }*/
+
         AtmosphereCalc(state[i][9], engine, &Pmax_h, &press_h, &temp_h, &rho_h, &vsuono_h);
 
         state = reallocState(state, 12);
@@ -108,6 +113,7 @@ int main(){
     system("copy /Y \"C:\\Users\\vitop\\OneDrive - Politecnico di Torino\\Computer\\Universita\\PoliTo\\2 anno\\Mod-Sim\\Simulazione\\Progetti\\Simulatore\\FILE_PROGETTO\\GIT\\DATI_ANALISI.txt\" \"C:\\Users\\vitop\\Downloads\\CODICE_GRUPPO\\CODICE_GRUPPO\\DATI_ANALISI.txt\"");
     system("copy /Y \"C:\\Users\\vitop\\OneDrive - Politecnico di Torino\\Computer\\Universita\\PoliTo\\2 anno\\Mod-Sim\\Simulazione\\Progetti\\Simulatore\\FILE_PROGETTO\\GIT\\DATI_COMANDI.txt\" \"C:\\Users\\vitop\\Downloads\\CODICE_GRUPPO\\CODICE_GRUPPO\\DATI_COMANDI.txt\"");
 
+    fclose(ew_log);
     printf("SIMULAZIONE TERMINATA. GRAZIE PER AVER VOLATO CON NOI, \tA PRESTO!\n");
     system("PAUSE");
     return 0;
