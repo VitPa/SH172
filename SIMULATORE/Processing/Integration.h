@@ -3,6 +3,6 @@
 
 void eulerEquation(double dt, int i);
 
-void progressBar(double Ts, double deltaT_fs);
+void progressBar(double Ts, double deltaT_fs, const char* context);
 
 #endif

@@ -7,7 +7,8 @@
 #include "../Error_Warning/ErrorWarning.h"
 #include "../Interpolation/Interpolation.h"
 #include "../Pre_processing/Variables.h"
-#include "../Processing/propeller.h"
+#include "../Processing/Propeller.h"
+#include "../Processing/Integration.h"
 
 #define g 9.80665
 #define pi 3.14159265
@@ -48,7 +49,9 @@ void trimEquation(double *CI, double *trim) {
                 flag_1 = 1;
             }
         }
+        progressBar(alpha_1, 20.0, "Calcolando le condizioni di Trim!");
     }
+    printf("\r\n");
     if (flag_1 != 0) {
         printf("\n*********************Alpha di Trim trovato**************************************\n\n");
         printf("---------- ALPHA: %lf\t\t DE_TRIM: %lf\n\n", trim[0], trim[1]);

@@ -43,11 +43,13 @@ int main(){
     double dt, deltaT_fs;
     printf("Inserire il passo di simulazione:\n(1) -> 0.01s\n(2) -> 0.02s\nScegliere tra [1 e 2]: ");
     do{
-        scanf("%lf", &deltaT_fs);
-        if(deltaT_fs <= 0){
+        scanf("%lf", &dt);
+        if(dt==1) dt = 0.01;
+        else if(dt==2) dt = 0.02;
+        if(dt != 0.01 && dt != 0.02){
             WARNING(500, 0, 1.0);
         }
-    }while(deltaT_fs <= 0);
+    }while(dt != 0.01 && dt != 0.02);
     printf("Inserire il tempo di simulazione [s]: ");
     do{
         scanf("%lf", &deltaT_fs);
@@ -56,7 +58,7 @@ int main(){
         }
     }while(deltaT_fs <= 0);
 
-    command = load_command(dt, deltaT_fs, trim[2], trim[1]);
+    load_command(dt, deltaT_fs, trim[2], trim[1]);
     
     // Integration and simulation
     int i = 0;
@@ -73,18 +75,19 @@ int main(){
         fprintf(com, "%lf\t%lf\t%lf\t%lf\t%lf\t\n", Ts, command[i][0], command[i][1], command[i][2], command[i][3]);
         fflush(com);
 
-        progressBar(Ts, deltaT_fs);
+        progressBar(Ts, deltaT_fs, "Volo in corso!");
         ++i;
     }
     printf("\n");
+    printf("Massa finale %g", body_axes[0]);
 
     // Free dynamic memory
     freeData();
 
     // DA ELIMINARE NEL CODICE FINALE
-    system("copy /Y \"C:\\Users\\vitop\\OneDrive - Politecnico di Torino\\Computer\\Universita\\PoliTo\\2 anno\\Mod-Sim\\Simulazione\\Progetti\\Simulatore\\FILE_PROGETTO\\GIT\\DATI_AGGIUNTIVI.txt\" \"C:\\Users\\vitop\\Downloads\\CODICE_GRUPPO\\CODICE_GRUPPO\\DATI_AGGIUNTIVI.txt\"");
-    system("copy /Y \"C:\\Users\\vitop\\OneDrive - Politecnico di Torino\\Computer\\Universita\\PoliTo\\2 anno\\Mod-Sim\\Simulazione\\Progetti\\Simulatore\\FILE_PROGETTO\\GIT\\DATI_ANALISI.txt\" \"C:\\Users\\vitop\\Downloads\\CODICE_GRUPPO\\CODICE_GRUPPO\\DATI_ANALISI.txt\"");
-    system("copy /Y \"C:\\Users\\vitop\\OneDrive - Politecnico di Torino\\Computer\\Universita\\PoliTo\\2 anno\\Mod-Sim\\Simulazione\\Progetti\\Simulatore\\FILE_PROGETTO\\GIT\\DATI_COMANDI.txt\" \"C:\\Users\\vitop\\Downloads\\CODICE_GRUPPO\\CODICE_GRUPPO\\DATI_COMANDI.txt\"");
+    system("copy /Y \"C:\\Users\\vitop\\OneDrive - Politecnico di Torino\\Computer\\Universita\\PoliTo\\2 anno\\Mod-Sim\\Simulazione\\Progetti\\Simulatore\\FILE_PROGETTO\\GIT\\SIMULAZIONE\\_output_files\\DATA.txt\" \"C:\\Users\\vitop\\Downloads\\CODICE_GRUPPO\\CODICE_GRUPPO\\DATA.txt\"");
+    system("copy /Y \"C:\\Users\\vitop\\OneDrive - Politecnico di Torino\\Computer\\Universita\\PoliTo\\2 anno\\Mod-Sim\\Simulazione\\Progetti\\Simulatore\\FILE_PROGETTO\\GIT\\SIMULAZIONE\\_output_files\\COMMAND.txt\" \"C:\\Users\\vitop\\Downloads\\CODICE_GRUPPO\\CODICE_GRUPPO\\COMMAND.txt\"");
+    system("copy /Y \"C:\\Users\\vitop\\OneDrive - Politecnico di Torino\\Computer\\Universita\\PoliTo\\2 anno\\Mod-Sim\\Simulazione\\Progetti\\Simulatore\\FILE_PROGETTO\\GIT\\SIMULAZIONE\\_output_files\\EXTRA.txt\" \"C:\\Users\\vitop\\Downloads\\CODICE_GRUPPO\\CODICE_GRUPPO\\EXTRA.txt\"");
 
     closeFiles();
     printf("SIMULAZIONE TERMINATA. GRAZIE PER AVER VOLATO CON NOI, \tA PRESTO!\n");

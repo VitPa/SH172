@@ -126,7 +126,7 @@ void eulerEquation(double dt, int i){
     state[11] = y_ned + dt*dy_ned;
 }
 
-void progressBar(double Ts, double deltaT_fs){
+void progressBar(double Ts, double deltaT_fs, const char* context){
     if(fmod(Ts, (deltaT_fs/40.0)) < 0.01){
         int progress = (int)(Ts / (deltaT_fs / 40.0));
         if (Ts > deltaT_fs) progress = 40;
@@ -138,6 +138,6 @@ void progressBar(double Ts, double deltaT_fs){
                 printf("-");
             }
         }
-        printf("] Simulating");
+        printf("] %s", context);
     }
 }

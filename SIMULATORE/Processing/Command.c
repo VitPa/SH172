@@ -9,15 +9,14 @@ static double manettat;
 static double et;
 static int n;
 
-double** load_command(double dt, double Tfs, double RPMtrim, double eTrim){
+void load_command(double dt, double Tfs, double RPMtrim, double eTrim){
     int choice;
     manettat = (RPMtrim - RPMmin) / (RPMmax - RPMmin);
     et = eTrim;
     n = ((int)(Tfs/dt))+1;
     
-    double **command = NULL;
     for(int i = 0; i<n; ++i){
-        command = reallocCommand(command, 4);
+        command = reallocCommand(4);
     }
 
     printf("(1) per le manovre standard già implementate, (2) per le manovre personalizzate: \n");
@@ -31,17 +30,15 @@ double** load_command(double dt, double Tfs, double RPMtrim, double eTrim){
     }while(1);
     switch (choice){
         case 1:
-            defaultManeuver(dt, Tfs, command);
+            defaultManeuver(dt, Tfs);
             break;
         case 2:
-            customManeuver(dt, Tfs, command);
+            customManeuver(dt, Tfs);
             break;
     }
-
-    return command;
 }
 
-void defaultManeuver(double dt, double Tfs, double **command){  //Manovre usate per i report
+void defaultManeuver(double dt, double Tfs){
     int maneuver;
     int nDefaultManeuver = 1;
     const char *maneuverName[] = {"Volo livellato"};
@@ -61,16 +58,15 @@ void defaultManeuver(double dt, double Tfs, double **command){  //Manovre usate 
 
     switch(maneuver){
         case 1:  // Volo livellato
-            zero(dt, Tfs, command, 0);
-            zero(dt, Tfs, command, 1);
-            zero(dt, Tfs, command, 2);
-            zero(dt, Tfs, command, 3);
-            liv_trim = 1;
+            zero(dt, Tfs, 0);
+            zero(dt, Tfs, 1);
+            zero(dt, Tfs, 2);
+            zero(dt, Tfs, 3);
             break;
     }
 }
 
-void customManeuver(double dt, double Tfs, double **command){
+void customManeuver(double dt, double Tfs){
     int maneuver;
     char *signal[4] = {"impulso", "impulso simmetrico", "gradino", "rampa"};
     char *name[4] = {"alettoni", "equilibratore", "timone", "manetta"};
@@ -142,7 +138,7 @@ void customManeuver(double dt, double Tfs, double **command){
 
             switch(maneuver){
                 case 0: // ZERO COMMAND
-                    zero(dt, Tfs, command, i);
+                    zero(dt, Tfs, i);
                     l = 1;
                     break;
                 case 1:  // IMPLUSE
@@ -156,7 +152,7 @@ void customManeuver(double dt, double Tfs, double **command){
                     else printf("Tempo inizio comando [0, %g]: ", Tfs-5*dt);
                     start_command = ask_double(0, Tfs-5*dt);
 
-                    impulse(apply_trim(A, i), start_command, dt, Tfs, command, i, l);
+                    impulse(apply_trim(A, i), start_command, dt, Tfs, i, l);
 
                     duration_command = 5*dt;
                     break;
@@ -172,7 +168,7 @@ void customManeuver(double dt, double Tfs, double **command){
                     else printf("Tempo inizio comando [0, %g]: ", Tfs-10*dt);
                     start_command = ask_double(0, Tfs-10*dt);
 
-                    symmetricImpulse(apply_trim(A, i), start_command, dt, Tfs, command, i, l);
+                    symmetricImpulse(apply_trim(A, i), start_command, dt, Tfs, i, l);
 
                     duration_command = 10*dt;
                     break;
@@ -198,7 +194,7 @@ void customManeuver(double dt, double Tfs, double **command){
                     else printf("Tempo inizio comando [0, %g]: ", Tfs-duration_command);
                     start_command = ask_double(0, Tfs-duration_command);
 
-                    step(apply_trim(A, i), start_command, duration_command, dt, Tfs, command, i, l);
+                    step(apply_trim(A, i), start_command, duration_command, dt, Tfs, i, l);
                     break;
                     
                 case 4: // RAMP
@@ -222,7 +218,7 @@ void customManeuver(double dt, double Tfs, double **command){
                     else printf("Tempo inizio comando [0, %g]: ", Tfs-duration_command);
                     start_command = ask_double(0, Tfs-duration_command);
 
-                    ramp(apply_trim(0.0, i), apply_trim(A, i), start_command, duration_command, dt, Tfs, command, i, l);
+                    ramp(apply_trim(0.0, i), apply_trim(A, i), start_command, duration_command, dt, Tfs, i, l);
                     break;
                 
                 default:
@@ -238,7 +234,7 @@ void customManeuver(double dt, double Tfs, double **command){
     }
 }
 
-void impulse(double A, double start_command, double dt, double Tfs, double **command, int column, int l){
+void impulse(double A, double start_command, double dt, double Tfs, int column, int l){
     int start = (int)(start_command / dt);
     int end = (int)(((start_command)/dt)+5);
     for(int i = 0; i<n; ++i){
@@ -250,7 +246,7 @@ void impulse(double A, double start_command, double dt, double Tfs, double **com
     }
 }
 
-void symmetricImpulse(double A, double start_command, double dt, double Tfs, double **command, int column, int l){
+void symmetricImpulse(double A, double start_command, double dt, double Tfs, int column, int l){
     int start = (int)(start_command / dt);
     int end1 = (int)(((start_command)/dt)+5);
     int end2 = (int)(((start_command)/dt)+10);
@@ -265,7 +261,7 @@ void symmetricImpulse(double A, double start_command, double dt, double Tfs, dou
     }
 }
 
-void step(double A, double start_command, double duration_command, double dt, double Tfs, double **command, int column, int l){
+void step(double A, double start_command, double duration_command, double dt, double Tfs, int column, int l){
     int start = (int)(start_command / dt);
     int end = (int)((start_command + duration_command) / dt);
     for(int i = 0; i<n; ++i){
@@ -277,7 +273,7 @@ void step(double A, double start_command, double duration_command, double dt, do
     }
 }
 
-void ramp(double A00, double A1, double start_command, double duration_command, double dt, double Tfs, double **command, int column, int l){
+void ramp(double A00, double A1, double start_command, double duration_command, double dt, double Tfs, int column, int l){
     int start = (int)(start_command / dt);
     int end = (int)((start_command + duration_command) / dt);
     int total_steps = end - start;
@@ -296,7 +292,7 @@ void ramp(double A00, double A1, double start_command, double duration_command, 
     }
 }
 
-void zero(double dt, double Tfs, double **command, int column){
+void zero(double dt, double Tfs, int column){
     for(int i = 0; i<n; ++i){
         command[i][column] = apply_trim(0.0, column);
     }

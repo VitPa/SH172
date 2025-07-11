@@ -90,8 +90,8 @@ double** loadMatrix(const char *path, int colonne, int checkSection, int *outRig
 }
 
 // Rialloca la matrice command aggiungendo una riga
-double** reallocCommand(double **command, int n_colonne) {
-    int new_rows = dimMat[12] + 1; // Usa un indice libero per command
+double** reallocCommand(int n_colonne) {
+    int new_rows = dimMat[12] + 1;
     
     double **tmp = realloc(command, new_rows * sizeof(double*));
     if (!tmp) MY_ERROR(901, "command");
@@ -100,6 +100,7 @@ double** reallocCommand(double **command, int n_colonne) {
     if (!tmp[new_rows - 1]) MY_ERROR(900, "command");
     
     dimMat[12] = new_rows;
+
     return tmp;
 }
 
