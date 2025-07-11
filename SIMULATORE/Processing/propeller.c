@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "EstrazioneDati.h"
-#include "Variables.h"
+#include "Propeller.h"
+#include "../Pre_processing/Variables.h"
+#include "../Pre_processing/EstrazioneDati.h"
 
 #define pi 3.14159265
 

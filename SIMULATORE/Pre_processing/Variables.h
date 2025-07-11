@@ -2,7 +2,6 @@
 #define VARIABLES_H
 
 #include <stdio.h>
-#include "EstrazioneDati.h"
 
 #define g 9.80665
 #define pi 3.14159265

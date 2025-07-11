@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "ErrorWarning.h"
+#include "Interpolation.h"
+#include "../Error_Warning/ErrorWarning.h"
 
-double interpolazioneTotale(double** mat_1, int colonna, double alpha){
+double interpolation(double** mat_1, int colonna, double alpha){
 
     //if (alpha < mat_1[125][0]+1e-6 && alpha > mat_1[125][0]) alpha = 20.0;
     if (alpha < mat_1[0][0]-1e-6) ERROR(600, alpha);

@@ -3,15 +3,15 @@
 #include <string.h>
 #include <math.h>
 #include <ctype.h>
-#include "Atmosphere.h"
-#include "EstrazioneDati.h"
-#include "Interpolazione.h"
-#include "MotionEq.h"
-#include "Integration.h"
-#include "InitialCondition.h"
-#include "Command.h"
-#include "ErrorWarning.h"
-#include "Variables.h"
+#include "../Atmosphere/Atmosphere.h"
+#include "../Error_Warning/ErrorWarning.h"
+#include "../Error_Warning/InitialCondition.h"
+#include "../Interpolation/Interpolation.h"
+#include "../Pre_processing/EstrazioneDati.h"
+#include "../Pre_processing/Variables.h"
+#include "../Processing/Command.h"
+#include "../Processing/Integration.h"
+#include "../Trim/MotionEq.h"
 
 int main(){    
     double trim[3];

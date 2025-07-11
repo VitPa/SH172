@@ -1,10 +1,11 @@
-#include "Variables.h"
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "propeller.h"
-#include "Interpolazione.h"
-#include "MotionEq.h"
+#include "rk4.h"
+#include "../Interpolation/Interpolation.h"
+#include "../Pre_processing/Variables.h"
+#include "../Processing/propeller.h"
+#include "../Trim/MotionEq.h"
 
 
 // Esempio di funzione per calcolare le derivate dello stato
@@ -25,22 +26,10 @@ void compute_derivatives(const double *state, double *dstatedt, double t, int i)
     double y_ned = state[11];
 
     // Comandi
-
-    double da, de, dr, manetta;
-    if(liv_trim == 2){
-        double trim[3] = {0.0, 0.0, 0.0};
-        double Ci[] = {sqrt(u*u + v*v + w*w), h};
-        equation(Ci, trim);
-        da    = 0.0;
-        de    = trim[1] *(pi/180);
-        dr    = 0.0;
-        manetta = trim[2];
-    }else{
-        da    = command[i][0] *(pi/180);
-        de    = command[i][1] *(pi/180);
-        dr    = command[i][2] *(pi/180);
-        manetta = engine[2] + (engine[3] - engine[2]) * (command[i][3]) / (100);
-    }
+    double da    = command[i][0] *(pi/180);
+    double de    = command[i][1] *(pi/180);
+    double dr    = command[i][2] *(pi/180);
+    double manetta = engine[2] + (engine[3] - engine[2]) * (command[i][3]) / (100);
 
     // Calcolo spinta
     double prop[3] =  {0.0, 0.0, 0.0}, Pal = 0.0;
@@ -61,32 +50,32 @@ void compute_derivatives(const double *state, double *dstatedt, double t, int i)
     double alpha_int = alpha*(180/pi);
 
     // Calcolo coefficienti aerodinamici
-    double Cxss = interpolazioneTotale(steady_state_coeff, 1, alpha_int);
-    double Cxa = interpolazioneTotale(aer_der_x, 1, alpha_int);
-    double Cxde = interpolazioneTotale(control_force_der, 1, alpha_int);
-    double Cyb = interpolazioneTotale(aer_der_y, 1, alpha_int);
-    double Cyp = interpolazioneTotale(aer_der_y, 3, alpha_int);
-    double Cyr = interpolazioneTotale(aer_der_y, 4, alpha_int);
-    double Cydr = interpolazioneTotale(control_force_der, 6, alpha_int);
-    double Czss = interpolazioneTotale(steady_state_coeff, 3, alpha_int);
-    double Cza = interpolazioneTotale(aer_der_z, 1, alpha_int);
-    double Czq = interpolazioneTotale(aer_der_z, 4, alpha_int);
-    double Czde = interpolazioneTotale(control_force_der, 3, alpha_int);
-    double Clb = interpolazioneTotale(rolling_moment_der, 1, alpha_int);
-    double Clp = interpolazioneTotale(rolling_moment_der, 3, alpha_int);
-    double Clr = interpolazioneTotale(rolling_moment_der, 4, alpha_int);
-    double Clda = interpolazioneTotale(control_moment_der, 1, alpha_int);
-    double Cldr = interpolazioneTotale(control_moment_der, 2, alpha_int); 
-    double Cmss = interpolazioneTotale(steady_state_coeff, 5, alpha_int);
-    double Cma = interpolazioneTotale(pitch_moment_der, 1, alpha_int);
-    double Cmq = interpolazioneTotale(pitch_moment_der, 4, alpha_int);
-    double Cmde = interpolazioneTotale(control_moment_der, 3, alpha_int);
-    double Cnss = interpolazioneTotale(steady_state_coeff, 6, alpha_int);
-    double Cnb = interpolazioneTotale(yawing_moment_der, 1, alpha_int);
-    double Cnp = interpolazioneTotale(yawing_moment_der, 3, alpha_int);
-    double Cnr = interpolazioneTotale(yawing_moment_der, 4, alpha_int);
-    double Cnda = interpolazioneTotale(control_moment_der, 5, alpha_int);
-    double Cndr = interpolazioneTotale(control_moment_der, 6, alpha_int);
+    double Cxss = interpolation(steady_state_coeff, 1, alpha_int);
+    double Cxa = interpolation(aer_der_x, 1, alpha_int);
+    double Cxde = interpolation(control_force_der, 1, alpha_int);
+    double Cyb = interpolation(aer_der_y, 1, alpha_int);
+    double Cyp = interpolation(aer_der_y, 3, alpha_int);
+    double Cyr = interpolation(aer_der_y, 4, alpha_int);
+    double Cydr = interpolation(control_force_der, 6, alpha_int);
+    double Czss = interpolation(steady_state_coeff, 3, alpha_int);
+    double Cza = interpolation(aer_der_z, 1, alpha_int);
+    double Czq = interpolation(aer_der_z, 4, alpha_int);
+    double Czde = interpolation(control_force_der, 3, alpha_int);
+    double Clb = interpolation(rolling_moment_der, 1, alpha_int);
+    double Clp = interpolation(rolling_moment_der, 3, alpha_int);
+    double Clr = interpolation(rolling_moment_der, 4, alpha_int);
+    double Clda = interpolation(control_moment_der, 1, alpha_int);
+    double Cldr = interpolation(control_moment_der, 2, alpha_int); 
+    double Cmss = interpolation(steady_state_coeff, 5, alpha_int);
+    double Cma = interpolation(pitch_moment_der, 1, alpha_int);
+    double Cmq = interpolation(pitch_moment_der, 4, alpha_int);
+    double Cmde = interpolation(control_moment_der, 3, alpha_int);
+    double Cnss = interpolation(steady_state_coeff, 6, alpha_int);
+    double Cnb = interpolation(yawing_moment_der, 1, alpha_int);
+    double Cnp = interpolation(yawing_moment_der, 3, alpha_int);
+    double Cnr = interpolation(yawing_moment_der, 4, alpha_int);
+    double Cnda = interpolation(control_moment_der, 5, alpha_int);
+    double Cndr = interpolation(control_moment_der, 6, alpha_int);
 
     //Calcolo i momenti di Inerzia sui vari assi e la massa
     double Jx = body_axes[13], Jy = body_axes[14], Jz = body_axes[15], m = body_axes[0];

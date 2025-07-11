@@ -1,5 +1,5 @@
-#include "rk4.h"
 #include <stdlib.h>
+#include "rk4.h"
 
 void rk4_step(double *state, int N, double dt, double t, int i, void (*derivs)(const double *, double *, double, int)) {
     double *k1 = (double*)malloc(N * sizeof(double));

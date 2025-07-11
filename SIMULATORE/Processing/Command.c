@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "command.h"
-#include "EstrazioneDati.h"
-#include "ErrorWarning.h"
-#include "Variables.h"
+#include "Command.h"
+#include "../Error_Warning/ErrorWarning.h"
+#include "../Pre_processing/Variables.h"
+#include "../Pre_processing/EstrazioneDati.h"
 
 static double manettat;
 static double et;

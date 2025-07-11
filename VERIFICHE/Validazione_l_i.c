@@ -125,7 +125,7 @@ void main() {
         break;
     }while(1);
 
-    double InterpVet = interpolazioneTotale(matrici[sceltaMat], sceltaCol, alpha);
+    double InterpVet = interpolation(matrici[sceltaMat], sceltaCol, alpha);
 
     while(matrici[sceltaMat][++k][0] < alpha){};
     double x0 = matrici[sceltaMat][k-1][0];

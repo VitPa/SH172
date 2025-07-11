@@ -3,8 +3,9 @@
 #include <string.h>
 #include <math.h>
 #include <ctype.h>
-#include "ErrorWarning.h"
-#include "Variables.h"
+#include "Atmosphere.h"
+#include "../Error_Warning/ErrorWarning.h"
+#include "../Pre_processing/Variables.h"
 
 static double press0 = 101325;    // Pa
 static double temp0 = 15;         // C

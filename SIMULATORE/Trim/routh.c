@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include <complex.h>
 #include <math.h>
-#include "ErrorWarning.h"
-#include "Variables.h"
+#include "routh.h"
+#include "../Error_Warning/ErrorWarning.h"
+#include "../Pre_processing/Variables.h"
 
 #define pi 3.14159265
 

@@ -2,18 +2,17 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-#include "ErrorWarning.h"
-#include "Interpolazione.h"
-#include "propeller.h"
+#include "MotionEq.h"
 #include "routh.h"
-#include "Variables.h"
+#include "../Error_Warning/ErrorWarning.h"
+#include "../Interpolation/Interpolation.h"
+#include "../Pre_processing/Variables.h"
+#include "../Processing/propeller.h"
 
 #define g 9.80665
 #define pi 3.14159265
 
 void equation(double *CI, double *trim) {
-    
-    static int stampa = 1;
 
     // ****** TROVARE ALPHA DI TRIM *******
 
@@ -24,11 +23,11 @@ void equation(double *CI, double *trim) {
     double res1 = 1, res2 = 0.0001;
     
     for (double alpha_1 = -5.0; alpha_1 <= 20.0; alpha_1 += 0.001) {
-        double CZss = interpolazioneTotale(steady_state_coeff, 3, alpha_1);
-        double CMss = interpolazioneTotale(steady_state_coeff, 5, alpha_1);
-        double CMalpha = interpolazioneTotale(pitch_moment_der, 1, alpha_1);
-        double CMde = interpolazioneTotale(control_moment_der, 3, alpha_1);
-        double CZalpha = interpolazioneTotale(aer_der_z, 1, alpha_1);
+        double CZss = interpolation(steady_state_coeff, 3, alpha_1);
+        double CMss = interpolation(steady_state_coeff, 5, alpha_1);
+        double CMalpha = interpolation(pitch_moment_der, 1, alpha_1);
+        double CMde = interpolation(control_moment_der, 3, alpha_1);
+        double CZalpha = interpolation(aer_der_z, 1, alpha_1);
         double CZde = control_force_der[0][3];
         
         for (double de_1 = -20.0; de_1 <= 20.0; de_1 += 0.001){
@@ -51,32 +50,28 @@ void equation(double *CI, double *trim) {
         }
     }
     if (flag_1 != 0) {
-        if(stampa){
-            printf("\n*********************Alpha di Trim trovato**************************************\n\n");
-            printf("---------- ALPHA: %lf\t\t DE_TRIM: %lf\n\n", trim[0], trim[1]);
-        }
+        printf("\n*********************Alpha di Trim trovato**************************************\n\n");
+        printf("---------- ALPHA: %lf\t\t DE_TRIM: %lf\n\n", trim[0], trim[1]);
     } else ERROR(400);
 
     double thetaTrim = (trim[0] + CI[2])*(pi/180);  
 
-    if(stampa){
-        // Componente velocità TAS di Trim
-        double uTrim = CI[0] * cos(trim[0]*(pi/180));
-        double wTrim = CI[0] * sin(trim[0]*(pi/180));
-        double hTrim = CI[1];
-        
-        state = calloc(12, sizeof(double));
-        if (state == NULL) ERROR(901, "state");
-        state[0] = uTrim;
-        state[2] = wTrim;
-        state[7] = thetaTrim;
-        state[9] = hTrim;
-    }
+    // Componente velocità TAS di Trim
+    double uTrim = CI[0] * cos(trim[0]*(pi/180));
+    double wTrim = CI[0] * sin(trim[0]*(pi/180));
+    double hTrim = CI[1];
+    
+    state = calloc(12, sizeof(double));
+    if (state == NULL) ERROR(901, "state");
+    state[0] = uTrim;
+    state[2] = wTrim;
+    state[7] = thetaTrim;
+    state[9] = hTrim;
     
 
-    double CXss = interpolazioneTotale(steady_state_coeff, 1, trim[0]);
-    double CXalpha = interpolazioneTotale(aer_der_x, 1, trim[0]);
-    double CXde = interpolazioneTotale(control_force_der, 1, trim[0]);
+    double CXss = interpolation(steady_state_coeff, 1, trim[0]);
+    double CXalpha = interpolation(aer_der_x, 1, trim[0]);
+    double CXde = interpolation(control_force_der, 1, trim[0]);
 
     // ******* TROVARE RPM di Trim *******
     double CX_tot = CXss + CXalpha * trim[0] * (pi/180) + CXde * trim[1] * (pi/180);
@@ -90,12 +85,10 @@ void equation(double *CI, double *trim) {
         propel(RPM, CI[0], prop, &Pal);
 
         if (tTrim - prop[0] < 0.0){            
-            if(stampa){
-                memcpy(prop, prop_hold, sizeof(double)*3);
-                printf("\n*********************RPM di Trim trovato**************************************\n\n");
-                printf("---------- RPM: %d\n\n", RPM-1);
-                printf("Efficienza elica: %lf\n\n", prop[2]);
-            }
+            memcpy(prop, prop_hold, sizeof(double)*3);
+            printf("\n*********************RPM di Trim trovato**************************************\n\n");
+            printf("---------- RPM: %d\n\n", RPM-1);
+            printf("Efficienza elica: %lf\n\n", prop[2]);
             trim[2] = RPM-1;
             break;
         }
@@ -105,8 +98,5 @@ void equation(double *CI, double *trim) {
     if(RPM > RPMmax) ERROR(401);
 
     // Calcolo la stabilità dell'aeromobile
-    if(stampa){
-        int a = routh(pitch_moment_der[0][4], trim[0], CI[0], CXalpha, CZtrim, CMtrim, pitch_moment_der[0][2]);
-        stampa = 0;
-    }
+    int a = routh(pitch_moment_der[0][4], trim[0], CI[0], CXalpha, CZtrim, CMtrim, pitch_moment_der[0][2]);
 }

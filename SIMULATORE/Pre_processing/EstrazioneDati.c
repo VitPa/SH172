@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "ErrorWarning.h"
 #include "EstrazioneDati.h"
-#include "Variables.h"
+#include "../Error_Warning/ErrorWarning.h"
+#include "../Pre_processing/Variables.h"
 
 static int dimVett[6];
 int dimMat[13];
