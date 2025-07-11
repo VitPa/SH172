@@ -1,15 +1,13 @@
 ## Da fare dopo
-- Tradurre o tutto in Inglese o tutto in Italiano
 - Abbellire l'interfaccia
 - Inserire i commenti per chi legge il codice
 - Eliminare alla fine il codice per copiare i file nelle cartelle
-- Inserire tutti i condizionali ngli header (#ifndef)
 
 ## Da fare ora
-- Abbellire il codice, eliminare le parti iniutili
 - Controllare le stampe di tutte le funzioni ed inserire quando serve system("cls")
 - Inserire l'apertura dei file nel file in una funzione dedicata (magari in InitialCondition) e poi dichiara i puntatori in maniera globale in Variables.h
 - Capire se togliere la condizione di velocità massima durante il volo
+- Verificare di nuovo le validazioni
 
 ## Domande
 

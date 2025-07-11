@@ -1,18 +1,25 @@
-#ifndef VARIABLES_H
-#define VARIABLES_H
-
 #include <stdio.h>
 
 #define g 9.80665
 #define pi 3.14159265
 
 // Percorsi file I/O
-//char *path_dba = "input_files/DBA.txt";
+extern char *path_dba;
+extern char *path_engine;
+extern char *path_propeller;
+
+extern char *path_v_l_i;
+extern char *path_v_p;
+
+extern char *path_data;
+extern char *path_com;
+extern char *path_agg;
+extern char *path_log;
 
 // Puntatori ai file
 extern FILE *ew_log;
-extern FILE *fp;
-extern FILE *cm;
+extern FILE *data;
+extern FILE *com;
 extern FILE *agg;
 
 
@@ -38,5 +45,3 @@ extern double **command;
 
 // variabili atmosferiche
 extern double Pmax_h, press_h, temp_h, rho_h, vsuono_h;
-
-#endif

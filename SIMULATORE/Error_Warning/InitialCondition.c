@@ -3,6 +3,7 @@
 #include <math.h>
 #include "ErrorWarning.h"
 #include "../Pre_processing/Variables.h"
+#include "../Pre_processing/Data.h"
 
 static double mFuelMin = -1.0;
 
@@ -52,7 +53,7 @@ void physicalCheck(double V, double h, double m, double Mdg, double vsuono_h) {
 
     for (int i = 0; i < N_COND; ++i) {
         if (triggered[i]) {
-            if (++counters[i] > threshold) ERROR(error_codes[i]);
+            if (++counters[i] > threshold) MY_ERROR(error_codes[i]);
         } else if (counters[i] > 0) {
             --counters[i];
         }
@@ -99,14 +100,14 @@ void loadCI(double *CI) {
 }
 
 void openFiles(){
-    ew_log = apriFile("log.txt", "w");
-    fp = apriFile("DATI_ANALISI.txt", "w");
-    cm = apriFile("DATI_COMANDI.txt", "w");
-    agg = apriFile("DATI_AGGIUNTIVI.txt", "w");
+    ew_log = openFile(path_log, "w");
+    data = openFile(path_data, "w");
+    com = openFile(path_com, "w");
+    agg = openFile(path_agg, "w");
 }
 void closeFiles(){
     fclose(ew_log);
-    fclose(fp);
-    fclose(cm);
+    fclose(data);
+    fclose(com);
     fclose(agg);
 }

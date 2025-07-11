@@ -1,22 +1,23 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "EstrazioneDati.h"
+#include "Data.h"
 #include "../Error_Warning/ErrorWarning.h"
 #include "../Pre_processing/Variables.h"
 
 static int dimVett[6];
 int dimMat[13];
+static FILE *val1;
 
-FILE* apriFile(const char *path, const char *mode) {
+FILE* openFile(const char *path, const char *mode) {
     FILE* f = fopen(path, mode);
-    if (!f) ERROR(100, path); //fprintf(stderr, "Errore apertura file: %s\n", path);
+    if (!f) MY_ERROR(100, path);
     return f;
 }
 
-double* caricaVettoreDouble(const char *path, int checkSection, int *outSize) {
+double* loadVector(const char *path, int checkSection, int *outSize) {
     char *name_p[] = {"geometry_propeller", "propeller_profile"};
     char *name_d[] = {"body_axes", "deflection_limits", "fuel_mass"};
-    FILE* f = apriFile(path, "r");
+    FILE* f = openFile(path, "r");
     double* arr = NULL;
     int n = 0, section = 0, flag = 1;
     double val;
@@ -29,8 +30,8 @@ double* caricaVettoreDouble(const char *path, int checkSection, int *outSize) {
         if (sscanf(riga, "%lf", &val) == 1) {
             if (section == checkSection){
                 arr = realloc(arr, (n+1)*sizeof(double));
-                if(!arr) ERROR(901, path!="input_files/engine.txt"?
-                    path!="input_files/propeller.txt"?name_d[checkSection-1]:name_p[checkSection-1]:"engine");
+                if(!arr) MY_ERROR(901, path!=path_engine?
+                    path!=path_propeller?name_d[checkSection-1]:name_p[checkSection-1]:"engine");
                 arr[n++] = val;
             }
             flag = 1;
@@ -38,15 +39,15 @@ double* caricaVettoreDouble(const char *path, int checkSection, int *outSize) {
     }
     fclose(f);
     if (outSize) *outSize = n;
-    if(!arr) ERROR(101, path!="input_files/engine.txt"?
-                    path!="input_files/propeller.txt"?name_d[checkSection-1]:name_p[checkSection-1]:"engine");
+    if(!arr) MY_ERROR(101, path!=path_engine?
+                    path!=path_propeller?name_d[checkSection-1]:name_p[checkSection-1]:"engine");
     return arr;
 }
 
-double** caricaMatriceDouble(const char *path, int colonne, int checkSection, int *outRighe) {
+double** loadMatrix(const char *path, int colonne, int checkSection, int *outRighe) {
     char *name[] = {"steady_state_coeff", "aer_der_x", "aer_der_y", "aer_der_z", 
         "rolling_moment_der", "pitch_moment_der", "yawing_moment_der", "control_force_der", "control_moment_der", "rotary_der"};
-    FILE* f = apriFile(path, "r");
+    FILE* f = openFile(path, "r");
     double **mat = NULL, t;
     int n = 0, section = 0, flag = 1;
     char riga[512];
@@ -73,7 +74,7 @@ double** caricaMatriceDouble(const char *path, int colonne, int checkSection, in
                 }
                 if (letti == colonne) {
                     mat = realloc(mat, (n+1)*sizeof(double*));
-                    if(!mat) ERROR(901, path!="input_files/propeller.txt"?name[checkSection-4]:"data_propeller");
+                    if(!mat) MY_ERROR(901, path!=path_propeller?name[checkSection-4]:"data_propeller");
                     mat[n++] = temp;
                 } else {
                     free(temp);
@@ -84,7 +85,7 @@ double** caricaMatriceDouble(const char *path, int colonne, int checkSection, in
     }
     fclose(f);
     if (outRighe) *outRighe = n;
-    if(!mat) ERROR(102, path!="input_files/propeller.txt"?name[checkSection-4]:"data_propeller");
+    if(!mat) MY_ERROR(102, path!=path_propeller?name[checkSection-4]:"data_propeller");
     return mat;
 }
 
@@ -93,26 +94,23 @@ double** reallocCommand(double **command, int n_colonne) {
     int new_rows = dimMat[12] + 1; // Usa un indice libero per command
     
     double **tmp = realloc(command, new_rows * sizeof(double*));
-    if (!tmp) ERROR(901, "command");
+    if (!tmp) MY_ERROR(901, "command");
     
     tmp[new_rows - 1] = calloc(n_colonne, sizeof(double));
-    if (!tmp[new_rows - 1]) ERROR(900, "command");
+    if (!tmp[new_rows - 1]) MY_ERROR(900, "command");
     
     dimMat[12] = new_rows;
     return tmp;
 }
 
-void stampaVettoreFile(const char* nome, double* v, int n) {
-    FILE *val1 = apriFile("Validazione_output/VALIDAZIONE_LETTURA_INTERPOLAZIONE.txt", "a");
+void printVector(const char* nome, double* v, int n) {
     fprintf(val1, "\n\n--- %s (vettore, %d elementi) ---\n", nome, n);
     for (int i = 0; i < n; ++i) {
         fprintf(val1, "%.2lf\t", v[i]);
     }
-    fclose(val1);
 }
 
-void stampaMatriceFile(const char* nome, double** m, int righe, int colonne) {
-    FILE *val1 = apriFile("Validazione_output/VALIDAZIONE_LETTURA_INTERPOLAZIONE.txt", "a");
+void printMatrix(const char* nome, double** m, int righe, int colonne) {
     fprintf(val1, "\n\n--- %s (matrice, %d x %d) ---\n", nome, righe, colonne);
     for (int i = 0; i < righe; ++i) {
         for (int j = 0; j < colonne; ++j) {
@@ -120,51 +118,46 @@ void stampaMatriceFile(const char* nome, double** m, int righe, int colonne) {
         }
         fprintf(val1, "\n");
     }
-    fclose(val1);
 }
 
 // Funzione wrapper per caricare tutti i dati richiesti dal simulatore
-void caricaTuttiIDati() {
+void loadData() {
     dimMat[11]=1;
     dimMat[12]=0;
     
     // VETTORI
-    engine = caricaVettoreDouble("input_files/engine.txt", 1, &dimVett[0]); 
-    geometry_propeller = caricaVettoreDouble("input_files/propeller.txt", 1, &dimVett[1]);
-    propeller_profile = caricaVettoreDouble("input_files/propeller.txt", 2, &dimVett[2]); 
-    body_axes = caricaVettoreDouble("input_files/dba.txt", 1, &dimVett[3]); 
-    deflection_limits = caricaVettoreDouble("input_files/dba.txt", 2, &dimVett[4]); 
-    fuel_mass = caricaVettoreDouble("input_files/dba.txt", 3, &dimVett[5]); 
+    engine = loadVector(path_engine, 1, &dimVett[0]); 
+    geometry_propeller = loadVector(path_propeller, 1, &dimVett[1]);
+    propeller_profile = loadVector(path_propeller, 2, &dimVett[2]); 
+    body_axes = loadVector(path_dba, 1, &dimVett[3]); 
+    deflection_limits = loadVector(path_dba, 2, &dimVett[4]); 
+    fuel_mass = loadVector(path_dba, 3, &dimVett[5]); 
     
     // MATRICI
-    data_propeller = caricaMatriceDouble("input_files/propeller.txt", 4, 3, &dimMat[0]);
-    steady_state_coeff = caricaMatriceDouble("input_files/dba.txt", 7, 4, &dimMat[1]);
-    aer_der_x = caricaMatriceDouble("input_files/dba.txt", 8, 5, &dimMat[2]);
-    aer_der_y = caricaMatriceDouble("input_files/dba.txt", 7, 6, &dimMat[3]);
-    aer_der_z = caricaMatriceDouble("input_files/dba.txt", 8, 7, &dimMat[4]);
-    rolling_moment_der = caricaMatriceDouble("input_files/dba.txt", 7, 8, &dimMat[5]);
-    pitch_moment_der = caricaMatriceDouble("input_files/dba.txt", 8, 9, &dimMat[6]);
-    yawing_moment_der = caricaMatriceDouble("input_files/dba.txt", 7, 10, &dimMat[7]);
-    control_force_der = caricaMatriceDouble("input_files/dba.txt", 7, 11, &dimMat[8]);
-    control_moment_der = caricaMatriceDouble("input_files/dba.txt", 7, 12, &dimMat[9]);
-    rotary_der = caricaMatriceDouble("input_files/dba.txt", 7, 13, &dimMat[10]);
+    data_propeller = loadMatrix(path_propeller, 4, 3, &dimMat[0]);
+    steady_state_coeff = loadMatrix(path_dba, 7, 4, &dimMat[1]);
+    aer_der_x = loadMatrix(path_dba, 8, 5, &dimMat[2]);
+    aer_der_y = loadMatrix(path_dba, 7, 6, &dimMat[3]);
+    aer_der_z = loadMatrix(path_dba, 8, 7, &dimMat[4]);
+    rolling_moment_der = loadMatrix(path_dba, 7, 8, &dimMat[5]);
+    pitch_moment_der = loadMatrix(path_dba, 8, 9, &dimMat[6]);
+    yawing_moment_der = loadMatrix(path_dba, 7, 10, &dimMat[7]);
+    control_force_der = loadMatrix(path_dba, 7, 11, &dimMat[8]);
+    control_moment_der = loadMatrix(path_dba, 7, 12, &dimMat[9]);
+    rotary_der = loadMatrix(path_dba, 7, 13, &dimMat[10]);
 
     RPMmin = (int)engine[2];
     RPMmax = (int)engine[3];
 }
 
-void stampaTuttiIDati() {
+void printData() {
     const char *name_vec[] = {"engine", "geometry_propeller", "propeller_profile", "body_axes", "deflection_limits", "fuel_mass"};
     double *vec[] = {engine, geometry_propeller,propeller_profile, body_axes, deflection_limits, fuel_mass};
 
-    FILE *val1 = fopen("Validazione_output/VALIDAZIONE_LETTURA_INTERPOLAZIONE.txt", "w");
-    fclose(val1);
-
-    val1 = fopen("Validazione_output/VALIDAZIONE_LETTURA_INTERPOLAZIONE.txt", "a");
+    FILE *val1 = fopen(path_v_l_i, "w");
     fprintf(val1, "\n\n**********   STAMPA VETTORI   **********");
-    fclose(val1);
     for(int i=0; i<sizeof(vec)/sizeof(vec[0]); ++i){
-        stampaVettoreFile(name_vec[i], vec[i], dimVett[i]);
+        printVector(name_vec[i], vec[i], dimVett[i]);
     }
 
     const char *name_mat[] = {"data_propeller", "steady_state_coeff", "aer_der_x", "aer_der_y", "aer_der_z", 
@@ -172,16 +165,16 @@ void stampaTuttiIDati() {
     double **mat[] = {data_propeller, steady_state_coeff, aer_der_x, aer_der_y, aer_der_z, 
         rolling_moment_der, pitch_moment_der, yawing_moment_der, control_force_der, control_moment_der, rotary_der};
 
-    val1 = fopen("Validazione_output/VALIDAZIONE_LETTURA_INTERPOLAZIONE.txt", "a");
     fprintf(val1, "\n\n\n**********   STAMPA MATRICI   **********");
-    fclose(val1);
     for(int i=0; i<sizeof(mat)/sizeof(mat[0]); ++i){
-        stampaMatriceFile(name_mat[i], mat[i], dimMat[i], (i==0) ? 4 : (i==2 || i==4 || i==6) ? 8 : 7);
+        printMatrix(name_mat[i], mat[i], dimMat[i], (i==0) ? 4 : (i==2 || i==4 || i==6) ? 8 : 7);
     }
+    fflush(val1);
+    fclose(val1);
 }
 
 // Funzione per liberare la memoria di tutti i dati caricati
-void liberaTuttiIDati() {
+void freeData() {
     free(engine); free(geometry_propeller); free(propeller_profile); free(body_axes); free(deflection_limits); free(fuel_mass); free(state);
     double** matrici[] = {
         data_propeller, steady_state_coeff, aer_der_x, aer_der_y, aer_der_z,

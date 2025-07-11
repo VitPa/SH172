@@ -3,7 +3,7 @@
 #include "Command.h"
 #include "../Error_Warning/ErrorWarning.h"
 #include "../Pre_processing/Variables.h"
-#include "../Pre_processing/EstrazioneDati.h"
+#include "../Pre_processing/Data.h"
 
 static double manettat;
 static double et;
@@ -226,7 +226,7 @@ void customManeuver(double dt, double Tfs, double **command){
                     break;
                 
                 default:
-                    ERROR(500);
+                    MY_ERROR(500);
             }
 
             if(++l<=1){

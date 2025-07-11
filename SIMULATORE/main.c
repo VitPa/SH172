@@ -3,15 +3,15 @@
 #include <string.h>
 #include <math.h>
 #include <ctype.h>
-#include "../Atmosphere/Atmosphere.h"
-#include "../Error_Warning/ErrorWarning.h"
-#include "../Error_Warning/InitialCondition.h"
-#include "../Interpolation/Interpolation.h"
-#include "../Pre_processing/EstrazioneDati.h"
-#include "../Pre_processing/Variables.h"
-#include "../Processing/Command.h"
-#include "../Processing/Integration.h"
-#include "../Trim/MotionEq.h"
+#include "Atmosphere/Atmosphere.h"
+#include "Error_Warning/ErrorWarning.h"
+#include "Error_Warning/InitialCondition.h"
+#include "Interpolation/Interpolation.h"
+#include "Pre_processing/Data.h"
+#include "Pre_processing/Variables.h"
+#include "Processing/Command.h"
+#include "Processing/Integration.h"
+#include "Trim/MotionEq.h"
 
 int main(){    
     double trim[3];
@@ -24,7 +24,7 @@ int main(){
     printf("--------------------------------------------\n\n");
 
     // Load variables from file .txt
-    caricaTuttiIDati();
+    loadData();
 
     // Load initial conditions
     double CI[3];
@@ -37,10 +37,17 @@ int main(){
     AtmosphereCalc(CI[1]);
 
     // Trim condition and Routh stability
-    equation(CI, trim);
+    trimEquation(CI, trim);
 
     // Load commands matrix
-    double dt = 0.01, deltaT_fs;
+    double dt, deltaT_fs;
+    printf("Inserire il passo di simulazione:\n(1) -> 0.01s\n(2) -> 0.02s\nScegliere tra [1 e 2]: ");
+    do{
+        scanf("%lf", &deltaT_fs);
+        if(deltaT_fs <= 0){
+            WARNING(500, 0, 1.0);
+        }
+    }while(deltaT_fs <= 0);
     printf("Inserire il tempo di simulazione [s]: ");
     do{
         scanf("%lf", &deltaT_fs);
@@ -61,10 +68,10 @@ int main(){
 
         physicalCheck(sqrt(pow(state[0], 2) + pow(state[1], 2) + pow(state[2], 2)), state[9], body_axes[0],body_axes[4], vsuono_h);
 
-        fprintf(fp, "%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t\n",Ts,state[0],state[1],state[2],state[3]*(180/pi),state[4]*(180/pi),state[5]*(180/pi),state[6]*(180/pi),state[7]*(180/pi),state[8]*(180/pi),state[9],state[10],state[11]);
-        fflush(fp);
-        fprintf(cm, "%lf\t%lf\t%lf\t%lf\t%lf\t\n", Ts, command[i][0], command[i][1], command[i][2], command[i][3]);
-        fflush(cm);
+        fprintf(data, "%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t\n",Ts,state[0],state[1],state[2],state[3]*(180/pi),state[4]*(180/pi),state[5]*(180/pi),state[6]*(180/pi),state[7]*(180/pi),state[8]*(180/pi),state[9],state[10],state[11]);
+        fflush(data);
+        fprintf(com, "%lf\t%lf\t%lf\t%lf\t%lf\t\n", Ts, command[i][0], command[i][1], command[i][2], command[i][3]);
+        fflush(com);
 
         progressBar(Ts, deltaT_fs);
         ++i;
@@ -72,7 +79,7 @@ int main(){
     printf("\n");
 
     // Free dynamic memory
-    liberaTuttiIDati();
+    freeData();
 
     // DA ELIMINARE NEL CODICE FINALE
     system("copy /Y \"C:\\Users\\vitop\\OneDrive - Politecnico di Torino\\Computer\\Universita\\PoliTo\\2 anno\\Mod-Sim\\Simulazione\\Progetti\\Simulatore\\FILE_PROGETTO\\GIT\\DATI_AGGIUNTIVI.txt\" \"C:\\Users\\vitop\\Downloads\\CODICE_GRUPPO\\CODICE_GRUPPO\\DATI_AGGIUNTIVI.txt\"");

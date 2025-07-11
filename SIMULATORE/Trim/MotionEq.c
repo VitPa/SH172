@@ -12,7 +12,7 @@
 #define g 9.80665
 #define pi 3.14159265
 
-void equation(double *CI, double *trim) {
+void trimEquation(double *CI, double *trim) {
 
     // ****** TROVARE ALPHA DI TRIM *******
 
@@ -52,7 +52,7 @@ void equation(double *CI, double *trim) {
     if (flag_1 != 0) {
         printf("\n*********************Alpha di Trim trovato**************************************\n\n");
         printf("---------- ALPHA: %lf\t\t DE_TRIM: %lf\n\n", trim[0], trim[1]);
-    } else ERROR(400);
+    } else MY_ERROR(400);
 
     double thetaTrim = (trim[0] + CI[2])*(pi/180);  
 
@@ -62,7 +62,7 @@ void equation(double *CI, double *trim) {
     double hTrim = CI[1];
     
     state = calloc(12, sizeof(double));
-    if (state == NULL) ERROR(901, "state");
+    if (state == NULL) MY_ERROR(901, "state");
     state[0] = uTrim;
     state[2] = wTrim;
     state[7] = thetaTrim;
@@ -95,7 +95,7 @@ void equation(double *CI, double *trim) {
         memcpy(prop_hold, prop, sizeof(double)*3);
         RPM += 1;
     }
-    if(RPM > RPMmax) ERROR(401);
+    if(RPM > RPMmax) MY_ERROR(401);
 
     // Calcolo la stabilità dell'aeromobile
     int a = routh(pitch_moment_der[0][4], trim[0], CI[0], CXalpha, CZtrim, CMtrim, pitch_moment_der[0][2]);

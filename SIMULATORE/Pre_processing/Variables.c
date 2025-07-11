@@ -1,10 +1,21 @@
 #include "Variables.h"
 
-FILE *ew_log = NULL;
-FILE *fp = NULL;
-FILE *cm = NULL;
-FILE *agg = NULL;
+char *path_dba = "_input_files/DBA.txt";
+char *path_engine = "_input_files/engine.txt";
+char *path_propeller = "_input_files/propeller.txt";
 
+char *path_v_l_i = "_validation_output/VALIDAZIONE_LETTURA_INTERPOLAZIONE.txt";
+char *path_v_p = "_validation_output/VALIDAZIONE_PROPELLER.txt";
+
+char *path_data = "_output_files/DATA.txt";
+char *path_com = "_output_files/COMMAND.txt";
+char *path_agg = "_output_files/EXTRA.txt";
+char *path_log = "_output_files/LOG.txt";
+
+FILE *ew_log = NULL;
+FILE *data = NULL;
+FILE *com = NULL;
+FILE *agg = NULL;
 
 int RPMmin = -1;
 int RPMmax = -1;

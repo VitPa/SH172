@@ -36,7 +36,7 @@ int routh(double Cm_q, double alpha_trim, double V, double Cx_alpha, double Cz_a
     Cwe = CLe;
     CTu = -3*CDe; //-0.0841
 
-    if(Cm_alpha>0) ERROR(402);
+    if(Cm_alpha>0) MY_ERROR(402);
 
 
     //Coefficienti quartica
@@ -49,7 +49,7 @@ int routh(double Cm_q, double alpha_trim, double V, double Cx_alpha, double Cz_a
     E = -2*Cm_alpha*Cwe*Cwe;
     Delta = B*C*D - A*D*D - B*B*E;
 
-    if(B<0||Delta<0||D<0||E<0) ERROR(403);
+    if(B<0||Delta<0||D<0||E<0) MY_ERROR(403);
 
     double omegaNph = (Cwe/(sqrt(2)*massa_adm))*2*V/(body_axes[3]);
     double zph = 3*CDe/(2*sqrt(2)*Cwe);

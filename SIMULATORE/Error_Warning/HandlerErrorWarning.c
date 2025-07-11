@@ -145,5 +145,5 @@ void Warning(int code, const char *func_name, ...){
             va_end(args);
         }
     }
-    if(!check) ERROR(0, code);
+    if(!check) MY_ERROR(0, code);
 }

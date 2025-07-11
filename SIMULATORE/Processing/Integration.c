@@ -5,7 +5,7 @@
 #include "Propeller.h"
 #include "../Interpolation/Interpolation.h"
 #include "../Pre_processing/Variables.h"
-#include "../Pre_processing/EstrazioneDati.h"
+#include "../Pre_processing/Data.h"
 
 #define g 9.80665
 #define pi 3.14159265
@@ -29,23 +29,10 @@ void eulerEquation(double dt, int i){
     double V = sqrt(pow(u, 2) + pow(v, 2) + pow(w, 2));
 
     // Richiamo componenti dei comandi
-    double da, de, dr, manetta;
-    if(liv_trim == 2){
-        double trim[3] = {0.0, 0.0, 0.0};
-        double Ci[] = {V, h};
-        equation(Ci, trim);
-        da    = 0.0;
-        de    = trim[1] *(pi/180);
-        dr    = 0.0;
-        manetta = trim[2];
-    }else{
-        da    = command[i][0] *(pi/180);
-        de    = command[i][1] *(pi/180);
-        dr    = command[i][2] *(pi/180);
-        manetta = engine[2] + (engine[3] - engine[2]) * (command[i][3]) / (1);  // Mappatura manetta [0, 1] -> [RPMmin, RPMmax];
-    }
-    //fprintf(agg, "%lf\t%lf\t%lf\t%lf\t%lf\n", i*dt, da, de, dr, manetta);
-    //fclose(agg);
+    double da    = command[i][0] *(pi/180);
+    double de    = command[i][1] *(pi/180);
+    double dr    = command[i][2] *(pi/180);
+    double manetta = engine[2] + (engine[3] - engine[2]) * (command[i][3]) / (1);  // Mappatura manetta [0, 1] -> [RPMmin, RPMmax];
 
     // Calcolo Spinta
     double prop[3] =  {0.0, 0.0, 0.0}, Pal = 0.0;
