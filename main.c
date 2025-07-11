@@ -12,26 +12,19 @@
 #include "Command.h"
 #include "ErrorWarning.h"
 #include "Variables.h"
-#include "rk4.h"
 
-int main(){
-    /*
-    In ogni caso tutti i warning ed errori li deve stampare anche su un file di log
-    */
-    ew_log = apriFile("log.txt", "w");
-    
+int main(){    
     double trim[3];
 
-    printf("\n\nSimulatore di volo per il Cessna 172\n Inserire i dati iniziali\n");
+    openFiles();
+
+    printf("Simulatore di volo per il Cessna 172\n Inserire i dati iniziali\n");
     printf("--------------------------------------------\n");
     printf("Per i valori di default premere Invio . . .\n");
     printf("--------------------------------------------\n\n");
 
     // Load variables from file .txt
     caricaTuttiIDati();
-
-    RPMmin = (int)engine[2];
-    RPMmax = (int)engine[3];
 
     // Load initial conditions
     double CI[3];
@@ -60,36 +53,23 @@ int main(){
     
     // Integration and simulation
     int i = 0;
-    FILE *fp = apriFile("DATI_ANALISI.txt", "w");
-    FILE *cm = apriFile("DATI_COMANDI.txt", "w");
-    FILE *f = apriFile("DATI_AGGIUNTIVI.txt", "w");
-    if (f) fclose(f);
     for(double Ts = 0.00; Ts <=deltaT_fs; Ts += dt){
 
-        //AtmosphereCalc(state[9]);
-
-        //state = reallocState(state, 12);
+        AtmosphereCalc(state[9]);
 
         eulerEquation(dt, i);
-        //rk4_step(state, 12, dt, Ts, i, compute_derivatives);
 
         physicalCheck(sqrt(pow(state[0], 2) + pow(state[1], 2) + pow(state[2], 2)), state[9], body_axes[0],body_axes[4], vsuono_h);
-        
-        //printf("%.2lf", Ts);
-        /*for(int j = 0; j < 12; j++){
-            printf("   -   %.4lf", state[i][j]);
-        }*/
-        //printf("\n");
 
-        fprintf(fp, "%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t\n",Ts,state[0],state[1],state[2],state[3],state[4],state[5],state[6],state[7],state[8],state[9],state[10],state[11]);
+        fprintf(fp, "%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t\n",Ts,state[0],state[1],state[2],state[3]*(180/pi),state[4]*(180/pi),state[5]*(180/pi),state[6]*(180/pi),state[7]*(180/pi),state[8]*(180/pi),state[9],state[10],state[11]);
+        fflush(fp);
         fprintf(cm, "%lf\t%lf\t%lf\t%lf\t%lf\t\n", Ts, command[i][0], command[i][1], command[i][2], command[i][3]);
+        fflush(cm);
 
         progressBar(Ts, deltaT_fs);
         ++i;
     }
     printf("\n");
-    fclose(fp);
-    fclose(cm);
 
     // Free dynamic memory
     liberaTuttiIDati();
@@ -99,7 +79,7 @@ int main(){
     system("copy /Y \"C:\\Users\\vitop\\OneDrive - Politecnico di Torino\\Computer\\Universita\\PoliTo\\2 anno\\Mod-Sim\\Simulazione\\Progetti\\Simulatore\\FILE_PROGETTO\\GIT\\DATI_ANALISI.txt\" \"C:\\Users\\vitop\\Downloads\\CODICE_GRUPPO\\CODICE_GRUPPO\\DATI_ANALISI.txt\"");
     system("copy /Y \"C:\\Users\\vitop\\OneDrive - Politecnico di Torino\\Computer\\Universita\\PoliTo\\2 anno\\Mod-Sim\\Simulazione\\Progetti\\Simulatore\\FILE_PROGETTO\\GIT\\DATI_COMANDI.txt\" \"C:\\Users\\vitop\\Downloads\\CODICE_GRUPPO\\CODICE_GRUPPO\\DATI_COMANDI.txt\"");
 
-    fclose(ew_log);
+    closeFiles();
     printf("SIMULAZIONE TERMINATA. GRAZIE PER AVER VOLATO CON NOI, \tA PRESTO!\n");
     system("PAUSE");
     return 0;

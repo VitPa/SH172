@@ -88,20 +88,6 @@ double** caricaMatriceDouble(const char *path, int colonne, int checkSection, in
     return mat;
 }
 
-// Rialloca la matrice state aggiungendo una riga
-double** reallocState(double **state, int n_colonne) {
-    int new_rows = dimMat[11] + 1;
-
-    double **tmp = realloc(state, new_rows * sizeof(double*));
-    if (!tmp) ERROR(901, "state");
-
-    tmp[new_rows - 1] = calloc(n_colonne, sizeof(double));
-    if (!tmp[new_rows - 1]) ERROR(900, "state");
-    
-    dimMat[11] = new_rows;
-    return tmp;
-}
-
 // Rialloca la matrice command aggiungendo una riga
 double** reallocCommand(double **command, int n_colonne) {
     int new_rows = dimMat[12] + 1; // Usa un indice libero per command
@@ -162,6 +148,9 @@ void caricaTuttiIDati() {
     control_force_der = caricaMatriceDouble("input_files/dba.txt", 7, 11, &dimMat[8]);
     control_moment_der = caricaMatriceDouble("input_files/dba.txt", 7, 12, &dimMat[9]);
     rotary_der = caricaMatriceDouble("input_files/dba.txt", 7, 13, &dimMat[10]);
+
+    RPMmin = (int)engine[2];
+    RPMmax = (int)engine[3];
 }
 
 void stampaTuttiIDati() {

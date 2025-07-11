@@ -97,7 +97,7 @@ double propel(double RPM_ref, double Vel, double* prop, double *Pal)
     double J = Vel/(n*diam); //rapporto di avanzamento
 
     if (t<0){
-        prop[2] = 0.0; //efficienza elica
+        prop[2] = 0.0; //efficienza propulsiva elica
     }else{
         //prop[2] = t/q*(J*diam)/(2.0*pi); //efficienza elica
         prop[2] = (J * t) / (2.0 * pi * q); //CONTROLLARE
@@ -114,5 +114,6 @@ double propel(double RPM_ref, double Vel, double* prop, double *Pal)
     }
 }
 double massConsumption(double Kc, double Pa, double np, double mass, double time){
+    if (np <= 0.0) return mass;
     return mass - (Kc*Pa*1000/np)*time;
 }

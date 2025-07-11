@@ -1,6 +1,10 @@
 #include "Variables.h"
 
 FILE *ew_log = NULL;
+FILE *fp = NULL;
+FILE *cm = NULL;
+FILE *agg = NULL;
+
 
 int RPMmin = -1;
 int RPMmax = -1;

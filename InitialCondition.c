@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <math.h>
 #include "ErrorWarning.h"
+#include "Variables.h"
+
+static double mFuelMin = -1.0;
 
 void checkVelAlt(double *V, double *h, double *gamma) {
     if (*V < 30){
@@ -31,21 +34,21 @@ void checkVelAlt(double *V, double *h, double *gamma) {
 }
 
 void physicalCheck(double V, double h, double m, double Mdg, double vsuono_h) {
-    enum {COND_VMIN, COND_MACH, COND_VMAX, COND_HMIN, COND_HMAX, COND_MASS, N_COND};
+    enum {COND_VMIN, COND_MACH, COND_HMIN, COND_HMAX, COND_MASS, N_COND};
     static int counters[N_COND] = {0};
     const int threshold = 3;
-    double mFuelMin = 0.95 * 1046; //0.95*body_axes[0]   //Eliminare quando si mette il controllo della massa nel main
+
+    if(mFuelMin < 0) mFuelMin = body_axes[0] * (1 - fuel_mass[1]);
 
     int triggered[N_COND] = {
         V < 30,
-        V/vsuono_h > Mdg,
-        V > 75,
+        (V/vsuono_h) > Mdg,
         h < 0,
         h > 4116,
         m < mFuelMin
     };
 
-    int error_codes[N_COND] = {200, 201, 202, 203, 204, 205};
+    int error_codes[N_COND] = {200, 201, /*202,*/ 203, 204, 205};
 
     for (int i = 0; i < N_COND; ++i) {
         if (triggered[i]) {
@@ -93,4 +96,17 @@ void loadCI(double *CI) {
         WARNING(504);
     }while(1);
     printf("\n");
+}
+
+void openFiles(){
+    ew_log = apriFile("log.txt", "w");
+    fp = apriFile("DATI_ANALISI.txt", "w");
+    cm = apriFile("DATI_COMANDI.txt", "w");
+    agg = apriFile("DATI_AGGIUNTIVI.txt", "w");
+}
+void closeFiles(){
+    fclose(ew_log);
+    fclose(fp);
+    fclose(cm);
+    fclose(agg);
 }

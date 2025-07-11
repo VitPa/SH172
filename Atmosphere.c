@@ -122,10 +122,10 @@ void AtmosphereCalc (double h)
             vsuono_h = sqrt(gamma*R*(temp_h));
             if (stampa == 0){
                 printf("\nI dati atmosferici e di potenza per la quota di %d m sono:\n\n", (int) h);
-                printf("Temperatura: \t\t%f [K]\n",temp_h);
-                printf("Pressione: \t\t%f [Pa]\n",press_h);
-                printf("Desita': \t\t%f [kg/m^3]\n",rho_h);
-                printf("Potenza: \t\t%f [kW]\n",Pmax_h);
+                printf("Temperatura: \t\t%g [K]\n",temp_h);
+                printf("Pressione: \t\t%g [Pa]\n",press_h);
+                printf("Desita': \t\t%g [kg/m^3]\n",rho_h);
+                printf("Potenza: \t\t%g [kW]\n",Pmax_h);
                 stampa = 1;
             }
             break;

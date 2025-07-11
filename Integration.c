@@ -12,8 +12,6 @@
 #define pi 3.14159265
 
 void eulerEquation(double dt, int i){
-    FILE *agg = apriFile("DATI_AGGIUNTIVI.txt", "a");
- 
     // Richiamo componenti vettore di stato state
     double u     = state[0];
     double v     = state[1];
@@ -56,7 +54,7 @@ void eulerEquation(double dt, int i){
     propel(manetta, V, prop, &Pal);
     double T = prop[0];
     fprintf(agg, "%lf\t%lf\n", i*dt, T);
-    fclose(agg);
+    fflush(agg);
 
     // Calcolo consumo di carburante
     if(fuel_mass[0] == 1) body_axes[0] = massConsumption(engine[5], Pal, prop[2], body_axes[0], dt);
@@ -123,7 +121,7 @@ void eulerEquation(double dt, int i){
     double dphi_   = p + q*sin(phi)*tan(theta) + r*cos(phi)*tan(theta);
     double dtheta_ = q*cos(phi) - r*sin(phi);
     double dpsi_   = q*(sin(phi)/cos(theta)) + r*(cos(phi)/cos(theta));
-    double dh_     = -u*sin(theta) + v*cos(theta)*sin(phi) + w*cos(theta)*cos(phi);
+    double dh_     = u*sin(theta) - v*cos(theta)*sin(phi) - w*cos(theta)*cos(phi);
     double dx_ned = u*cos(psi)*cos(theta) + v*(cos(psi)*sin(theta)*sin(phi) - sin(psi)*cos(phi)) + w*(cos(psi)*sin(theta)*cos(phi) + sin(psi)*sin(phi));
     double dy_ned = u*sin(psi)*cos(theta) + v*(sin(psi)*sin(theta)*sin(phi) + cos(psi)*cos(phi)) + w*(sin(psi)*sin(theta)*cos(phi) - cos(psi)*sin(phi));
     

@@ -21,6 +21,7 @@ void equation(double *CI, double *trim) {
     int flag_1 = 0;
     double score_min = 1000;
     double CZtrim, CMtrim;
+    double res1 = 1, res2 = 0.0001;
     
     for (double alpha_1 = -5.0; alpha_1 <= 20.0; alpha_1 += 0.001) {
         double CZss = interpolazioneTotale(steady_state_coeff, 3, alpha_1);
@@ -35,9 +36,9 @@ void equation(double *CI, double *trim) {
             double control = fabs(body_axes[0]*g*cos(alpha_1*(pi/180) + CI[2]*(pi/180)) + cst * CZ_tot);
             double control2 = fabs(CMss + CMalpha * alpha_1*(pi/180) + CMde * de_1 * (pi/180));
 
-            if (control < 1.0 && control2 < 0.0001){
+            if (control < res1 && control2 < res2){
 
-                double score = sqrt(pow(control/10,2) + pow(control2/0.004,2));
+                double score = sqrt(pow(control/res1,2) + pow(control2/res2,2));
                 if (score < score_min) {
                     score_min = score;
                     trim[1] = de_1;
@@ -63,40 +64,13 @@ void equation(double *CI, double *trim) {
         double uTrim = CI[0] * cos(trim[0]*(pi/180));
         double wTrim = CI[0] * sin(trim[0]*(pi/180));
         double hTrim = CI[1];
-
-        /*// Creo la prima righa della matrice vett_stato (dinamica)
-        state = malloc(sizeof(double*));
-        if (state == NULL) ERROR(902, "state");
-
-        state[0] = calloc(12, sizeof(double));
-        if (state[0] == NULL) ERROR(901, "state");
-
-        // Riempio la prima riga con i valori di Trim
-        for (int i = 0; i < 12; ++i){
-            switch (i) {
-                case 0:
-                    state[0][i] = uTrim;
-                    break;
-                case 2:
-                    state[0][i] = wTrim;
-                    break;
-                case 7:
-                    state[0][i] = thetaTrim;
-                    break;
-                case 9:
-                    state[0][i] = hTrim;
-                    break;
-                default:
-                    state[0][i] = 0;
-                    break;
-            }
-        }*/
-       state = calloc(12, sizeof(double));
-       if (state == NULL) ERROR(901, "state");
-       state[0] = uTrim;
-       state[2] = wTrim;
-       state[7] = thetaTrim;
-       state[9] = hTrim;
+        
+        state = calloc(12, sizeof(double));
+        if (state == NULL) ERROR(901, "state");
+        state[0] = uTrim;
+        state[2] = wTrim;
+        state[7] = thetaTrim;
+        state[9] = hTrim;
     }
     
 

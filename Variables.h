@@ -1,3 +1,6 @@
+#ifndef VARIABLES_H
+#define VARIABLES_H
+
 #include <stdio.h>
 #include "EstrazioneDati.h"
 
@@ -9,14 +12,16 @@
 
 // Puntatori ai file
 extern FILE *ew_log;
+extern FILE *fp;
+extern FILE *cm;
+extern FILE *agg;
 
 
 /*// variabili globali
 const double Vmax = 75;
 const double Vmin = 30;
 const double Hmin = 0;
-const double Hmax = 4116;
-double mFuelMin;  //Da inserire in Estrazione dati con = 0.95 * body_axes[0]*/
+const double Hmax = 4116;*/
 extern int RPMmin;
 extern int RPMmax;
 extern int liv_trim;
@@ -34,3 +39,5 @@ extern double **command;
 
 // variabili atmosferiche
 extern double Pmax_h, press_h, temp_h, rho_h, vsuono_h;
+
+#endif

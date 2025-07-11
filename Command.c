@@ -80,7 +80,7 @@ void customManeuver(double dt, double Tfs, double **command){
         int l = 0;
         double A = 0.0, start_command= 0.0, duration_command = 0.0, old_A, old_start, old_dur;
         char *old_signal;
-        printf("Modifica comando %s \tAmpiezza attuale %g\n", name[i], apply_trim(0.0, i));
+        printf("Modifica comando %s \t\tValore attuale %g\n", name[i], apply_trim(0.0, i));
         do{
             if(l>0){
                 printf("\nModifica aggiuntiva comando %s\n", name[i]);
@@ -146,7 +146,13 @@ void customManeuver(double dt, double Tfs, double **command){
                     l = 1;
                     break;
                 case 1:  // IMPLUSE
-                    if(l>0) printf("Tempo inizio comando (precedente -> %s [%g, %g]) [0, %g]: ", old_signal, old_start, old_start+old_dur, Tfs-5*dt);
+                    if(l>0) {
+                        printf("Tempo inizio comando ");
+                        SetColor(8);
+                        printf("(precedente -> %s [%g, %g])", old_signal, old_start, old_start+old_dur);
+                        SetColor(15);
+                        printf(" [0, %g]: ", Tfs-5*dt);
+                    }
                     else printf("Tempo inizio comando [0, %g]: ", Tfs-5*dt);
                     start_command = ask_double(0, Tfs-5*dt);
 
@@ -156,7 +162,13 @@ void customManeuver(double dt, double Tfs, double **command){
                     break;
 
                 case 2: // SYMMITRIC IMPULSE
-                    if(l>0) printf("Tempo inizio comando (precedente -> %s [%g, %g]) [0, %g]: ",old_signal, old_start, old_start+old_dur, Tfs-10*dt);
+                    if(l>0) {
+                        printf("Tempo inizio comando ");
+                        SetColor(8);
+                        printf("(precedente -> %s [%g, %g])", old_signal, old_start, old_start+old_dur);
+                        SetColor(15);
+                        printf(" [0, %g]: ", Tfs-10*dt);
+                    }
                     else printf("Tempo inizio comando [0, %g]: ", Tfs-10*dt);
                     start_command = ask_double(0, Tfs-10*dt);
 
@@ -166,11 +178,23 @@ void customManeuver(double dt, double Tfs, double **command){
                     break;
 
                 case 3: // STEP
-                    if(l>0) printf("Tempo durata comando (precedente -> %s [%g]) [0, %g]: ",old_signal, old_dur, Tfs);
+                    if(l>0) {
+                        printf("Tempo durata comando ");
+                        SetColor(8);
+                        printf("(precedente -> %s [%g])", old_signal, old_dur);
+                        SetColor(15);
+                        printf(" [0, %g]: ", Tfs-5*dt);
+                    }
                     else printf("Tempo durata comando [0, %g]: ", Tfs);
                     duration_command = ask_double(0, Tfs);
                     
-                    if(l>0) printf("Tempo inizio comando (precedente -> %s [%g, %g]) [0, %g]: ",old_signal, old_start, old_start+old_dur, Tfs-duration_command);
+                    if(l>0) {
+                        printf("Tempo inizio comando ");
+                        SetColor(8);
+                        printf("(precedente -> %s [%g, %g])", old_signal, old_start, old_start+old_dur);
+                        SetColor(15);
+                        printf(" [0, %g]: ", Tfs-duration_command);
+                    }
                     else printf("Tempo inizio comando [0, %g]: ", Tfs-duration_command);
                     start_command = ask_double(0, Tfs-duration_command);
 
@@ -178,11 +202,23 @@ void customManeuver(double dt, double Tfs, double **command){
                     break;
                     
                 case 4: // RAMP
-                    if(l>0) printf("Tempo durata comando (precedente -> %s [%g]) [0, %g]: ",old_signal, old_dur, Tfs);
+                    if(l>0) {
+                        printf("Tempo durata comando ");
+                        SetColor(8);
+                        printf("(precedente -> %s [%g])", old_signal, old_dur);
+                        SetColor(15);
+                        printf(" [0, %g]: ", Tfs-5*dt);
+                    }
                     else printf("Tempo durata comando [0, %g]: ", Tfs);
                     duration_command = ask_double(0, Tfs);
                     
-                    if(l>0) printf("Tempo inizio comando (precedente -> %s [%g, %g]) [0, %g]: ",old_signal, old_start, old_start+old_dur, Tfs-duration_command);
+                    if(l>0) {
+                        printf("Tempo inizio comando ");
+                        SetColor(8);
+                        printf("(precedente -> %s [%g, %g])", old_signal, old_start, old_start+old_dur);
+                        SetColor(15);
+                        printf(" [0, %g]: ", Tfs-duration_command);
+                    }
                     else printf("Tempo inizio comando [0, %g]: ", Tfs-duration_command);
                     start_command = ask_double(0, Tfs-duration_command);
 
