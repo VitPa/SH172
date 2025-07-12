@@ -47,7 +47,6 @@ int routh(double Cm_q, double alpha_trim, double V, double Cx_alpha, double Cz_a
     if(B<0||Delta<0||D<0||E<0) MY_ERROR(403);
 
     // *** Section: Compute dynamic mode characteristics (frequencies, damping, periods) for phugoid ***
-    double omegaNph_adm = sqrt(-(2*massa_adm*Cm_alpha+Cm_q*CL_alpha)/(2*massa_adm*inerziaY_adm));
     double omegaNph = (Cwe/(sqrt(2)*massa_adm))*2*V/(body_axes[3]);
     double zph = 3*CDe/(2*sqrt(2)*Cwe);
     double omegaNph_adm = -CTu/(4*massa_adm*zph);
