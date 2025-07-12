@@ -111,8 +111,6 @@ void AtmosphereChoice ()
         }
     }
     while(input!=1 && input!=2 && input!=3);
-
-    endSection();
 }
 
 void AtmosphereCalc (double h)
@@ -134,6 +132,7 @@ void AtmosphereCalc (double h)
                 printf("Pressione: \t\t%g [Pa]\n",press_h);
                 printf("Desita': \t\t%g [kg/m^3]\n",rho_h);
                 printf("Potenza: \t\t%g [kW]\n",Pmax_h);
+                endSection();
                 stampa = 1;
             }
             break;
@@ -147,6 +146,7 @@ void AtmosphereCalc (double h)
                 printf("Pressione: \t\t%g [Pa]\n",press_h);
                 printf("Densita': \t\t%g [kg/m^3]\n",rho_h);
                 printf("Potenza: \t\t%g [kW]\n",Pmax_h);
+                endSection();
                 stampa = 1;
             }
             break;

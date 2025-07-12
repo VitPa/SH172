@@ -104,7 +104,7 @@ void trimEquation(double *CI, double *trim) {
     }
     if(RPM > RPMmax) MY_ERROR(401, "alti");
 
-    endSection();
+    system("PAUSE");
 
     // Calcolo la stabilità dell'aeromobile
     int a = routh(pitch_moment_der[0][4], trim[0], CI[0], CXalpha, CZtrim, CMtrim, pitch_moment_der[0][2]);

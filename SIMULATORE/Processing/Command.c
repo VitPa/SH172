@@ -69,8 +69,9 @@ void defaultManeuver(double dt, double Tfs){
 
 void customManeuver(double dt, double Tfs){
     int maneuver;
-    char *signal[4] = {"impulso", "impulso simmetrico", "gradino", "rampa"};
+    char *signal[5] = {"impulso", "impulso simmetrico", "gradino", "gradino con durata", "rampa"};
     char *name[4] = {"alettoni", "equilibratore", "timone", "manetta"};
+    int n = sizeof(signal)/sizeof(signal[0]);
 
     for(int i = 0; i<4; ++i){
         system("cls");
@@ -95,11 +96,13 @@ void customManeuver(double dt, double Tfs){
                 printf(" | Durata: [%g, %g]\n", old_start, old_start+old_dur);
                 printf("___________________________________________\n");
             }
-            printf("(0) nessun comando\n(1) impulso\n(2) impulso simmetrico\n(3) gradino\n(4) rampa\n");
+            for(int j = 0; j<n; ++j){
+                printf("(%d) %s\n", j+1, signal[j]);
+            }
             do{
                 scanf("%d", &maneuver);
-                if(maneuver<0 || maneuver>4){
-                    WARNING(500, 1, 4);
+                if(maneuver<0 || maneuver>n){
+                    WARNING(500, 1, n);
                     continue;
                 }
                 break;
@@ -180,6 +183,20 @@ void customManeuver(double dt, double Tfs){
 
                 case 3: // STEP
                     if(l>0) {
+                        printf("Tempo inizio comando ");
+                        SetColor(8);
+                        printf("(precedente -> %s [%g, %g])", old_signal, old_start, old_start+old_dur);
+                        SetColor(15);
+                        printf(" [0, %g]: ", Tfs);
+                    }
+                    else printf("Tempo inizio comando [0, %g]: ", Tfs);
+                    start_command = ask_double(0, Tfs);
+
+                    step(apply_trim(A, i), start_command, dt, Tfs, i, l);
+                    break;
+
+                case 4: // STEP SHORT
+                    if(l>0) {
                         printf("Tempo durata comando ");
                         SetColor(8);
                         printf("(precedente -> %s [%g])", old_signal, old_dur);
@@ -199,10 +216,12 @@ void customManeuver(double dt, double Tfs){
                     else printf("Tempo inizio comando [0, %g]: ", Tfs-duration_command);
                     start_command = ask_double(0, Tfs-duration_command);
 
-                    step(apply_trim(A, i), start_command, duration_command, dt, Tfs, i, l);
+                    stepShort(apply_trim(A, i), start_command, duration_command, dt, Tfs, i, l);
                     break;
+
+                
                     
-                case 4: // RAMP
+                case 5: // RAMP
                     if(l>0) {
                         printf("Tempo durata comando ");
                         SetColor(8);
@@ -267,11 +286,22 @@ void symmetricImpulse(double A, double start_command, double dt, double Tfs, int
     }
 }
 
-void step(double A, double start_command, double duration_command, double dt, double Tfs, int column, int l){
+void stepShort(double A, double start_command, double duration_command, double dt, double Tfs, int column, int l){
     int start = (int)(start_command / dt);
     int end = (int)((start_command + duration_command) / dt);
     for(int i = 0; i<n; ++i){
         if(i>=start && i<end){
+            command[i][column] = A; 
+        }else{
+            command[i][column] = l==0 ? apply_trim(0.0, column) : command[i][column];
+        }
+    }
+}
+
+void step(double A, double start_command, double dt, double Tfs, int column, int l){
+    int start = (int)(start_command / dt);
+    for(int i = 0; i<n; ++i){
+        if(i>=start){
             command[i][column] = A; 
         }else{
             command[i][column] = l==0 ? apply_trim(0.0, column) : command[i][column];

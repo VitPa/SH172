@@ -80,7 +80,7 @@ int routh(double Cm_q, double alpha_trim, double V, double Cx_alpha, double Cz_a
     double Tsp = 2*pi/Imsp;
     double T12_sp = fabs(log(0.5)/Resp);
 
-    printf("\n\nCaratteristiche modi:\n");
+    printf("Caratteristiche modi:\n\n");
     printf("     ***************************************************************************************\n");
     printf("     * - MODO FUGOIDE:                           * - MODO CORTO PERIODO:                   *\n" );
     printf("     * - omega[rad/s] = %.3f                    * - omega[rad/s]= %.3lf                   *\n",omegaNph,omegaNsp);
@@ -89,5 +89,5 @@ int routh(double Cm_q, double alpha_trim, double V, double Cx_alpha, double Cz_a
     printf("     * - tempo di dimezzamento[s] = %.3lf       * - tempo di dimezzamento[s]= %.3lf       *\n",T12_ph,T12_sp);
     printf("     ***************************************************************************************\n\n");
     
-    endSection();
+    system("PAUSE");
 }
