@@ -88,7 +88,6 @@ double** loadMatrix(const char *path, int colonne, int checkSection, int *outRig
     return mat;
 }
 
-// Rialloca la matrice command aggiungendo una riga
 double** reallocCommand(int n_colonne) {
     int new_rows = dimMat[12] + 1;
     
@@ -120,7 +119,6 @@ void printMatrix(const char* nome, double** m, int righe, int colonne) {
     }
 }
 
-// Funzione wrapper per caricare tutti i dati richiesti dal simulatore
 void loadData() {
     dimMat[11]=1;
     dimMat[12]=0;
@@ -172,7 +170,6 @@ void printData() {
     fflush(val1);
 }
 
-// Funzione per liberare la memoria di tutti i dati caricati
 void freeData() {
     free(engine); free(geometry_propeller); free(propeller_profile); free(body_axes); free(deflection_limits); free(fuel_mass); free(state);
     double** matrici[] = {
