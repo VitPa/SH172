@@ -46,21 +46,21 @@ void startSection(int option){
 }
 
 void checkVelAlt(double *V, double *h, double *gamma) {
-    if (*V < 30){
-        WARNING(200, 30.0);
-        *V = 30;
+    if (*V < Vmin){
+        WARNING(200, Vmin);
+        *V = Vmin;
     }
-    else if (*V > 75){
-        WARNING(202, 75.0);
-        *V = 75;
+    else if (*V > Vmax){
+        WARNING(202, Vmax);
+        *V = Vmax;
     }
-    if (*h<0){
-        WARNING(203, 0);
-        *h = 0;
+    if (*h<Hmin){
+        WARNING(203, Hmin);
+        *h = Hmin;
     }
-    else if(*h>4116){
-        WARNING(204, 4116.0);
-        *h = 4116;
+    else if(*h>Hmax){
+        WARNING(204, Hmax);
+        *h = Hmax;
     }
     if (*gamma<-5){
         WARNING(205, -5.0);
@@ -80,10 +80,10 @@ void physicalCheck(double V, double h, double m, double Mdg, double vsuono_h) {
     if(mFuelMin < 0) mFuelMin = body_axes[0] * (1 - fuel_mass[1]);              // Compute minimum fuel mass only once
 
     int triggered[N_COND] = {
-        V < 30,                 // Airspeed below minimum
+        V < Vmin,                 // Airspeed below minimum
         (V/vsuono_h) > Mdg,     // Mach number exceeds limit
-        h < 0,                  // Altitude below ground
-        h > 4116,               // Altitude above maximum
+        h < Hmin,                  // Altitude below ground
+        h > Hmax,               // Altitude above maximum
         m < mFuelMin            // Mass below minimum allowed (fuel exhausted)
     };
 

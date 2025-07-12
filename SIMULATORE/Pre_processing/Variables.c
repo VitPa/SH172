@@ -19,6 +19,10 @@ FILE *agg = NULL;
 FILE *val1 = NULL;
 FILE *val2 = NULL;
 
+double Vmax = 75;
+double Vmin = 30;
+double Hmin = 0;
+double Hmax = 4116;
 int RPMmin = -1;
 int RPMmax = -1;
 int liv_trim = 0;

@@ -25,11 +25,11 @@ extern FILE *val1;
 extern FILE *val2;
 
 
-/*// variabili globali
-const double Vmax = 75;
-const double Vmin = 30;
-const double Hmin = 0;
-const double Hmax = 4116;*/
+// variabili globali
+extern double Vmax;
+extern double Vmin;
+extern double Hmin;
+extern double Hmax;
 extern int RPMmin;
 extern int RPMmax;
 extern int liv_trim;
