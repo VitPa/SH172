@@ -1,12 +1,6 @@
 ## Da fare dopo
-- Abbellire l'interfaccia
-- Inserire i commenti per chi legge il codice
-- Eliminare alla fine il codice per copiare i file nelle cartelle
 
 ## Da fare ora
-- Controllare le stampe di tutte le funzioni ed inserire quando serve system("cls")
-- Inserire l'apertura dei file nel file in una funzione dedicata (magari in InitialCondition) e poi dichiara i puntatori in maniera globale in Variables.h
-- Capire se togliere la condizione di velocità massima durante il volo
 - Verificare di nuovo le validazioni
 
 ## Domande

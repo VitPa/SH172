@@ -17,6 +17,34 @@ void endSection(){
     Sleep(1000);
 }
 
+void startSection(int option){
+    system("cls");
+    printf("\n>>>-----------------------------------------------------------------<<<\n");
+    switch(option){
+        case 1:
+            printf(">     [ PRE-PROCESSING ]  >>  Inserimento condizioni iniziali ...     <\n");
+            printf(">                    --------------------------                       <\n");
+            printf(">             Per i valori di default premere Invio . . .             <\n");
+            break;
+        case 2:
+            printf(">             [ PRE-PROCESSING ]  >>  Atmosfera ISA ...               <\n");
+            break;
+        case 3:
+            printf(">       [ PRE-PROCESSING ]  >>  Calcolo condizioni di Trim ...        <\n");
+            break;
+        case 4:
+            printf(">    [ PRE-PROCESSING ]  >>  Calcolo condizioni di stabilita' ...     <\n");
+            break;
+        case 5:
+            printf(">               [ PRE-PROCESSING ]  >>  Scelta Manovra ...            <\n");
+            break;
+        case 6:
+            printf(">           [ PROCESSING ]  >>  Integrazione e Simulazione ...        <\n");
+            break;
+    }
+    printf(">>>-----------------------------------------------------------------<<<\n\n");
+}
+
 void checkVelAlt(double *V, double *h, double *gamma) {
     if (*V < 30){
         WARNING(200, 30.0);
@@ -49,21 +77,21 @@ void physicalCheck(double V, double h, double m, double Mdg, double vsuono_h) {
     static int counters[N_COND] = {0};
     const int threshold = 3;
 
-    if(mFuelMin < 0) mFuelMin = body_axes[0] * (1 - fuel_mass[1]);
+    if(mFuelMin < 0) mFuelMin = body_axes[0] * (1 - fuel_mass[1]);              // Compute minimum fuel mass only once
 
     int triggered[N_COND] = {
-        V < 30,
-        (V/vsuono_h) > Mdg,
-        h < 0,
-        h > 4116,
-        m < mFuelMin
+        V < 30,                 // Airspeed below minimum
+        (V/vsuono_h) > Mdg,     // Mach number exceeds limit
+        h < 0,                  // Altitude below ground
+        h > 4116,               // Altitude above maximum
+        m < mFuelMin            // Mass below minimum allowed (fuel exhausted)
     };
 
-    int error_codes[N_COND] = {200, 201, /*202,*/ 203, 204, 205};
+    int error_codes[N_COND] = {200, 201, 203, 204, 205};                        // Error codes for each condition
 
-    for (int i = 0; i < N_COND; ++i) {
+    for (int i = 0; i < N_COND; ++i) {                                          // For each condition, increment counter if triggered, reset if not
         if (triggered[i]) {
-            if (++counters[i] > threshold) MY_ERROR(error_codes[i]);
+            if (++counters[i] > threshold) MY_ERROR(error_codes[i]);            // If the violation persists for more than 'threshold' cycles, raise error
         } else if (counters[i] > 0) {
             --counters[i];
         }
@@ -72,14 +100,9 @@ void physicalCheck(double V, double h, double m, double Mdg, double vsuono_h) {
 
 void loadCI(double *CI) {
     char input[100];
-
-    system("cls");
-    printf("\n>>>-----------------------------------------------------------------<<<\n");
-    printf(  ">     [ PRE-PROCESSING ]  >>  Inserimento condizioni iniziali ...     <\n");
-    printf(  ">                    --------------------------                       <\n");
-    printf(  ">             Per i valori di default premere Invio . . .             <\n");
-    printf(  ">>>-----------------------------------------------------------------<<<\n\n");
     
+    startSection(1);
+
     printf("Inserire la velocità inziale [m/s] (default: 52): ");
     do{
         fgets(input, 100, stdin);

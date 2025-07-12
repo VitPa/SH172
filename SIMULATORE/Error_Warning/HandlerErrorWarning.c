@@ -15,55 +15,55 @@ static const Err_War_t error_table[] = {
     // 0  -> Warning error
     {0, "Codice warning sconosciuto (%d).\n"},
 
-    //1xx -> Errori per file e variabili
+    //1xx -> File and variables errors
     {100, "Apertura del file '%s' non riuscita.\n"},
     {101, "Caricamento vettore '%s' non riuscito.\n"},
     {102, "Caricamento matrice '%s' non riuscita.\n"},
 
-    //2xx -> Superamento condizioni di funzionamento
-    {200, "La velocità è inferiore della velocità di stallo.\n"},
-    {201, "La velocità è maggiore del Mach di drag rise.\n"},
-    {202, "La velocità è maggiore della velocità massima.\n"},
-    {203, "La quota è minore di zero.\n"},
-    {204, "La quota è maggiore della quota di tangenza.\n"},
-    {205, "La massa di carburante è scesa sotto la soglia minima consentita.\n"},
+    //2xx -> Operating conditions
+    {200, "La velocita' e' inferiore della velocita' di stallo.\n"},
+    {201, "La velocita' e' maggiore del Mach di drag rise.\n"},
+    {202, "La velocita' e' maggiore della velocita' massima.\n"},
+    {203, "La quota e' minore di zero.\n"},
+    {204, "La quota e' maggiore della quota di tangenza.\n"},
+    {205, "La massa di carburante e' scesa sotto la soglia minima consentita.\n"},
     
-    //4xx -> Condizioni di Trim e stabilità
+    //4xx -> Trim and Stability conditions
     {400, "Alpha e/o de di Trim non trovati.\n"},
     {401, "RPM di Trim non trovati. RPM necessari troppo %s.\n"},
-    {402, "L'aereo è staticamente instabile.\n"},
-    {403, "L'aereo è dinamicamente instabile.\n"},
+    {402, "L'aereo e' staticamente instabile.\n"},
+    {403, "L'aereo e' dinamicamente instabile.\n"},
 
-    //5xx -> Caricamento vettore comandi
+    //5xx -> Commands
     {500, "Nessun comando inserito.\n"},
 
-    //6xx -> Interpolazione
+    //6xx -> Interpolation
     {600, "Alpha inserito '%.2lf' minore del minimo consentito.\n"},
     {601, "Alpha inserito '%.2lf' maggiore del massimo consentito.\n"},
     
-    //9xx -> Errori per memoria dinamica
+    //9xx -> Dynamic memory
     {900, "Inizializzazione memoria dinamica per '%s' non riuscita.\n"},
-    {901, "Riallocazione memoria dinamica per '%s' non riuscita.\n"},
+    {901, "Ri-allocazione memoria dinamica per '%s' non riuscita.\n"},
     {902, "Allocazione memoria dinamica per '%s' non riuscita.\n"}
 };
 
 static const Err_War_t warning_table[] = {
-    // Informational Warnings
     // 0   -> Default
     {0, "Inserito valore di default: %g.\n"},
 
+    // Informational Warnings
     // 1xx -> Commands
     {100, "Ampiezza minore del minimo consentito... Impostata a %g.\n"},
     {101, "Ampiezza maggiore del massimo consentito... Impostata a %g.\n"},
 
     // 2xx -> Exceeding Operating Conditions
-    {200, "La velocità è minore della velocità di stallo... Impostata a %g.\n"},
-    {201, "La velocità è maggiore del match di drag rise... Impostata a %g.\n"},
-    {202, "La velocità è maggiore della velocità massima... Impostata a %g.\n"},
-    {203, "La quota è minore di zero... Impostata a %g.\n"},
-    {204, "La quota è maggiore della quota di tangenza... Impostata a %g.\n"},
-    {205, "L'angolo di rampa è minore del minimo consentito... Impostato a %g.\n"},
-    {206, "L'angolo di rampaè maggiore del massimo consentito... Impostato a %g.\n"},
+    {200, "La velocita' e' minore della velocita' di stallo... Impostata a %g.\n"},
+    {201, "La velocita' e' maggiore del Mach di drag rise... Impostata a %g.\n"},
+    {202, "La velocita' e' maggiore della velocita' massima... Impostata a %g.\n"},
+    {203, "La quota e' minore di zero... Impostata a %g.\n"},
+    {204, "La quota e' maggiore della quota di tangenza... Impostata a %g.\n"},
+    {205, "L'angolo di rampa e' minore del minimo consentito... Impostato a %g.\n"},
+    {206, "L'angolo di rampa e' maggiore del massimo consentito... Impostato a %g.\n"},
 
     // Action Required Warnings
     // 5xx -> Generics

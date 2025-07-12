@@ -11,41 +11,32 @@
 
 int routh(double Cm_q, double alpha_trim, double V, double Cx_alpha, double Cz_alpha, double Cm_alpha, double Cm_alphaprimo){
 
-    system("cls");
-    printf("\n>>>-----------------------------------------------------------------<<<\n");
-    printf(  ">    [ PRE-PROCESSING ]  >>  Calcolo condizioni di stabilita' ...     <\n");
-    printf(  ">>>-----------------------------------------------------------------<<<\n\n");
+    startSection(4);
 
     static int stampa = 1;
-
-    //Variabili geometriche
     double massa_adm;
     double inerziaY_adm;
     double omega_ph, omega_sp;
 
     alpha_trim = alpha_trim*(pi/180);
-
-    //Massa e Momento di inerzia adimensionali
     massa_adm = 2*body_axes[0]/(rho_h*body_axes[2]*body_axes[3]);
     inerziaY_adm = 8*body_axes[14]/(rho_h*body_axes[2]*pow(body_axes[3],3));
 
-    //Variabili Aerodinamiche
     double CL_alpha,CLalpha_primo, CLe,CDe,CDalpha, Cwe,CTu;
     double k = 0.047, Cd0 = 0.0235;
 
-    //Impostiamo il Clalpha nel nuovo (SdR)
-    CL_alpha = Cx_alpha*sin(alpha_trim) - Cz_alpha*cos(alpha_trim); // da modificare
-    CLalpha_primo = 1.56; // (rad^-1)
+    CL_alpha = Cx_alpha*sin(alpha_trim) - Cz_alpha*cos(alpha_trim); // Compute CL_alpha in the new reference frame
+    CLalpha_primo = 1.56;                                           // (rad^-1)
     CLe = body_axes[0]*9.81*2/(rho_h*body_axes[2]*V*V);
-    CDe = Cd0 + k*CLe*CLe;  //k = 0.047 CD0 = 0.0235
-    CDalpha = 2*k*CL_alpha*CLe; //
+    CDe = Cd0 + k*CLe*CLe;                                          // Drag coefficient at equilibrium
+    CDalpha = 2*k*CL_alpha*CLe;
     Cwe = CLe;
-    CTu = -3*CDe; //-0.0841
+    CTu = -3*CDe;                                                   // Thrust coefficient (empirical)
 
-    if(Cm_alpha>0) MY_ERROR(402);
+    
+    if(Cm_alpha>0) MY_ERROR(402);                                   // If Cm_alpha is positive, the aircraft is statically unstable
 
-
-    //Coefficienti quartica
+    // *** Section: Quartic characteristic equation coefficients ***
     double A, B, C, D, E, Delta;
 
     A = 2*massa_adm*inerziaY_adm*(2*massa_adm + CLalpha_primo);
@@ -57,28 +48,25 @@ int routh(double Cm_q, double alpha_trim, double V, double Cx_alpha, double Cz_a
 
     if(B<0||Delta<0||D<0||E<0) MY_ERROR(403);
 
+    // *** Section: Compute dynamic mode characteristics (frequencies, damping, periods) for phugoid ***
+    double omegaNph_adm = sqrt(-(2*massa_adm*Cm_alpha+Cm_q*CL_alpha)/(2*massa_adm*inerziaY_adm));
     double omegaNph = (Cwe/(sqrt(2)*massa_adm))*2*V/(body_axes[3]);
     double zph = 3*CDe/(2*sqrt(2)*Cwe);
-
     double omegaNph_adm = -CTu/(4*massa_adm*zph);
     double Reph = -zph*omegaNph;
     double Imph = omegaNph*sqrt(fabs(zph*zph - 1.0));
-
     double Tph = 2*pi/Imph;
     double T12_ph = fabs(log(0.5)/Reph);
-
-    //double omegaNsp_adm = sqrt(-Cm_alpha/inerziaY_adm);
-    double omegaNsp_adm = sqrt(-(2*massa_adm*Cm_alpha+Cm_q*CL_alpha)/(2*massa_adm*inerziaY_adm));  //Modello completo non semplificato  
-    //double omegaNsp_adm = sqrt(-Cm_alpha/inerziaY_adm-(Cm_q*CL_alpha)/(2*massa_adm*inerziaY_adm));
+    
+    // *** Section: Compute dynamic mode characteristics (frequencies, damping, periods) for short period ***
+    double omegaNsp_adm = sqrt(-(2*massa_adm*Cm_alpha+Cm_q*CL_alpha)/(2*massa_adm*inerziaY_adm));
     double omegaNsp = (omegaNsp_adm*2*V)/(body_axes[3]);
     double zsp = (inerziaY_adm*CL_alpha-2*massa_adm*(Cm_q+Cm_alphaprimo))/(2*sqrt(-2*massa_adm*inerziaY_adm*(2*massa_adm*Cm_alpha+Cm_q*CL_alpha)));
-    //double omegasp = omegaNsp*sqrt(fabs(zsp*zsp - 1));
-
     double Resp = -zsp*omegaNsp;
     double Imsp = omegaNsp*sqrt(fabs(zsp*zsp - 1.0));
-
     double Tsp = 2*pi/Imsp;
     double T12_sp = fabs(log(0.5)/Resp);
+
 
     printf("Caratteristiche modi:\n\n");
     printf("     ***************************************************************************************\n");

@@ -126,7 +126,7 @@ void loadData() {
     dimMat[11]=1;
     dimMat[12]=0;
     
-    // VETTORI
+    // *** Section: Load vector from file ***
     engine = loadVector(path_engine, 1, &dimVett[0]); 
     geometry_propeller = loadVector(path_propeller, 1, &dimVett[1]);
     propeller_profile = loadVector(path_propeller, 2, &dimVett[2]); 
@@ -134,7 +134,7 @@ void loadData() {
     deflection_limits = loadVector(path_dba, 2, &dimVett[4]); 
     fuel_mass = loadVector(path_dba, 3, &dimVett[5]); 
     
-    // MATRICI
+    // *** Section: Load matrix from file ***
     data_propeller = loadMatrix(path_propeller, 4, 3, &dimMat[0]);
     steady_state_coeff = loadMatrix(path_dba, 7, 4, &dimMat[1]);
     aer_der_x = loadMatrix(path_dba, 8, 5, &dimMat[2]);
@@ -147,15 +147,17 @@ void loadData() {
     control_moment_der = loadMatrix(path_dba, 7, 12, &dimMat[9]);
     rotary_der = loadMatrix(path_dba, 7, 13, &dimMat[10]);
 
+    // *** Section: Set RPM limits ***
     RPMmin = (int)engine[2];
     RPMmax = (int)engine[3];
 }
 
 void printData() {
+    FILE *val1 = fopen(path_v_l_i, "w");
+    
     const char *name_vec[] = {"engine", "geometry_propeller", "propeller_profile", "body_axes", "deflection_limits", "fuel_mass"};
     double *vec[] = {engine, geometry_propeller,propeller_profile, body_axes, deflection_limits, fuel_mass};
 
-    FILE *val1 = fopen(path_v_l_i, "w");
     fprintf(val1, "\n\n**********   STAMPA VETTORI   **********");
     for(int i=0; i<sizeof(vec)/sizeof(vec[0]); ++i){
         printVector(name_vec[i], vec[i], dimVett[i]);

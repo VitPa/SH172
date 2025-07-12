@@ -18,10 +18,7 @@ void AtmosphereChoice ()
 {
     int input;
 
-    system("cls");
-    printf("\n>>>-----------------------------------------------------------------<<<\n");
-    printf(  ">             [ PRE-PROCESSING ]  >>  Atmosfera ISA ...               <\n");
-    printf(  ">>>-----------------------------------------------------------------<<<\n\n");
+    startSection(2);
 
     printf("\nLa simulazione fa riferimento al modello atmosferico ISA, avente i segeunti valori per quota h=0m (sea level):\n\n");
     printf("\tPressione: \t\tP = %g Pa\n",press0);
@@ -32,22 +29,22 @@ void AtmosphereChoice ()
     printf("\nSe non si desidera procedere con i suddetti parametri e' possibile modificarli, reinserendoli manualmente o scegliendo una quota differente.\n");
     do {
         printf("\nPremere:\n");
-        printf("\t[1] se si desidera procedere con i valori iniziali precedentemente indicati\n"); // mantiene i valori iniziali di default
-        printf("\t[2] se si desidera modificare i valori iniziali a h=0\n"); //modifica i valori iniziali di default
-        printf("\t[3] se di desidera immettere i valori manualmente a una quota specifica (richiesta in seguito)\n");// immette i valori manualmente a una data quota senza richiederla poi
+        printf("\t[1] se si desidera procedere con i valori iniziali precedentemente indicati\n");
+        printf("\t[2] se si desidera modificare i valori iniziali a h=0\n");
+        printf("\t[3] se di desidera immettere i valori manualmente a una quota specifica (richiesta in seguito)\n");
 
         scanf("%d", &input);
         if(input!=1 && input!=2 && input!=3)
         {
-            scanf("%*[^\n]"); //svuota il buffer di scanf se immetto un carattere invece che un numero
+            scanf("%*[^\n]");
             WARNING(500, 1.0, 3.0);
         }
         switch(input)
         {
-            case 1: // mantiene i valori iniziali di default
+            case 1:                                                             // Use initial default values
                 flagatm = 1;
                 break;
-            case 2: //modifica i valori iniziali di default
+            case 2:                                                             // Modify initial default values
                 printf("Inserire un valore di pressione (h=0) [Pa]:");    
                 do {
                     scanf("%*[^\n]");
@@ -78,7 +75,7 @@ void AtmosphereChoice ()
 
                 flagatm = 1;
                 break;
-            case 3: // immette i valori manualmente a una data quota senza richiederla poi
+            case 3:                                                             // Enters values manually at a given altitude
                 printf("Inserire un valore di pressione [Pa]:");
                 do {
                     scanf("%*[^\n]");
@@ -119,7 +116,7 @@ void AtmosphereCalc (double h)
     static int stampa = 0;
     switch(flagatm)
     {
-        case 1: // calcola le condizioni atmosferiche e di pot per i valori a SL di default o inseriti dall'utente
+        case 1:                                                         // Calculates atmospheric and power conditions for default or user-entered SL values
             double temp = temp0 + 273.15;
             temp_h = temp - 0.0065*h;
             press_h = press0*(pow((temp_h/(temp)),5.2561));
@@ -136,7 +133,7 @@ void AtmosphereCalc (double h)
                 stampa = 1;
             }
             break;
-        case 2:// usa i valori scelti dall'utente
+        case 2:                                                         // Uses the values chosen by the user
             temp_h=temp_h+273.15;
             Pmax_h= engine[0] * pow(rho_h/(rho0),engine[1]);
 

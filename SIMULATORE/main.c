@@ -16,6 +16,7 @@
 int main(){    
     double trim[3] = {0.0, 0.0, 0.0};
 
+    // *** Section: Open output/input files ***
     openFiles();
     
     printf("Simulatore di volo per il Cessna 172\n\t\tGruppo 01\n\t    A.A. (24-25)\n");
@@ -26,28 +27,23 @@ int main(){
 
     system("PAUSE");
 
-    // Load variables from file .txt
+    // *** Section: Load data from file ***
     loadData();
 
-    // Load initial conditions
+    // *** Section: Load and check initial conditions ***
     double CI[3];
-
     loadCI(CI);
     checkVelAlt(&CI[0], &CI[1], &CI[2]);
 
-    // Compute atmospheric variables
+    // *** Section: Compute atmospheric variables at initial altitude ***
     AtmosphereChoice();
     AtmosphereCalc(CI[1]);
 
-    // Trim condition and Routh stability
+    // *** Section: Compute trim condition and check stability ***
     trimEquation(CI, trim);
 
-    system("cls");
-    printf("\n>>>-----------------------------------------------------------------<<<\n");
-    printf(  ">               [ PRE-PROCESSING ]  >>  Scelta Manovra ...            <\n");
-    printf(  ">>>-----------------------------------------------------------------<<<\n\n");
-
-    // Load commands matrix
+    // *** Section: Maneuver selection and simulation setup ***
+    startSection(5);
     double dt, deltaT_fs;
     printf("Inserire il passo di simulazione:\n(1) -> 0.01s\n(2) -> 0.02s\nScegliere tra [1 e 2]: ");
     do{
@@ -66,24 +62,23 @@ int main(){
         }
     }while(deltaT_fs <= 0);
 
-    load_command(dt, deltaT_fs, trim[2], trim[1]);
-    
-    // Integration and simulation
+    load_command(dt, deltaT_fs, trim[2], trim[1]);          // Load the command matrix for the simulation
 
-    system("cls");
-    printf("\n>>>-----------------------------------------------------------------<<<\n");
-    printf(  ">           [ PROCESSING ]  >>  Integrazione e Simulazione ...        <\n");
-    printf(  ">>>-----------------------------------------------------------------<<<\n\n");
+    
+    // *** Section: Integration and simulation loop ***
+    startSection(6);
 
     int i = 0;
     for(double Ts = 0.00; Ts <=deltaT_fs; Ts += dt){
 
-        AtmosphereCalc(state[9]);
+        AtmosphereCalc(state[9]);                   // Update atmospheric variables at current altitude
 
-        eulerEquation(dt, i);
+        eulerEquation(dt, i);                       // Integrate equations of motion for this time step
 
+        // Check physical constraints (e.g., velocity, altitude, etc.)
         physicalCheck(sqrt(pow(state[0], 2) + pow(state[1], 2) + pow(state[2], 2)), state[9], body_axes[0],body_axes[4], vsuono_h);
 
+        // Write data to output files
         fprintf(data, "%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t\n",Ts,state[0],state[1],state[2],state[3]*(180/pi),state[4]*(180/pi),state[5]*(180/pi),state[6]*(180/pi),state[7]*(180/pi),state[8]*(180/pi),state[9],state[10],state[11]);
         fflush(data);
         fprintf(com, "%lf\t%lf\t%lf\t%lf\t%lf\t\n", Ts, command[i][0], command[i][1], command[i][2], command[i][3]);
@@ -92,15 +87,9 @@ int main(){
         progressBar(Ts, deltaT_fs, "Volo in corso!");
         ++i;
     }
-    printf("\n");
 
-    // Free dynamic memory
+    // *** Section: Free memory and close files ***
     freeData();
-
-    // DA ELIMINARE NEL CODICE FINALE
-    system("copy /Y \"C:\\Users\\vitop\\OneDrive - Politecnico di Torino\\Computer\\Universita\\PoliTo\\2 anno\\Mod-Sim\\Simulazione\\Progetti\\Simulatore\\FILE_PROGETTO\\GIT\\SIMULATORE\\_output_files\\DATA.txt\" \"C:\\Users\\vitop\\Downloads\\CODICE_GRUPPO\\CODICE_GRUPPO\\DATA.txt\"");
-    system("copy /Y \"C:\\Users\\vitop\\OneDrive - Politecnico di Torino\\Computer\\Universita\\PoliTo\\2 anno\\Mod-Sim\\Simulazione\\Progetti\\Simulatore\\FILE_PROGETTO\\GIT\\SIMULATORE\\_output_files\\COMMAND.txt\" \"C:\\Users\\vitop\\Downloads\\CODICE_GRUPPO\\CODICE_GRUPPO\\COMMAND.txt\"");
-    system("copy /Y \"C:\\Users\\vitop\\OneDrive - Politecnico di Torino\\Computer\\Universita\\PoliTo\\2 anno\\Mod-Sim\\Simulazione\\Progetti\\Simulatore\\FILE_PROGETTO\\GIT\\SIMULATORE\\_output_files\\EXTRA.txt\" \"C:\\Users\\vitop\\Downloads\\CODICE_GRUPPO\\CODICE_GRUPPO\\EXTRA.txt\"");
 
     closeFiles();
     system("cls");

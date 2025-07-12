@@ -11,7 +11,7 @@
 #define pi 3.14159265
 
 void eulerEquation(double dt, int i){
-    // Richiamo componenti vettore di stato state
+    // *** Section: Extract state vector components ***
     double u     = state[0];
     double v     = state[1];
     double w     = state[2];
@@ -25,40 +25,37 @@ void eulerEquation(double dt, int i){
     double x_ned = state[10];
     double y_ned = state[11];
 
-    // Velostatetà totale iniziale (t = 0);
+    // *** Section: Compute total velocity ***
     double V = sqrt(pow(u, 2) + pow(v, 2) + pow(w, 2));
 
-    // Richiamo componenti dei comandi
+    // *** Section: Extract command inputs for this time step ***
     double da    = command[i][0] *(pi/180);
     double de    = command[i][1] *(pi/180);
     double dr    = command[i][2] *(pi/180);
-    double manetta = engine[2] + (engine[3] - engine[2]) * (command[i][3]) / (1);  // Mappatura manetta [0, 1] -> [RPMmin, RPMmax];
+    double manetta = engine[2] + (engine[3] - engine[2]) * (command[i][3]) / (1);  // Map throttle [0, 1] -> [RPMmin, RPMmax];
 
-    // Calcolo Spinta
+    // *** Section: Compute propeller thrust ***
     double prop[3] =  {0.0, 0.0, 0.0}, Pal = 0.0;
-
     propel(manetta, V, prop, &Pal);
     double T = prop[0];
-    fprintf(agg, "%lf\t%lf\n", i*dt, V);
-    fflush(agg);
+    
 
-    // Calcolo consumo di carburante
+    // *** Section: Fuel consumption update (if enabled) ***
     if(fuel_mass[0] == 1) body_axes[0] = massConsumption(engine[5], Pal, prop[2], body_axes[0], dt);
 
+    // *** Section: Aerodynamic and geometric parameters ***
     double S = body_axes[2];
     double costante=0.5*rho_h*V*V*S;
 
-    // Definizione alpha e beta iniziali (t = 0):
-    double alpha = atan2(w,u);
+    double alpha = atan2(w,u);                      // Compute angles
     double beta = asin(v/V);
-
-    // Calcolo velocità angolari adimensionali
-    double q_ad = q*body_axes[3]/(2*V);
+    
+    double q_ad = q*body_axes[3]/(2*V);             // Compute dimensionless angular rates
     double p_ad = p*body_axes[1]/(2*V);
     double r_ad = r*body_axes[1]/(2*V);
     double alpha_int = alpha*(180/pi);
 
-    // Calcolo coefficienti aerodinamici
+    // *** Section: Interpolate aerodynamic coefficients ***
     double Cxss = interpolation(steady_state_coeff, 1, alpha_int);
     double Cxa = interpolation(aer_der_x, 1, alpha_int);
     double Cxde = interpolation(control_force_der, 1, alpha_int);
@@ -86,10 +83,9 @@ void eulerEquation(double dt, int i){
     double Cnda = interpolation(control_moment_der, 5, alpha_int);
     double Cndr = interpolation(control_moment_der, 6, alpha_int);
 
-    //Calcolo i momenti di Inerzia sui vari assi e la massa
-    double Jx = body_axes[13], Jy = body_axes[14], Jz = body_axes[15], m = body_axes[0];
+    double Jx = body_axes[13], Jy = body_axes[14], Jz = body_axes[15], m = body_axes[0];    // Inertia and mass extraction
 
-    // Calcolo Forze e Momenti (t = 0);
+    // *** Section: Compute aerodynamic forces and moments ***
     double X = costante*(Cxss+Cxa*alpha+Cxde*de);
     double Y = costante*(Cyb*beta+Cyp*p_ad+Cyr*r_ad+Cydr*dr);
     double Z = costante*(Czss+Cza*alpha+Czq*q_ad+Czde*de);
@@ -97,7 +93,7 @@ void eulerEquation(double dt, int i){
     double M = costante*body_axes[3]*(Cmss+Cma*alpha+Cmq*q_ad+Cmde*de);
     double N = costante*body_axes[1]*(Cnss+Cnb*beta+Cnp*p_ad+Cnr*r_ad+Cnda*da+Cndr*dr);
 
-    // Incrementi tempo t = 0[s]
+    // *** Section: Compute time derivatives of state variables (equations of motion) ***
     double du_     = (r*v-q*w) - g*sin(theta) + X/m + T/m;
     double dv_     = (p*w-r*u) + g*sin(phi)*cos(theta) + Y/m;
     double dw_     = (q*u-p*v) + g*cos(phi)*cos(theta) + Z/m;
@@ -107,11 +103,14 @@ void eulerEquation(double dt, int i){
     double dphi_   = p + q*sin(phi)*tan(theta) + r*cos(phi)*tan(theta);
     double dtheta_ = q*cos(phi) - r*sin(phi);
     double dpsi_   = q*(sin(phi)/cos(theta)) + r*(cos(phi)/cos(theta));
-    double dh_     = -(u*sin(theta) - v*cos(theta)*sin(phi) - w*cos(theta)*cos(phi));
+    double dh_     = u*sin(theta) - v*cos(theta)*sin(phi) - w*cos(theta)*cos(phi);
     double dx_ned = u*cos(psi)*cos(theta) + v*(cos(psi)*sin(theta)*sin(phi) - sin(psi)*cos(phi)) + w*(cos(psi)*sin(theta)*cos(phi) + sin(psi)*sin(phi));
     double dy_ned = u*sin(psi)*cos(theta) + v*(sin(psi)*sin(theta)*sin(phi) + cos(psi)*cos(phi)) + w*(sin(psi)*sin(theta)*cos(phi) - cos(psi)*sin(phi));
+
+    fprintf(agg, "%lf\t%lf\n", i*dt, alpha_int);
+    fflush(agg);
     
-    // Vettore di stato dopo condizione di trim.
+    // *** Section: Update state vector using Euler integration ***
     state[0]  = u + dt*du_;
     state[1]  = v + dt*dv_;
     state[2]  = w + dt*dw_;
@@ -121,7 +120,7 @@ void eulerEquation(double dt, int i){
     state[6]  = phi + dt*dphi_;
     state[7]  = theta + dt*dtheta_;
     state[8]  = psi + dt*dpsi_;
-    state[9]  = h + dt*dh_;
+    state[9]  = h - dt*dh_;
     state[10] = x_ned + dt*dx_ned;
     state[11] = y_ned + dt*dy_ned;
 }
@@ -130,6 +129,7 @@ void progressBar(double Ts, double deltaT_fs, const char* context){
     if(fmod(Ts, (deltaT_fs/40.0)) < 0.01){
         int progress = (int)(Ts / (deltaT_fs / 40.0));
         if (Ts > deltaT_fs) progress = 40;
+        
         printf("\r[");
         for(int k = 0; k<40; ++k){
             if(k <= progress){

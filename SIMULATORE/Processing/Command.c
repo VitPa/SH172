@@ -6,17 +6,19 @@
 #include "../Pre_processing/Variables.h"
 #include "../Pre_processing/Data.h"
 
-static double manettat;
+static double throttle;
 static double et;
 static int n;
 
 void load_command(double dt, double Tfs, double RPMtrim, double eTrim){
     int choice;
-    manettat = (RPMtrim - RPMmin) / (RPMmax - RPMmin);
+    
+    throttle = (RPMtrim - RPMmin) / (RPMmax - RPMmin);              // Compute mapped throttle value
     et = eTrim;
     n = ((int)(Tfs/dt))+1;
     
-    for(int i = 0; i<n; ++i){
+    
+    for(int i = 0; i<n; ++i){                                       // Allocate command matrix for each time step
         command = reallocCommand(4);
     }
 
@@ -29,6 +31,7 @@ void load_command(double dt, double Tfs, double RPMtrim, double eTrim){
         }
         break;
     }while(1);
+
     switch (choice){
         case 1:
             defaultManeuver(dt, Tfs);
@@ -41,8 +44,8 @@ void load_command(double dt, double Tfs, double RPMtrim, double eTrim){
 
 void defaultManeuver(double dt, double Tfs){
     int maneuver;
-    int nDefaultManeuver = 1;
-    const char *maneuverName[] = {"Volo livellato"};
+    int nDefaultManeuver = 2;
+    const char *maneuverName[] = {"Volo livellato", "Prova mia"};
 
     printf("\nScegliere la manovra desiderata:\n");
     for(int i = 0; i<nDefaultManeuver; ++i){
@@ -58,11 +61,18 @@ void defaultManeuver(double dt, double Tfs){
     }while(1);
 
     switch(maneuver){
-        case 1:  // Volo livellato
+        case 1:  // Level Flight
             zero(dt, Tfs, 0);
             zero(dt, Tfs, 1);
             zero(dt, Tfs, 2);
             zero(dt, Tfs, 3);
+            break;
+        case 2:  // First simple maneuver
+            zero(dt, Tfs, 0);
+            ramp(apply_trim(0.0, 1), apply_trim(-2, 1), 400, 2, dt, Tfs, 1, 0);
+            ramp(apply_trim(0.0, 1), apply_trim(0, 1), 403, 2, dt, Tfs, 1, 1);
+            zero(dt, Tfs, 2);
+            ramp(apply_trim(0.0, 3), apply_trim(0.6, 3), 50, 10, dt, Tfs, 3, 0);
             break;
     }
 }
@@ -74,10 +84,8 @@ void customManeuver(double dt, double Tfs){
     int n = sizeof(signal)/sizeof(signal[0]);
 
     for(int i = 0; i<4; ++i){
-        system("cls");
-        printf("\n>>>-----------------------------------------------------------------<<<\n");
-        printf(  ">               [ PRE-PROCESSING ]  >>  Scelta Manovra ...            <\n");
-        printf(  ">>>-----------------------------------------------------------------<<<\n\n");
+        
+        startSection(5);
 
         int l = 0;
         double A = 0.0, start_command= 0.0, duration_command = 0.0, old_A, old_start, old_dur;
@@ -109,19 +117,19 @@ void customManeuver(double dt, double Tfs){
             }while(1);
 
             if(maneuver!=0){
-                if(i==3) printf("Ampiezza %s [%g, %g]: ", signal[maneuver-1], 0-manettat, 1-manettat); 
+                if(i==3) printf("Ampiezza %s [%g, %g]: ", signal[maneuver-1], 0-throttle, 1-throttle); 
                 else if(i==1) printf("Ampiezza %s [%g, %g]: ", signal[maneuver-1], -20-et, 20-et);
                 else printf("Ampiezza %s [-20, 20]: ", signal[maneuver-1]);
                 scanf("%lf", &A);
 
                 if (i==3){
-                    if(A+manettat<0){
-                        A=0-manettat; 
-                        WARNING(100, 0-manettat);
+                    if(A+throttle<0){
+                        A=0-throttle; 
+                        WARNING(100, 0-throttle);
                     }
-                    if(A+manettat>1){
-                        A=1-manettat; 
-                        WARNING(101, 1-manettat);
+                    if(A+throttle>1){
+                        A=1-throttle; 
+                        WARNING(101, 1-throttle);
                     }
                 }else if (i==1){
                     if(A+et<-20){
@@ -145,11 +153,11 @@ void customManeuver(double dt, double Tfs){
             }
 
             switch(maneuver){
-                case 0: // ZERO COMMAND
+                case 0:                 // ZERO COMMAND
                     zero(dt, Tfs, i);
                     l = 1;
                     break;
-                case 1:  // IMPLUSE
+                case 1:                 // IMPLUSE
                     if(l>0) {
                         printf("Tempo inizio comando ");
                         SetColor(8);
@@ -165,7 +173,7 @@ void customManeuver(double dt, double Tfs){
                     duration_command = 5*dt;
                     break;
 
-                case 2: // SYMMITRIC IMPULSE
+                case 2:                 // SYMMITRIC IMPULSE
                     if(l>0) {
                         printf("Tempo inizio comando ");
                         SetColor(8);
@@ -181,7 +189,7 @@ void customManeuver(double dt, double Tfs){
                     duration_command = 10*dt;
                     break;
 
-                case 3: // STEP
+                case 3:                 // STEP
                     if(l>0) {
                         printf("Tempo inizio comando ");
                         SetColor(8);
@@ -195,7 +203,7 @@ void customManeuver(double dt, double Tfs){
                     step(apply_trim(A, i), start_command, dt, Tfs, i, l);
                     break;
 
-                case 4: // STEP SHORT
+                case 4:                 // STEP SHORT
                     if(l>0) {
                         printf("Tempo durata comando ");
                         SetColor(8);
@@ -218,10 +226,8 @@ void customManeuver(double dt, double Tfs){
 
                     stepShort(apply_trim(A, i), start_command, duration_command, dt, Tfs, i, l);
                     break;
-
-                
                     
-                case 5: // RAMP
+                case 5:                 // RAMP
                     if(l>0) {
                         printf("Tempo durata comando ");
                         SetColor(8);
@@ -249,7 +255,7 @@ void customManeuver(double dt, double Tfs){
                     MY_ERROR(500);
             }
 
-            if(++l<=1){
+            if(++l<=1){                             // Check if the user wants to add another command or if there are just two signals
                 char choice = check_choice();
                 if(choice == 1) continue;
                 break;
@@ -336,7 +342,7 @@ void zero(double dt, double Tfs, int column){
 
 //Utility
 static inline double apply_trim(double val, int column) {
-    return (column == 1) ? (val + et) : (column == 3) ? (val + manettat) : val;
+    return (column == 1) ? (val + et) : (column == 3) ? (val + throttle) : val;
 }
 
 double ask_double(double min, double max) {
@@ -353,7 +359,7 @@ double ask_double(double min, double max) {
 }
 
 char check_choice(){
-    printf("Inserire altri segnali per questo comando? (0=No, 1=Si): ");
+    printf("Inserire altri segnali per questo comando? [0=No, 1=Si]: ");
     int choice;
     do{
         scanf("%d", &choice);
