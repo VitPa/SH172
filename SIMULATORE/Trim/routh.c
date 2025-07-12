@@ -7,8 +7,6 @@
 #include "../Error_Warning/InitialCondition.h"
 #include "../Pre_processing/Variables.h"
 
-#define pi 3.14159265
-
 int routh(double Cm_q, double alpha_trim, double V, double Cx_alpha, double Cz_alpha, double Cm_alpha, double Cm_alphaprimo){
 
     startSection(4);

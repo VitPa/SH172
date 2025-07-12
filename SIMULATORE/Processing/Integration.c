@@ -7,9 +7,6 @@
 #include "../Pre_processing/Variables.h"
 #include "../Pre_processing/Data.h"
 
-#define g 9.80665
-#define pi 3.14159265
-
 void eulerEquation(double dt, int i){
     // *** Section: Extract state vector components ***
     double u     = state[0];

@@ -11,9 +11,6 @@
 #include "../Processing/Propeller.h"
 #include "../Processing/Integration.h"
 
-#define g 9.80665
-#define pi 3.14159265
-
 void trimEquation(double *CI, double *trim) {
 
     startSection(3);
