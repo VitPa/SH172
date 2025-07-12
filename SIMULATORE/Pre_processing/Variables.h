@@ -21,6 +21,8 @@ extern FILE *ew_log;
 extern FILE *data;
 extern FILE *com;
 extern FILE *agg;
+extern FILE *val1;
+extern FILE *val2;
 
 
 /*// variabili globali

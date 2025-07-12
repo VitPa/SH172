@@ -7,58 +7,49 @@
 
 void main() {
     int k = 0;
+    path_engine = "../SIMULATORE/_input_files/engine.txt";
+    path_propeller = "../SIMULATORE/_input_files/propeller.txt";
+    path_dba = "../SIMULATORE/_input_files/DBA.txt";
 
-    /*              VALDAZIONE LETTURA DATI                     */
     printf("Inizio lettura dati -> ");
     system("PAUSE");
 
+    val1 = fopen(path_v_l_i, "w");
     loadData();
     printData();
     
-    printf("\n- Valori correttamente scritti nel file \"VALIDAZIONE_LETTURA_INTERPOLAZIONE.txt\"\n\n");
+    printf("\n- Valori correttamente scritti nel file %s\n\n", path_v_l_i);
 
     printf("\nInizio interpolazione dati -> ");
     system("PAUSE");
 
-    /*              VALDAZIONE INTERPOLAZIONE DATI                     */
+    // *** Section: Validation - Interpolation test setup ***
     const char *legende[][8] = {
-        // steady_state_coeff
-        {"ALPHA", "CX", "CY", "CZ", "Cl", "Cm", "Cn", NULL},
-        // aer_der_x
-        {"ALPHA", "CXA", "CXAP", "CXU", "CXQ", "CXB", "CXP", "CXR"},
-        // aer_der_y
-        {"ALPHA", "CYB", "CYBP", "CYP", "CYR", "CYA", "CYQ", NULL},
-        // aer_der_z
-        {"ALPHA", "CZALPHA", "CZAP", "CZU", "CZQ", "CZB", "CZP", "CZR"},
-        // rolling_moment_der
-        {"ALPHA", "ClB", "ClBP", "ClP", "ClR", "ClA", "ClQ", NULL},
-        // pitch_moment_der
-        {"ALPHA", "CmA", "CmAP", "CmU", "CmQ", "CmB", "CmP", "CmR"},
-        // yawing_moment_der
-        {"ALPHA", "CnB", "CnBP", "CnP", "CnR", "CnA", "CnQ", NULL},
-        // control_force_der
-        {"ALPHA", "CXde", "CXdle", "CZde", "CZdle", "CYda", "CYdr", NULL},
-        // control_moment_der
-        {"ALPHA", "Clda", "Cldr", "Cmde", "Cmdle", "Cnda", "Cndr", NULL},
-        // rotary_der
-        {"ALPHA", "CXom", "CYom", "CZom", "Clom", "Cmom", "Cnom", NULL}
+        {"ALPHA", "CX", "CY", "CZ", "Cl", "Cm", "Cn", NULL},                    // steady_state_coeff
+        {"ALPHA", "CXA", "CXAP", "CXU", "CXQ", "CXB", "CXP", "CXR"},            // aer_der_x
+        {"ALPHA", "CYB", "CYBP", "CYP", "CYR", "CYA", "CYQ", NULL},             // aer_der_y
+        {"ALPHA", "CZALPHA", "CZAP", "CZU", "CZQ", "CZB", "CZP", "CZR"},        // aer_der_z
+        {"ALPHA", "ClB", "ClBP", "ClP", "ClR", "ClA", "ClQ", NULL},             // rolling_moment_der
+        {"ALPHA", "CmA", "CmAP", "CmU", "CmQ", "CmB", "CmP", "CmR"},            // pitch_moment_der
+        {"ALPHA", "CnB", "CnBP", "CnP", "CnR", "CnA", "CnQ", NULL},             // yawing_moment_der
+        {"ALPHA", "CXde", "CXdle", "CZde", "CZdle", "CYda", "CYdr", NULL},      // control_force_der
+        {"ALPHA", "Clda", "Cldr", "Cmde", "Cmdle", "Cnda", "Cndr", NULL},       // control_moment_der
+        {"ALPHA", "CXom", "CYom", "CZom", "Clom", "Cmom", "Cnom", NULL}         // rotary_der
     };
-
     const char *nomi[] = {
         "steady_state_coeff", "aer_der_x", "aer_der_y", "aer_der_z",
         "rolling_moment_der", "pitch_moment_der", "yawing_moment_der",
         "control_force_der", "control_moment_der", "rotary_der"
     };
-
     double** matrici[] = {
         steady_state_coeff, aer_der_x, aer_der_y, aer_der_z,
         rolling_moment_der, pitch_moment_der, yawing_moment_der,
         control_force_der, control_moment_der, rotary_der
     };
-
     int numMatrici = sizeof(nomi) / sizeof(nomi[0]);
 
-    printf("\nScegli la matrice da interpolare:\n");
+    // *** Section: User selects data for interpolation ***
+    printf("\nScegli la matrice da interpolare:\n");                        // Selects matrix
     for (int i = 0; i < numMatrici; ++i) {
         printf("(%d) %s\n", i, nomi[i]);
     }
@@ -73,7 +64,7 @@ void main() {
         break;
     }while(1);
 
-    printf("\nLegenda colonne per '%s':\n", nomi[sceltaMat]);
+    printf("\nLegenda colonne per '%s':\n", nomi[sceltaMat]);               // Selects column
     for (int j = 0; j < 8; ++j) {
         if(legende[sceltaMat][j] == NULL) {
             break;
@@ -93,7 +84,7 @@ void main() {
     }while(1);
 
     double alpha;
-    printf("Inserisci il valore di alpha per l'interpolazione[-5, 20]: ");
+    printf("Inserisci il valore di alpha per l'interpolazione[-5, 20]: ");  // Selects alpha
     do{
         scanf("%lf", &alpha);
         if(alpha < -5 || alpha > 20){
@@ -103,15 +94,15 @@ void main() {
         break;
     }while(1);
 
+    // *** Section: Perform interpolation ***
     double InterpVet = interpolation(matrici[sceltaMat], sceltaCol, alpha);
-
+    
+    // *** Section: Prepare data for graphical output ***
     while(matrici[sceltaMat][++k][0] < alpha){};
     double x0 = matrici[sceltaMat][k-1][0];
     double x1 = matrici[sceltaMat][k][0];
 
-    FILE *val1 = apriFile("Validazione_output/VALIDAZIONE_LETTURA_INTERPOLAZIONE.txt", "a");
     fprintf(val1, "\n------------VALIDAZIONE_INTERPOLAZIONE------------\n");
-
     fprintf(val1, "\nTest interpolazione su matrice '%s'\n", nomi[sceltaMat]);
     fprintf(val1, "Alpha di riferimento: %g\n", alpha);
     fprintf(val1, "Colonna di riferimento: %s\n", legende[sceltaMat][sceltaCol]);
@@ -127,6 +118,7 @@ void main() {
     if (pos < 0) pos = 0;
     if (pos > bar_len) pos = bar_len;
 
+    // *** Section: Print graphical representation of interpolation result ***
     fprintf(val1, "\nVisualizzazione grafica:\n");
     fprintf(val1, "Estremo1: %g", x0);
     for (int i = 0; i < bar_len + 2; ++i) fprintf(val1, " ");
@@ -145,9 +137,10 @@ void main() {
     fprintf(val1, "^\n");
     fprintf(val1, "\t\tValore interpolato: %g\n", InterpVet);
 
+    fflush(val1);
     fclose(val1);
 
-    printf("\n- Valori correttamente scritti nel file \"VALIDAZIONE_LETTURA_INTERPOLAZIONE.txt\"\n\n");
+    printf("\n- Valori correttamente scritti nel file %s\n\n", path_v_l_i);
 
     printf("Validazione terminata con successo!\n");
     system("PAUSE");

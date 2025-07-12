@@ -16,6 +16,8 @@ FILE *ew_log = NULL;
 FILE *data = NULL;
 FILE *com = NULL;
 FILE *agg = NULL;
+FILE *val1 = NULL;
+FILE *val2 = NULL;
 
 int RPMmin = -1;
 int RPMmax = -1;

@@ -6,7 +6,6 @@
 
 static int dimVett[6];
 int dimMat[13];
-static FILE *val1;
 
 FILE* openFile(const char *path, const char *mode) {
     FILE* f = fopen(path, mode);
@@ -152,13 +151,11 @@ void loadData() {
     RPMmax = (int)engine[3];
 }
 
-void printData() {
-    FILE *val1 = fopen(path_v_l_i, "w");
-    
+void printData() {    
     const char *name_vec[] = {"engine", "geometry_propeller", "propeller_profile", "body_axes", "deflection_limits", "fuel_mass"};
     double *vec[] = {engine, geometry_propeller,propeller_profile, body_axes, deflection_limits, fuel_mass};
 
-    fprintf(val1, "\n\n**********   STAMPA VETTORI   **********");
+    fprintf(val1, "**********   STAMPA VETTORI   **********");
     for(int i=0; i<sizeof(vec)/sizeof(vec[0]); ++i){
         printVector(name_vec[i], vec[i], dimVett[i]);
     }
@@ -173,7 +170,6 @@ void printData() {
         printMatrix(name_mat[i], mat[i], dimMat[i], (i==0) ? 4 : (i==2 || i==4 || i==6) ? 8 : 7);
     }
     fflush(val1);
-    fclose(val1);
 }
 
 // Funzione per liberare la memoria di tutti i dati caricati
