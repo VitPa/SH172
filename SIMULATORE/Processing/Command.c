@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "Command.h"
 #include "../Error_Warning/ErrorWarning.h"
+#include "../Error_Warning/InitialCondition.h"
 #include "../Pre_processing/Variables.h"
 #include "../Pre_processing/Data.h"
 
@@ -19,7 +20,7 @@ void load_command(double dt, double Tfs, double RPMtrim, double eTrim){
         command = reallocCommand(4);
     }
 
-    printf("(1) per le manovre standard già implementate, (2) per le manovre personalizzate: \n");
+    printf("\n(1) per le manovre standard gia' implementate, (2) per le manovre personalizzate: \n");
     do{
         scanf("%d", &choice);
         if(choice != 1 && choice != 2){
@@ -43,7 +44,7 @@ void defaultManeuver(double dt, double Tfs){
     int nDefaultManeuver = 1;
     const char *maneuverName[] = {"Volo livellato"};
 
-    printf("Scegliere la manovra desiderata:\n");
+    printf("\nScegliere la manovra desiderata:\n");
     for(int i = 0; i<nDefaultManeuver; ++i){
         printf("(%d) %s\n", i+1, maneuverName[i]);
     }
@@ -73,6 +74,10 @@ void customManeuver(double dt, double Tfs){
 
     for(int i = 0; i<4; ++i){
         system("cls");
+        printf("\n>>>-----------------------------------------------------------------<<<\n");
+        printf(  ">               [ PRE-PROCESSING ]  >>  Scelta Manovra ...            <\n");
+        printf(  ">>>-----------------------------------------------------------------<<<\n\n");
+
         int l = 0;
         double A = 0.0, start_command= 0.0, duration_command = 0.0, old_A, old_start, old_dur;
         char *old_signal;
@@ -232,6 +237,7 @@ void customManeuver(double dt, double Tfs){
             };
         }while(l<=1);
     }
+    endSection();
 }
 
 void impulse(double A, double start_command, double dt, double Tfs, int column, int l){

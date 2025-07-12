@@ -4,11 +4,17 @@
 #include <math.h>
 #include "routh.h"
 #include "../Error_Warning/ErrorWarning.h"
+#include "../Error_Warning/InitialCondition.h"
 #include "../Pre_processing/Variables.h"
 
 #define pi 3.14159265
 
 int routh(double Cm_q, double alpha_trim, double V, double Cx_alpha, double Cz_alpha, double Cm_alpha, double Cm_alphaprimo){
+
+    system("cls");
+    printf("\n>>>-----------------------------------------------------------------<<<\n");
+    printf(  ">    [ PRE-PROCESSING ]  >>  Calcolo condizioni di stabilita' ...     <\n");
+    printf(  ">>>-----------------------------------------------------------------<<<\n\n");
 
     static int stampa = 1;
 
@@ -75,12 +81,13 @@ int routh(double Cm_q, double alpha_trim, double V, double Cx_alpha, double Cz_a
     double T12_sp = fabs(log(0.5)/Resp);
 
     printf("\n\nCaratteristiche modi:\n");
-    printf("                  ****************************************************************************************** \n");
-    printf("                  * - MODO FUGOIDE:                           * - MODO CORTO PERIODO:                   *\n" );
-    printf("                  * - omega[rad/s] = %.3f                    * - omega[rad/s]= %.3lf                   *\n",omegaNph,omegaNsp);
-    printf("                  * - smorzamento[-] = %.3lf                  * - smorzamento[-]= %.3lf                 *\n",zph,zsp);
-    printf("                  * - periodo[s] = %.3lf                     * - periodo[s]= %.3lf                     *\n",Tph,Tsp);
-    printf("                  * - tempo di dimezzamento[s] = %.3lf       * - tempo di dimezzamento[s]= %.3lf       *\n",T12_ph,T12_sp);
-    printf("                  ****************************************************************************************** \n\n");
+    printf("     ***************************************************************************************\n");
+    printf("     * - MODO FUGOIDE:                           * - MODO CORTO PERIODO:                   *\n" );
+    printf("     * - omega[rad/s] = %.3f                    * - omega[rad/s]= %.3lf                   *\n",omegaNph,omegaNsp);
+    printf("     * - smorzamento[-] = %.3lf                  * - smorzamento[-]= %.3lf                 *\n",zph,zsp);
+    printf("     * - periodo[s] = %.3lf                     * - periodo[s]= %.3lf                     *\n",Tph,Tsp);
+    printf("     * - tempo di dimezzamento[s] = %.3lf       * - tempo di dimezzamento[s]= %.3lf       *\n",T12_ph,T12_sp);
+    printf("     ***************************************************************************************\n\n");
     
+    endSection();
 }

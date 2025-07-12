@@ -30,7 +30,7 @@ static const Err_War_t error_table[] = {
     
     //4xx -> Condizioni di Trim e stabilità
     {400, "Alpha e/o de di Trim non trovati.\n"},
-    {401, "RPM di Trim non trovati.\n"},
+    {401, "RPM di Trim non trovati. RPM necessari troppo %s.\n"},
     {402, "L'aereo è staticamente instabile.\n"},
     {403, "L'aereo è dinamicamente instabile.\n"},
 

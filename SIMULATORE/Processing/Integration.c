@@ -39,7 +39,7 @@ void eulerEquation(double dt, int i){
 
     propel(manetta, V, prop, &Pal);
     double T = prop[0];
-    fprintf(agg, "%lf\t%lf\n", i*dt, T);
+    fprintf(agg, "%lf\t%lf\n", i*dt, V);
     fflush(agg);
 
     // Calcolo consumo di carburante
@@ -107,7 +107,7 @@ void eulerEquation(double dt, int i){
     double dphi_   = p + q*sin(phi)*tan(theta) + r*cos(phi)*tan(theta);
     double dtheta_ = q*cos(phi) - r*sin(phi);
     double dpsi_   = q*(sin(phi)/cos(theta)) + r*(cos(phi)/cos(theta));
-    double dh_     = u*sin(theta) - v*cos(theta)*sin(phi) - w*cos(theta)*cos(phi);
+    double dh_     = -(u*sin(theta) - v*cos(theta)*sin(phi) - w*cos(theta)*cos(phi));
     double dx_ned = u*cos(psi)*cos(theta) + v*(cos(psi)*sin(theta)*sin(phi) - sin(psi)*cos(phi)) + w*(cos(psi)*sin(theta)*cos(phi) + sin(psi)*sin(phi));
     double dy_ned = u*sin(psi)*cos(theta) + v*(sin(psi)*sin(theta)*sin(phi) + cos(psi)*cos(phi)) + w*(sin(psi)*sin(theta)*cos(phi) - cos(psi)*sin(phi));
     

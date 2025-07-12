@@ -5,6 +5,7 @@
 #include <ctype.h>
 #include "Atmosphere.h"
 #include "../Error_Warning/ErrorWarning.h"
+#include "../Error_Warning/InitialCondition.h"
 #include "../Pre_processing/Variables.h"
 
 static double press0 = 101325;    // Pa
@@ -17,7 +18,11 @@ void AtmosphereChoice ()
 {
     int input;
 
-    printf("\n\\\\\\\\\\\\\\\\\\\\\\\n\\\\\\\\ATMOSFERA ISA\n\\\\\\\\\\\\\\\\\\\\\\\n");
+    system("cls");
+    printf("\n>>>-----------------------------------------------------------------<<<\n");
+    printf(  ">             [ PRE-PROCESSING ]  >>  Atmosfera ISA ...               <\n");
+    printf(  ">>>-----------------------------------------------------------------<<<\n\n");
+
     printf("\nLa simulazione fa riferimento al modello atmosferico ISA, avente i segeunti valori per quota h=0m (sea level):\n\n");
     printf("\tPressione: \t\tP = %g Pa\n",press0);
     printf("\tTemperatura: \t\tT = %g C\n",temp0);
@@ -106,6 +111,8 @@ void AtmosphereChoice ()
         }
     }
     while(input!=1 && input!=2 && input!=3);
+
+    endSection();
 }
 
 void AtmosphereCalc (double h)

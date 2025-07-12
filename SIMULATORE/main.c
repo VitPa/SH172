@@ -14,14 +14,17 @@
 #include "Trim/MotionEq.h"
 
 int main(){    
-    double trim[3];
+    double trim[3] = {0.0, 0.0, 0.0};
 
     openFiles();
+    
+    printf("Simulatore di volo per il Cessna 172\n\t\tGruppo 01\n\t    A.A. (24-25)\n");
+    printf("Casali Filippo   -   Dimola Alessio\n");
+    printf("Godoy Gabriel    -   Guarino Enrica\n");
+    printf("Piazzolla Vito   -   Ruggieri Elena\n");
+    printf("Scarso Giovanni\n\n");
 
-    printf("Simulatore di volo per il Cessna 172\n Inserire i dati iniziali\n");
-    printf("--------------------------------------------\n");
-    printf("Per i valori di default premere Invio . . .\n");
-    printf("--------------------------------------------\n\n");
+    system("PAUSE");
 
     // Load variables from file .txt
     loadData();
@@ -39,6 +42,11 @@ int main(){
     // Trim condition and Routh stability
     trimEquation(CI, trim);
 
+    system("cls");
+    printf("\n>>>-----------------------------------------------------------------<<<\n");
+    printf(  ">               [ PRE-PROCESSING ]  >>  Scelta Manovra ...            <\n");
+    printf(  ">>>-----------------------------------------------------------------<<<\n\n");
+
     // Load commands matrix
     double dt, deltaT_fs;
     printf("Inserire il passo di simulazione:\n(1) -> 0.01s\n(2) -> 0.02s\nScegliere tra [1 e 2]: ");
@@ -50,7 +58,7 @@ int main(){
             WARNING(500, 0, 1.0);
         }
     }while(dt != 0.01 && dt != 0.02);
-    printf("Inserire il tempo di simulazione [s]: ");
+    printf("\nInserire il tempo di simulazione [s]: ");
     do{
         scanf("%lf", &deltaT_fs);
         if(deltaT_fs <= 0){
@@ -61,6 +69,12 @@ int main(){
     load_command(dt, deltaT_fs, trim[2], trim[1]);
     
     // Integration and simulation
+
+    system("cls");
+    printf("\n>>>-----------------------------------------------------------------<<<\n");
+    printf(  ">           [ PROCESSING ]  >>  Integrazione e Simulazione ...        <\n");
+    printf(  ">>>-----------------------------------------------------------------<<<\n\n");
+
     int i = 0;
     for(double Ts = 0.00; Ts <=deltaT_fs; Ts += dt){
 
@@ -79,7 +93,6 @@ int main(){
         ++i;
     }
     printf("\n");
-    printf("Massa finale %g\n", body_axes[0]);
 
     // Free dynamic memory
     freeData();
@@ -90,7 +103,8 @@ int main(){
     system("copy /Y \"C:\\Users\\vitop\\OneDrive - Politecnico di Torino\\Computer\\Universita\\PoliTo\\2 anno\\Mod-Sim\\Simulazione\\Progetti\\Simulatore\\FILE_PROGETTO\\GIT\\SIMULATORE\\_output_files\\EXTRA.txt\" \"C:\\Users\\vitop\\Downloads\\CODICE_GRUPPO\\CODICE_GRUPPO\\EXTRA.txt\"");
 
     closeFiles();
-    printf("SIMULAZIONE TERMINATA. GRAZIE PER AVER VOLATO CON NOI, \tA PRESTO!\n");
+    system("cls");
+    printf("\nSIMULAZIONE TERMINATA. GRAZIE PER AVER VOLATO CON NOI, \tA PRESTO!\n");
     system("PAUSE");
     return 0;
 }

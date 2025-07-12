@@ -1,11 +1,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <windows.h>
 #include "ErrorWarning.h"
 #include "../Pre_processing/Variables.h"
 #include "../Pre_processing/Data.h"
 
 static double mFuelMin = -1.0;
+
+void endSection(){
+    printf("                                                             =");
+    Sleep(1000);
+    printf("=");
+    Sleep(1000);
+    printf(">>");
+    Sleep(1000);
+}
 
 void checkVelAlt(double *V, double *h, double *gamma) {
     if (*V < 30){
@@ -62,6 +72,13 @@ void physicalCheck(double V, double h, double m, double Mdg, double vsuono_h) {
 
 void loadCI(double *CI) {
     char input[100];
+
+    system("cls");
+    printf("\n>>>-----------------------------------------------------------------<<<\n");
+    printf(  ">     [ PRE-PROCESSING ]  >>  Inserimento condizioni iniziali ...     <\n");
+    printf(  ">                    --------------------------                       <\n");
+    printf(  ">             Per i valori di default premere Invio . . .             <\n");
+    printf(  ">>>-----------------------------------------------------------------<<<\n\n");
     
     printf("Inserire la velocità inziale [m/s] (default: 52): ");
     do{
@@ -97,6 +114,8 @@ void loadCI(double *CI) {
         WARNING(504);
     }while(1);
     printf("\n");
+
+    endSection();
 }
 
 void openFiles(){

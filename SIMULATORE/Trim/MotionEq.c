@@ -5,6 +5,7 @@
 #include "MotionEq.h"
 #include "routh.h"
 #include "../Error_Warning/ErrorWarning.h"
+#include "../Error_Warning/InitialCondition.h"
 #include "../Interpolation/Interpolation.h"
 #include "../Pre_processing/Variables.h"
 #include "../Processing/Propeller.h"
@@ -15,13 +16,17 @@
 
 void trimEquation(double *CI, double *trim) {
 
-    // ****** TROVARE ALPHA DI TRIM *******
+    system("cls");
+    printf("\n>>>-----------------------------------------------------------------<<<\n");
+    printf(  ">       [ PRE-PROCESSING ]  >>  Calcolo condizioni di Trim ...        <\n");
+    printf(  ">>>-----------------------------------------------------------------<<<\n\n");
 
+    // ****** TROVARE ALPHA DI TRIM *******
     double cst = 0.5 * rho_h * CI[0] * CI[0] * body_axes[2];
     int flag_1 = 0;
     double score_min = 1000;
     double CZtrim, CMtrim;
-    double res1 = 1, res2 = 0.0009; //Prima 0.0001
+    double res1 = 1, res2 = 0.0001; //Prima 0.0009
     
     for (double alpha_1 = -5.0; alpha_1 <= 20.0; alpha_1 += 0.001) {
         double CZss = interpolation(steady_state_coeff, 3, alpha_1);
@@ -41,8 +46,8 @@ void trimEquation(double *CI, double *trim) {
                 double score = sqrt(pow(control/res1,2) + pow(control2/res2,2));
                 if (score < score_min) {
                     score_min = score;
-                    trim[1] = de_1;
                     trim[0] = alpha_1;
+                    trim[1] = de_1;
                     CZtrim = CZalpha;
                     CMtrim = CMalpha;
                 }
@@ -88,18 +93,18 @@ void trimEquation(double *CI, double *trim) {
         propel(RPM, CI[0], prop, &Pal);
 
         if (tTrim - prop[0] < 0.0){  
-            if(RPM == RPMmin) MY_ERROR(401);         
-            memcpy(prop, prop_hold, sizeof(double)*3);
+            if(RPM == RPMmin) MY_ERROR(401, "bassi");
+            trim[2] = (prop[0]-tTrim)<(tTrim-prop_hold[0]) ? RPM : RPM-1;
             printf("\n*********************RPM di Trim trovato**************************************\n\n");
-            printf("---------- RPM: %d\n\n", RPM-1);
-            printf("Efficienza elica: %lf\n\n", prop[2]);
-            trim[2] = RPM-1;
+            printf("---------- RPM: %g\n\n", trim[2]);
             break;
         }
         memcpy(prop_hold, prop, sizeof(double)*3);
         RPM += 1;
     }
-    if(RPM > RPMmax || RPM <= RPMmin) MY_ERROR(401);
+    if(RPM > RPMmax) MY_ERROR(401, "alti");
+
+    endSection();
 
     // Calcolo la stabilità dell'aeromobile
     int a = routh(pitch_moment_der[0][4], trim[0], CI[0], CXalpha, CZtrim, CMtrim, pitch_moment_der[0][2]);
