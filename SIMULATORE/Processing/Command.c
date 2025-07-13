@@ -44,8 +44,8 @@ void load_command(double dt, double Tfs, double RPMtrim, double eTrim){
 
 void defaultManeuver(double dt, double Tfs){
     int maneuver;
-    int nDefaultManeuver = 2;
-    const char *maneuverName[] = {"Volo livellato", "Prova mia"};
+    int nDefaultManeuver = 3;
+    const char *maneuverName[] = {"Volo livellato", "Manovra semplice", "Manovra combinata"};
 
     printf("\nScegliere la manovra desiderata:\n");
     for(int i = 0; i<nDefaultManeuver; ++i){
@@ -67,19 +67,25 @@ void defaultManeuver(double dt, double Tfs){
             zero(dt, Tfs, 2);
             zero(dt, Tfs, 3);
             break;
-        case 2:  // First simple maneuver
+        case 2:  // Simple maneuver
             zero(dt, Tfs, 0);
-            ramp(apply_trim(0.0, 1), apply_trim(-2, 1), 400, 2, dt, Tfs, 1, 0);
-            ramp(apply_trim(0.0, 1), apply_trim(0, 1), 403, 2, dt, Tfs, 1, 1);
+            stepShort(apply_trim(-2, 1), 150, 10, dt, Tfs, 1, 0);
+            step(apply_trim(1, 1), 300, dt, Tfs, 1, 1);
             zero(dt, Tfs, 2);
-            ramp(apply_trim(0.0, 3), apply_trim(0.6, 3), 50, 10, dt, Tfs, 3, 0);
+            zero(dt, Tfs, 3);
+            break;
+        case 3:  // Combinate maneuver
+            zero(dt, Tfs, 0); //step da 10 per 5-10s
+            zero(dt, Tfs, 1);
+            zero(dt, Tfs, 2); //step da 5 per 5-10s
+            zero(dt, Tfs, 0);
             break;
     }
 }
 
 void customManeuver(double dt, double Tfs){
     int maneuver;
-    char *signal[5] = {"impulso", "impulso simmetrico", "gradino", "gradino con durata", "rampa"};
+    char *signal[6] = {"nessun comando", "impulso", "impulso simmetrico", "gradino", "gradino con durata", "rampa"};
     char *name[4] = {"alettoni", "equilibratore", "timone", "manetta"};
     int n = sizeof(signal)/sizeof(signal[0]);
 
@@ -105,12 +111,12 @@ void customManeuver(double dt, double Tfs){
                 printf("___________________________________________\n");
             }
             for(int j = 0; j<n; ++j){
-                printf("(%d) %s\n", j+1, signal[j]);
+                printf("(%d) %s\n", j, signal[j]);
             }
             do{
                 scanf("%d", &maneuver);
                 if(maneuver<0 || maneuver>n){
-                    WARNING(500, 1, n);
+                    WARNING(500, 0, n);
                     continue;
                 }
                 break;

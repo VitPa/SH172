@@ -38,12 +38,12 @@ void startSection(int option){
             printf("       V = %.2lf m/s  -  h = %.2lf m  -  gamma = %.2lf deg           \n", CI[0], CI[1], CI[2]);
             break;
         case 3:
-            printf(">       [ PRE-PROCESSING ]  >>  Calcolo condizioni di Trim ...        <\n");
+            printf(">         [ PROCESSING ]  >>  Calcolo condizioni di Trim ...          <\n");
             printf(">                    --------------------------                       <\n");
             printf("         V = %.2lf m/s  -  h = %.2lf m  -  gamma = %.2lf deg           \n", CI[0], CI[1], CI[2]);
             break;
         case 4:
-            printf(">    [ PRE-PROCESSING ]  >>  Calcolo condizioni di stabilita' ...     <\n");
+            printf(">      [ PROCESSING ]  >>  Calcolo condizioni di stabilita' ...       <\n");
             printf(">                    --------------------------                       <\n");
             printf("         V = %.2lf m/s  -  h = %.2lf m  -  gamma = %.2lf deg           \n", CI[0], CI[1], CI[2]);
             break;
@@ -52,10 +52,14 @@ void startSection(int option){
             printf(">                    --------------------------                       <\n");
             printf("         V = %.2lf m/s  -  h = %.2lf m  -  gamma = %.2lf deg           \n", CI[0], CI[1], CI[2]);
             printf(">                    --------------------------                       <\n");
-            printf("    alphaTrim = %.2lf deg - deTrim = %.2lf deg  -  manettaTrim = %.2lf \n", trim[0], trim[1], trim[2]);
+            printf("  alphaTrim = %.3lf deg - deTrim = %.3lf deg  -  manettaTrim = %.2lf \n", trim[0], trim[1], trim[2]);
             break;
         case 6:
             printf(">           [ PROCESSING ]  >>  Integrazione e Simulazione ...        <\n");
+            printf(">                    --------------------------                       <\n");
+            printf("         V = %.2lf m/s  -  h = %.2lf m  -  gamma = %.2lf deg           \n", CI[0], CI[1], CI[2]);
+            printf(">                    --------------------------                       <\n");
+            printf("  alphaTrim = %.3lf deg - deTrim = %.3lf deg  -  manettaTrim = %.2lf \n", trim[0], trim[1], trim[2]);
             break;
     }
     printf(">>>-----------------------------------------------------------------<<<\n\n");
@@ -160,10 +164,12 @@ void openFiles(){
     data = openFile(path_data, "w");
     com = openFile(path_com, "w");
     agg = openFile(path_agg, "w");
+    sval = openFile(path_sval, "w");
 }
 void closeFiles(){
     fclose(ew_log);
     fclose(data);
     fclose(com);
     fclose(agg);
+    fclose(sval);
 }

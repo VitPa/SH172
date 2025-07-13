@@ -15,12 +15,14 @@ extern char *path_data;
 extern char *path_com;
 extern char *path_agg;
 extern char *path_log;
+extern char *path_sval;
 
 // Puntatori ai file
 extern FILE *ew_log;
 extern FILE *data;
 extern FILE *com;
 extern FILE *agg;
+extern FILE *sval;
 extern FILE *val1;
 extern FILE *val2;
 

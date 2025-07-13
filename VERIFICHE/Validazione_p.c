@@ -20,7 +20,7 @@ void main() {
     val2 = openFile(path_v_p, "w");
 
     // *** Section: Load initial conditions ***
-    double CI[2];
+    double CI[3] = {0.0, 0.0, 0.0};
     printf("Inserire la velocità inziale [m/s]: ");
     do{
         if(scanf("%lf",&CI[0])!=0) break;
@@ -31,6 +31,7 @@ void main() {
         if(scanf("%lf",&CI[1])!=0) break;
         WARNING(504);
     }while(1);
+    endSection(CI);
 
     AtmosphereChoice();
     AtmosphereCalc(CI[1]);

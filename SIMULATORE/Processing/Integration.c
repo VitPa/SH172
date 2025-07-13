@@ -29,7 +29,7 @@ void eulerEquation(double dt, int i){
     double da    = command[i][0] *(pi/180);
     double de    = command[i][1] *(pi/180);
     double dr    = command[i][2] *(pi/180);
-    double manetta = engine[2] + (engine[3] - engine[2]) * (command[i][3]) / (1);  // Map throttle [0, 1] -> [RPMmin, RPMmax];
+    double manetta = RPMmin + (RPMmax - RPMmin) * (command[i][3]) / (1);  // Map throttle [0, 1] -> [RPMmin, RPMmax];
 
     // *** Section: Compute propeller thrust ***
     double prop[3] =  {0.0, 0.0, 0.0}, Pal = 0.0;
@@ -100,11 +100,12 @@ void eulerEquation(double dt, int i){
     double dphi_   = p + q*sin(phi)*tan(theta) + r*cos(phi)*tan(theta);
     double dtheta_ = q*cos(phi) - r*sin(phi);
     double dpsi_   = q*(sin(phi)/cos(theta)) + r*(cos(phi)/cos(theta));
-    double dh_     = u*sin(theta) - v*cos(theta)*sin(phi) - w*cos(theta)*cos(phi);
+    double dh_     = u*sin(theta) - v*cos(theta)*sin(phi) - w*cos(theta)*cos(phi);  // Con questi segni, le manovre (equilibratore) vanno bene ma il trim va verso l'alto
     double dx_ned = u*cos(psi)*cos(theta) + v*(cos(psi)*sin(theta)*sin(phi) - sin(psi)*cos(phi)) + w*(cos(psi)*sin(theta)*cos(phi) + sin(psi)*sin(phi));
     double dy_ned = u*sin(psi)*cos(theta) + v*(sin(psi)*sin(theta)*sin(phi) + cos(psi)*cos(phi)) + w*(sin(psi)*sin(theta)*cos(phi) - cos(psi)*sin(phi));
 
-    fprintf(agg, "%lf\t%lf\n", i*dt, alpha_int);
+    double gamma = atan2(dh_, sqrt(dx_ned*dx_ned + dy_ned*dy_ned));
+    fprintf(agg, "%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t\n", i*dt, alpha_int, beta*(180/pi), gamma, V, T, -Z, body_axes[0]);
     fflush(agg);
     
     // *** Section: Update state vector using Euler integration ***
@@ -117,7 +118,7 @@ void eulerEquation(double dt, int i){
     state[6]  = phi + dt*dphi_;
     state[7]  = theta + dt*dtheta_;
     state[8]  = psi + dt*dpsi_;
-    state[9]  = h - dt*dh_;
+    state[9]  = h + dt*dh_;
     state[10] = x_ned + dt*dx_ned;
     state[11] = y_ned + dt*dy_ned;
 }

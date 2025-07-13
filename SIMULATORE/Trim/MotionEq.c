@@ -78,6 +78,7 @@ void trimEquation(double *CI, double *trim) {
     // *** Section: Find propeller RPM for trim ***
     double CX_tot = CXss + CXalpha * trim[0] * (pi/180) + CXde * trim[1] * (pi/180);
     double tTrim = body_axes[0]*g*sin(thetaTrim) - 0.5*CX_tot*rho_h*CI[0]*CI[0]*body_axes[2];
+    fprintf(sval, "%lf\t%lf\t\n", trim[0], tTrim);
 
     int RPM = RPMmin;
     double prop_hold[3];

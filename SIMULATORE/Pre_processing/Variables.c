@@ -11,11 +11,13 @@ char *path_data = "_output_files/DATA.txt";
 char *path_com = "_output_files/COMMAND.txt";
 char *path_agg = "_output_files/EXTRA.txt";
 char *path_log = "_output_files/LOG.txt";
+char *path_sval = "_output_files/SVALUE.txt";
 
 FILE *ew_log = NULL;
 FILE *data = NULL;
 FILE *com = NULL;
 FILE *agg = NULL;
+FILE *sval = NULL;
 FILE *val1 = NULL;
 FILE *val2 = NULL;
 
