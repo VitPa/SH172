@@ -19,7 +19,7 @@ int main(){
     // *** Section: Open output/input files ***
     openFiles();
     
-    printf("Simulatore di volo per il Cessna 172\n\t\tGruppo 01\n\t    A.A. (24-25)\n");
+    printf("Simulatore di volo per il Cessna 172\n\t\tGruppo 01\n\t       A.A. (24-25)\n");
     printf("Casali Filippo   -   Dimola Alessio\n");
     printf("Godoy Gabriel    -   Guarino Enrica\n");
     printf("Piazzolla Vito   -   Ruggieri Elena\n");
@@ -34,6 +34,7 @@ int main(){
     double CI[3];
     loadCI(CI);
     checkVelAlt(&CI[0], &CI[1], &CI[2]);
+    endSection(CI);
 
     // *** Section: Compute atmospheric variables at initial altitude ***
     AtmosphereChoice();

@@ -262,7 +262,7 @@ void customManeuver(double dt, double Tfs){
             };
         }while(l<=1);
     }
-    endSection();
+    endSection(NULL);
 }
 
 void impulse(double A, double start_command, double dt, double Tfs, int column, int l){

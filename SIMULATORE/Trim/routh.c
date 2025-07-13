@@ -75,4 +75,5 @@ int routh(double Cm_q, double alpha_trim, double V, double Cx_alpha, double Cz_a
     printf("     ***************************************************************************************\n\n");
     
     system("PAUSE");
+    endSection(NULL);
 }

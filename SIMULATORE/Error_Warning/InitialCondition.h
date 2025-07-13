@@ -1,7 +1,7 @@
 #ifndef INITIALCONDITION_H
 #define INITIALCONDITION_H
 
-void endSection();
+void endSection(double *opt);
 void startSection(int option);
 
 void checkVelAlt(double *V, double *h, double *gamma);

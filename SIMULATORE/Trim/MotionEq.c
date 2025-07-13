@@ -51,7 +51,7 @@ void trimEquation(double *CI, double *trim) {
     }
     printf("\r\n");
     if (flag_1 != 0) {
-        printf("\n*********************Alpha di Trim trovato**************************************\n\n");
+        printf("\n>>>>>>>>>>>>>>>>>>>>  Alpha di Trim trovato  <<<<<<<<<<<<<<<<<<<<\n\n");
         printf("---------- ALPHA: %lf\t\t DE_TRIM: %lf\n\n", trim[0], trim[1]);
     } else MY_ERROR(400);
 
@@ -89,7 +89,7 @@ void trimEquation(double *CI, double *trim) {
         if (tTrim - prop[0] < 0.0){                             // If thrust is sufficient, select the best RPM (closest to tTrim)
             if(RPM == RPMmin) MY_ERROR(401, "bassi");
             trim[2] = (prop[0]-tTrim)<(tTrim-prop_hold[0]) ? RPM : RPM-1;
-            printf("\n*********************RPM di Trim trovato**************************************\n\n");
+            printf("\n>>>>>>>>>>>>>>>>>>>>  RPM di Trim trovato  <<<<<<<<<<<<<<<<<<<<\n\n");
             printf("---------- RPM: %g\n\n", trim[2]);
             break;
         }
@@ -99,6 +99,7 @@ void trimEquation(double *CI, double *trim) {
     if(RPM > RPMmax) MY_ERROR(401, "alti");
 
     system("PAUSE");
+    endSection(trim);
 
     // *** Section: Aircraft stability analysis using Routh criterion ***
     int a = routh(pitch_moment_der[0][4], trim[0], CI[0], CXalpha, CZtrim, CMtrim, pitch_moment_der[0][2]);

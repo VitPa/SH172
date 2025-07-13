@@ -7,9 +7,15 @@
 #include "../Pre_processing/Data.h"
 
 static double mFuelMin = -1.0;
+static double CI[3];
+static double trim[3];
+static int hop = 0;
 
-void endSection(){
-    printf("                                                             =");
+void endSection(double *opt){
+    if(opt!=NULL && hop==0){CI[0] = opt[0]; CI[1] = opt[1]; CI[2] = opt[2]; hop = 1;}
+    if(opt!=NULL && hop==1){trim[0] = opt[0]; trim[1] = opt[1]; trim[2] = (opt[2] - RPMmin) / (RPMmax - RPMmin);}
+    
+    printf("\n                                                             =");
     Sleep(1000);
     printf("=");
     Sleep(1000);
@@ -28,15 +34,25 @@ void startSection(int option){
             break;
         case 2:
             printf(">             [ PRE-PROCESSING ]  >>  Atmosfera ISA ...               <\n");
+            printf(">                    --------------------------                       <\n");
+            printf("       V = %.2lf m/s  -  h = %.2lf m  -  gamma = %.2lf deg           \n", CI[0], CI[1], CI[2]);
             break;
         case 3:
             printf(">       [ PRE-PROCESSING ]  >>  Calcolo condizioni di Trim ...        <\n");
+            printf(">                    --------------------------                       <\n");
+            printf("         V = %.2lf m/s  -  h = %.2lf m  -  gamma = %.2lf deg           \n", CI[0], CI[1], CI[2]);
             break;
         case 4:
             printf(">    [ PRE-PROCESSING ]  >>  Calcolo condizioni di stabilita' ...     <\n");
+            printf(">                    --------------------------                       <\n");
+            printf("         V = %.2lf m/s  -  h = %.2lf m  -  gamma = %.2lf deg           \n", CI[0], CI[1], CI[2]);
             break;
         case 5:
             printf(">               [ PRE-PROCESSING ]  >>  Scelta Manovra ...            <\n");
+            printf(">                    --------------------------                       <\n");
+            printf("         V = %.2lf m/s  -  h = %.2lf m  -  gamma = %.2lf deg           \n", CI[0], CI[1], CI[2]);
+            printf(">                    --------------------------                       <\n");
+            printf("    alphaTrim = %.2lf deg - deTrim = %.2lf deg  -  manettaTrim = %.2lf \n", trim[0], trim[1], trim[2]);
             break;
         case 6:
             printf(">           [ PROCESSING ]  >>  Integrazione e Simulazione ...        <\n");
@@ -137,8 +153,6 @@ void loadCI(double *CI) {
         WARNING(504);
     }while(1);
     printf("\n");
-
-    endSection();
 }
 
 void openFiles(){
