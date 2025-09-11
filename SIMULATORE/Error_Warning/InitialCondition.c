@@ -48,7 +48,7 @@ void startSection(int option){
             printf("         V = %.2lf m/s  -  h = %.2lf m  -  gamma = %.2lf deg           \n", CI[0], CI[1], CI[2]);
             break;
         case 5:
-            printf(">               [ PRE-PROCESSING ]  >>  Scelta Manovra ...            <\n");
+            printf(">                 [ PROCESSING ]  >>  Scelta Manovra ...              <\n");
             printf(">                    --------------------------                       <\n");
             printf("         V = %.2lf m/s  -  h = %.2lf m  -  gamma = %.2lf deg           \n", CI[0], CI[1], CI[2]);
             printf(">                    --------------------------                       <\n");
@@ -145,7 +145,7 @@ void loadCI(double *CI) {
         if(sscanf(input,"%lf",&CI[1])!=0) break;
         WARNING(504);
     }while(1);
-    printf("\nInserire l'angolo di attacco inziale [deg] (default: 0): ");
+    printf("\nInserire l'angolo di rampa iniziale (gamma) [deg] (default: 0): ");
     do{
         fgets(input, 100, stdin);
         if(input[0]=='\n') {

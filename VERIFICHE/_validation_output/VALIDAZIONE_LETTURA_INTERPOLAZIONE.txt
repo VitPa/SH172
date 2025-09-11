@@ -1376,12 +1376,12 @@
 ------------VALIDAZIONE_INTERPOLAZIONE------------
 
 Test interpolazione su matrice 'steady_state_coeff'
-Alpha di riferimento: 4.387
-Colonna di riferimento: CX
-Valori di alpha di riferimento: 4.2, 4.4 
+Alpha di riferimento: -4.765
+Colonna di riferimento: Cm
+Valori di alpha di riferimento: -4.8, -4.6 
 
 Visualizzazione grafica:
-Estremo1: -0.0118041                                          Estremo2: -0.00997254
-[-------------------------------------|--]
-                                      ^
-		Valore interpolato: -0.0100916
+Estremo1: 0.0348874                                          Estremo2: 0.0317741
+[--------------------------------|-------]
+                                 ^
+		Valore interpolato: 0.0343426

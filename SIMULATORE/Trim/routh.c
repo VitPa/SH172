@@ -56,7 +56,7 @@ int routh(double Cm_q, double alpha_trim, double V, double Cx_alpha, double Cz_a
     double T12_ph = fabs(log(0.5)/Reph);
     
     // *** Section: Compute dynamic mode characteristics (frequencies, damping, periods) for short period ***
-    double omegaNsp_adm = sqrt(-(2*massa_adm*Cm_alpha+Cm_q*CL_alpha)/(2*massa_adm*inerziaY_adm));
+    double omegaNsp_adm = sqrt(-Cm_alpha/inerziaY_adm);
     double omegaNsp = (omegaNsp_adm*2*V)/(body_axes[3]);
     double zsp = (inerziaY_adm*CL_alpha-2*massa_adm*(Cm_q+Cm_alphaprimo))/(2*sqrt(-2*massa_adm*inerziaY_adm*(2*massa_adm*Cm_alpha+Cm_q*CL_alpha)));
     double Resp = -zsp*omegaNsp;

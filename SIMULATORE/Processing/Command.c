@@ -123,9 +123,9 @@ void customManeuver(double dt, double Tfs){
             }while(1);
 
             if(maneuver!=0){
-                if(i==3) printf("Ampiezza %s [%g, %g]: ", signal[maneuver-1], 0-throttle, 1-throttle); 
-                else if(i==1) printf("Ampiezza %s [%g, %g]: ", signal[maneuver-1], -20-et, 20-et);
-                else printf("Ampiezza %s [-20, 20]: ", signal[maneuver-1]);
+                if(i==3) printf("Ampiezza %s [%g, %g]: ", signal[maneuver], 0-throttle, 1-throttle); 
+                else if(i==1) printf("Ampiezza %s [%g, %g]: ", signal[maneuver], -20-et, 20-et);
+                else printf("Ampiezza %s [-20, 20]: ", signal[maneuver]);
                 scanf("%lf", &A);
 
                 if (i==3){

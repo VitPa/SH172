@@ -125,7 +125,7 @@ void Warning(int code, const char *func_name, ...){
             printf("[~]WARNING: ");
             vprintf(warning_table[i].message, args);
 
-            fprintf(ew_log, "[%02d-%02d-%04d %02d:%02d:%02d] - [~]WARNING (%s): ",
+            fprintf(ew_log, "[%02d-%02d-%04d %02d:%02d:%02d] - [~]WARNING: (%s): ",
                         t->tm_mday, t->tm_mon+1, t->tm_year+1900,
                         t->tm_hour, t->tm_min, t->tm_sec, func_name);
             vfprintf(ew_log, warning_table[i].message, args);
