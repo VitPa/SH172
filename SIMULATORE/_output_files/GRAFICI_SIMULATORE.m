@@ -120,10 +120,10 @@ hold off
 
 %%
 figure(2);
-plot3(DATI(:,12),DATI(:,10),DATI(:,11), LineWidth = 3)
+plot3(DATI(:,12),DATI(:,13),DATI(:,11), LineWidth = 3)
 hold on
-plot3(DATI(1,12), DATI(1,10), DATI(1,11), 'go', 'MarkerSize', 10, 'MarkerFaceColor', 'g')
-plot3(DATI(end,12), DATI(end,10), DATI(end,11), 'ro', 'MarkerSize', 10, 'MarkerFaceColor', 'r')
+plot3(DATI(1,12), DATI(1,13), DATI(1,11), 'go', 'MarkerSize', 10, 'MarkerFaceColor', 'g')
+plot3(DATI(end,12), DATI(end,13), DATI(end,11), 'ro', 'MarkerSize', 10, 'MarkerFaceColor', 'r')
 hold off
 title('TRAIETTORIA', 'FontSize', 14)
 grid on
